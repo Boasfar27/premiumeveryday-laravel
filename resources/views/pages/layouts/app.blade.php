@@ -1,36 +1,108 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="id">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-
-    <title>{{ config('app.name', 'Premium Everyday') }} - @yield('title')</title>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@yield('title', 'Premium Everyday')</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-    <!-- Scripts and Styles -->
+    
+    <!-- Styles -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    <!-- Additional Styles -->
-    @stack('styles')
+    <!-- Alpine.js -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    @yield('styles')
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .navbar-fixed {
+            @apply fixed top-0 left-0 w-full z-50 transition-all duration-300 ease-in-out;
+        }
+        
+        .navbar-fixed.scrolled {
+            @apply bg-white shadow-md;
+        }
+        
+        .auth-page {
+            @apply min-h-screen flex flex-col;
+        }
+        
+        .auth-page .navbar {
+            @apply hidden;
+        }
+        
+        .auth-page .footer {
+            @apply hidden;
+        }
+    </style>
 </head>
-<body class="font-sans antialiased">
-    <div class="min-h-screen bg-gray-50">
-        @include('pages.layouts.navigation')
+<body class="@if(request()->is('login') || request()->is('register')) auth-page @endif font-sans antialiased bg-gray-100" x-data="{ mobileMenu: false }">
+    @if(!request()->is('login') && !request()->is('register'))
+        @include('components.navbar.main')
+    @endif
 
-        <!-- Page Content -->
-        <main>
-            @yield('content')
-        </main>
+    <!-- Flash Messages -->
+    @if (session('success'))
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+                <span class="block sm:inline">{{ session('success') }}</span>
+            </div>
+        </div>
+    @endif
 
-        @include('pages.layouts.footer')
-    </div>
+    @if (session('error'))
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                <span class="block sm:inline">{{ session('error') }}</span>
+            </div>
+        </div>
+    @endif
 
-    <!-- Additional Scripts -->
+    <!-- Main Content -->
+    <main class="flex-grow">
+        @yield('content')
+    </main>
+
+    @if(!request()->is('login') && !request()->is('register'))
+        @include('components.footer.main')
+    @endif
+
+    <!-- Scripts -->
+    <script>
+        // Mobile menu toggle
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        if (mobileMenuButton && mobileMenu) {
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+        }
+
+        // Navbar scroll effect
+        const navbar = document.querySelector('nav');
+        if (navbar) {
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 0) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            });
+        }
+    </script>
+    
     @stack('scripts')
 </body>
 </html> 

@@ -1,89 +1,5 @@
 @extends('pages.layouts.app')
 
-@section('title', 'Login')
-
-@section('styles')
-<style>
-    :root {
-        --primary-dark: #3D0301;
-        --primary: #B03052;
-        --secondary: #D76C82;
-        --accent: #3D0301;
-    }
-
-    .auth-container {
-        min-height: calc(100vh - 200px);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 2rem;
-    }
-
-    .auth-card {
-        background: white;
-        border-radius: 15px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
-        width: 100%;
-        max-width: 400px;
-    }
-
-    .auth-header {
-        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-        color: white;
-        padding: 2rem;
-        text-align: center;
-    }
-
-    .auth-body {
-        padding: 2rem;
-    }
-
-    .form-control:focus {
-        border-color: var(--primary);
-        box-shadow: 0 0 0 0.2rem rgba(176, 48, 82, 0.25);
-    }
-
-    .btn-google {
-        background-color: #fff;
-        color: #757575;
-        border: 1px solid #ddd;
-        padding: 0.5rem 1rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-        transition: all 0.3s ease;
-    }
-
-    .btn-google:hover {
-        background-color: #f8f9fa;
-        border-color: #ddd;
-        color: #000;
-    }
-
-    .divider {
-        display: flex;
-        align-items: center;
-        text-align: center;
-        margin: 1.5rem 0;
-    }
-
-    .divider::before,
-    .divider::after {
-        content: '';
-        flex: 1;
-        border-bottom: 1px solid #dee2e6;
-    }
-
-    .divider span {
-        padding: 0 1rem;
-        color: #6c757d;
-        font-size: 0.9rem;
-    }
-</style>
-@endsection
-
 @section('content')
 <div class="hidden sm:flex min-h-screen items-center justify-center bg-gray-50">
     <div class="flex w-full max-w-6xl mx-auto shadow-lg rounded-lg overflow-hidden">
@@ -91,49 +7,43 @@
         <div class="hidden lg:block w-1/2 bg-primary relative">
             <div class="absolute inset-0 bg-gradient-to-r from-primary to-secondary opacity-90"></div>
             <div class="relative z-10 p-12 text-white">
-                <h2 class="text-4xl font-bold mb-6">Selamat Datang Kembali</h2>
-                <p class="text-lg mb-8">Masuk ke akun Anda untuk menikmati layanan premium kami.</p>
+                <h2 class="text-4xl font-bold mb-6">Bergabung dengan Kami</h2>
+                <p class="text-lg mb-8">Dapatkan akses ke berbagai layanan premium kami dengan mendaftar sekarang.</p>
                 <div class="space-y-4">
                     <div class="flex items-center">
                         <svg class="w-6 h-6 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
-                        <span>Akses ke semua fitur premium</span>
+                        <span>Produk berkualitas premium</span>
                     </div>
                     <div class="flex items-center">
                         <svg class="w-6 h-6 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
-                        <span>Dukungan pelanggan 24/7</span>
+                        <span>Pengiriman cepat ke seluruh Indonesia</span>
                     </div>
                     <div class="flex items-center">
                         <svg class="w-6 h-6 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
-                        <span>Update produk terbaru</span>
+                        <span>Layanan pelanggan 24/7</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Right Side - Login Form -->
+        <!-- Right Side - Register Form -->
         <div class="w-full lg:w-1/2 bg-white p-12">
             <div class="max-w-md mx-auto">
                 <div class="text-center mb-8">
-                    <h2 class="text-3xl font-bold text-gray-900 mb-2">Masuk</h2>
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">Daftar Akun Baru</h2>
                     <p class="text-gray-600">
-                        Belum punya akun? 
-                        <a href="{{ route('register') }}" class="text-secondary hover:text-secondary-light transition-colors duration-200">
-                            Daftar disini
+                        Sudah punya akun? 
+                        <a href="{{ route('login') }}" class="text-secondary hover:text-secondary-light transition-colors duration-200">
+                            Masuk disini
                         </a>
                     </p>
                 </div>
-
-                @if (session('status'))
-                    <div class="mb-4 p-4 rounded-md bg-green-50 text-green-700">
-                        {{ session('status') }}
-                    </div>
-                @endif
 
                 @if ($errors->any())
                     <div class="mb-4 p-4 rounded-md bg-red-50">
@@ -148,8 +58,17 @@
                     </div>
                 @endif
 
-                <form class="space-y-6" action="{{ route('login') }}" method="POST">
+                <form class="space-y-6" action="{{ route('register') }}" method="POST">
                     @csrf
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700">
+                            Nama Lengkap
+                        </label>
+                        <input id="name" name="name" type="text" required 
+                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-secondary focus:border-secondary sm:text-sm"
+                               value="{{ old('name') }}">
+                    </div>
+
                     <div>
                         <label for="email" class="block text-sm font-medium text-gray-700">
                             Alamat Email
@@ -160,32 +79,41 @@
                     </div>
 
                     <div>
+                        <label for="phone" class="block text-sm font-medium text-gray-700">
+                            Nomor Telepon
+                        </label>
+                        <input id="phone" name="phone" type="tel" required 
+                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-secondary focus:border-secondary sm:text-sm"
+                               value="{{ old('phone') }}">
+                    </div>
+
+                    <div>
                         <label for="password" class="block text-sm font-medium text-gray-700">
                             Kata Sandi
                         </label>
-                        <input id="password" name="password" type="password" autocomplete="current-password" required 
+                        <input id="password" name="password" type="password" required 
                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-secondary focus:border-secondary sm:text-sm">
                     </div>
 
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center">
-                            <input id="remember_me" name="remember" type="checkbox" 
-                                   class="h-4 w-4 text-secondary focus:ring-secondary border-gray-300 rounded">
-                            <label for="remember_me" class="ml-2 block text-sm text-gray-900">
-                                Ingat Saya
-                            </label>
-                        </div>
+                    <div>
+                        <label for="password_confirmation" class="block text-sm font-medium text-gray-700">
+                            Konfirmasi Kata Sandi
+                        </label>
+                        <input id="password_confirmation" name="password_confirmation" type="password" required 
+                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-secondary focus:border-secondary sm:text-sm">
+                    </div>
 
-                        <div class="text-sm">
-                            <a href="{{ route('password.request') }}" class="font-medium text-secondary hover:text-secondary-light transition-colors duration-200">
-                                Lupa kata sandi?
-                            </a>
-                        </div>
+                    <div class="flex items-center">
+                        <input id="terms" name="terms" type="checkbox" required
+                               class="h-4 w-4 text-secondary focus:ring-secondary border-gray-300 rounded">
+                        <label for="terms" class="ml-2 block text-sm text-gray-900">
+                            Saya setuju dengan <a href="{{ route('terms') }}" class="text-secondary hover:text-secondary-light">Syarat dan Ketentuan</a> serta <a href="{{ route('privacy') }}" class="text-secondary hover:text-secondary-light">Kebijakan Privasi</a>
+                        </label>
                     </div>
 
                     <div>
                         <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-secondary hover:bg-secondary-light focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary transition-colors duration-200">
-                            Masuk
+                            Daftar Sekarang
                         </button>
                     </div>
                 </form>
@@ -197,7 +125,7 @@
                         </div>
                         <div class="relative flex justify-center text-sm">
                             <span class="px-2 bg-white text-gray-500">
-                                Atau masuk dengan
+                                Atau daftar dengan
                             </span>
                         </div>
                     </div>

@@ -1,6 +1,6 @@
 @extends('pages.layouts.app')
 
-@section('title', 'Dashboard User')
+@section('title', 'Dashboard - Premium Everyday')
 
 @section('styles')
 <style>
@@ -90,90 +90,68 @@
 @endsection
 
 @section('content')
-<!-- Profile Section -->
-<div class="profile-section">
-    <img src="{{ auth()->user()->profile_photo_url }}" 
-         alt="Profile" 
-         class="rounded-circle mb-3"
-         style="width: 80px; height: 80px; object-fit: cover; border: 3px solid white;">
-    <h5 class="mb-1">{{ auth()->user()->name }}</h5>
-    <p class="mb-0 small">{{ auth()->user()->email }}</p>
-</div>
-
-<div class="container">
-    <!-- Stats Cards -->
-    <div class="row g-2 mb-3">
-        <div class="col-4">
-            <div class="stat-card text-center">
-                <div class="small">Total</div>
-                <h4 class="mb-0">{{ $totalOrders ?? 0 }}</h4>
-            </div>
-        </div>
-        <div class="col-4">
-            <div class="stat-card text-center">
-                <div class="small">Aktif</div>
-                <h4 class="mb-0">{{ $activeOrders ?? 0 }}</h4>
-            </div>
-        </div>
-        <div class="col-4">
-            <div class="stat-card text-center">
-                <div class="small">Pengeluaran</div>
-                <h4 class="mb-0">{{ number_format($totalSpent ?? 0, 0, ',', '.') }}</h4>
-            </div>
-        </div>
-    </div>
-
-    <!-- Quick Actions -->
-    <div class="dashboard-card">
-        <h6 class="p-3 mb-0 border-bottom">Menu Cepat</h6>
-        <div class="quick-actions">
-            <a href="{{ route('products') }}" class="action-button">
-                <i class="fas fa-shopping-bag mb-1"></i><br>
-                Produk
-            </a>
-            <a href="{{ route('user.orders') }}" class="action-button">
-                <i class="fas fa-list mb-1"></i><br>
-                Pesanan
-            </a>
-            <a href="{{ route('user.profile') }}" class="action-button">
-                <i class="fas fa-user mb-1"></i><br>
-                Profil
-            </a>
-            <a href="{{ route('contact') }}" class="action-button">
-                <i class="fas fa-headset mb-1"></i><br>
-                Bantuan
-            </a>
-        </div>
-    </div>
-
-    <!-- Recent Orders -->
-    <div class="dashboard-card">
-        <h6 class="p-3 mb-0 border-bottom">Pesanan Terbaru</h6>
-        <div class="p-2">
-            @forelse($recentOrders ?? [] as $order)
-            <div class="order-item p-2">
-                <div class="d-flex justify-content-between align-items-center mb-1">
-                    <strong>#{{ $order->id }}</strong>
-                    <span class="badge bg-{{ $order->status_color }}">
-                        {{ $order->status }}
-                    </span>
+<div class="py-12">
+    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="p-6 bg-white border-b border-gray-200">
+                <h2 class="text-2xl font-bold mb-4">Selamat Datang, {{ $user->name }}!</h2>
+                
+                @if(session('success'))
+                <div class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+                    {{ session('success') }}
                 </div>
-                <div class="d-flex justify-content-between align-items-center">
-                    <small class="text-muted">{{ $order->created_at->format('d M Y') }}</small>
-                    <div>
-                        <span class="me-2">Rp {{ number_format($order->total, 0, ',', '.') }}</span>
-                        <a href="{{ route('user.orders.show', $order->id) }}" 
-                           class="btn btn-sm btn-primary">
-                            Detail
+                @endif
+
+                <div class="space-y-6">
+                    <!-- Ringkasan -->
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold mb-3">Ringkasan Akun</h3>
+                        <div class="space-y-2">
+                            <p><span class="font-medium">Nama:</span> {{ $user->name }}</p>
+                            <p><span class="font-medium">Email:</span> {{ $user->email }}</p>
+                            <p><span class="font-medium">No. Telepon:</span> {{ $user->phone }}</p>
+                            <p><span class="font-medium">Status Email:</span> 
+                                @if($user->email_verified_at)
+                                    <span class="text-green-600">Terverifikasi</span>
+                                @else
+                                    <span class="text-red-600">Belum Terverifikasi</span>
+                                @endif
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Menu Cepat -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <a href="{{ route('products') }}" class="block p-4 bg-primary text-white rounded-lg text-center hover:bg-primary-dark transition">
+                            <svg class="w-6 h-6 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                            </svg>
+                            Lihat Produk
                         </a>
+                        <a href="{{ route('user.orders') }}" class="block p-4 bg-primary text-white rounded-lg text-center hover:bg-primary-dark transition">
+                            <svg class="w-6 h-6 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                            </svg>
+                            Pesanan Saya
+                        </a>
+                        <a href="{{ route('user.profile') }}" class="block p-4 bg-primary text-white rounded-lg text-center hover:bg-primary-dark transition">
+                            <svg class="w-6 h-6 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                            Profil Saya
+                        </a>
+                        <form method="POST" action="{{ route('logout') }}" class="block">
+                            @csrf
+                            <button type="submit" class="w-full p-4 bg-red-600 text-white rounded-lg text-center hover:bg-red-700 transition">
+                                <svg class="w-6 h-6 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                </svg>
+                                Keluar
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
-            @empty
-            <div class="text-center py-4">
-                <p class="mb-0 text-muted">Belum ada pesanan</p>
-            </div>
-            @endforelse
         </div>
     </div>
 </div>

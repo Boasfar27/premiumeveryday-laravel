@@ -4,11 +4,9 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
-class AdminMiddleware
+class VerifyAuth
 {
     /**
      * Handle an incoming request.
@@ -17,8 +15,8 @@ class AdminMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!$request->user() || $request->user()->role != 1) {
-            return redirect()->route('home')->with('error', 'Anda tidak memiliki akses ke halaman ini.');
+        if (!auth()->check()) {
+            return redirect()->route('login');
         }
 
         return $next($request);
