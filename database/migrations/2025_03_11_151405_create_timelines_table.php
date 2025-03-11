@@ -11,15 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('products', function (Blueprint $table) {
+        Schema::create('timelines', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 100);
-            $table->string('type_sharing', 500);
-            $table->string('type_private', 500);
-            $table->decimal('price', 10, 2);
-            $table->decimal('private_price', 10, 2);
-            $table->binary('image')->nullable();
-            $table->boolean('featured')->default(false);
+            $table->string('title');
+            $table->text('description');
+            $table->string('icon')->nullable();
+            $table->integer('step_number');
             $table->boolean('active')->default(true);
             $table->timestamps();
         });
@@ -30,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('products');
+        Schema::dropIfExists('timelines');
     }
 };

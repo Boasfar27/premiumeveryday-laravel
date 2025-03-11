@@ -30,69 +30,54 @@ class AuthController extends BaseController
     public function showLogin()
     {
         $agent = new Agent();
-        return view($agent->isMobile() ? 'pages.mobile.auth.login' : 'pages.desktop.auth.login');
+        return view($agent->isMobile() ? 
+            'pages.auth.mobile.login' : 
+            'pages.auth.desktop.login'
+        );
     }
 
     public function login(Request $request)
     {
-        $request->validate([
-            'email' => 'required|string|email',
-            'password' => 'required|string',
+        $credentials = $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
         ]);
 
-        $credentials = $request->only('email', 'password');
-        
-        Log::info('Login attempt', [
-            'email' => $request->email
-        ]);
-        
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
             
-            Log::info('User authenticated', [
-                'id' => $user->id,
-                'email' => $user->email,
-                'role' => $user->role,
-                'is_active' => $user->is_active ? 'Yes' : 'No',
-                'email_verified' => $user->email_verified_at ? 'Yes' : 'No'
-            ]);
-            
-            // Cek status aktif
             if (!$user->is_active) {
                 Auth::logout();
-                Log::warning('Inactive user attempted login', ['email' => $user->email]);
-                return back()->with('error', 'Akun Anda tidak aktif. Silakan hubungi administrator.');
+                return back()->withErrors([
+                    'email' => 'Akun Anda telah dinonaktifkan. Silakan hubungi admin.',
+                ]);
             }
 
-            // Cek verifikasi email
-            if (!$user->email_verified_at) {
-                Log::info('Unverified user redirected to verification', ['email' => $user->email]);
-                return redirect()->route('verification.notice')
-                    ->with('warning', 'Silakan verifikasi email Anda terlebih dahulu.');
+            if (!$user->email_verified_at && !$user->google_id) {
+                return redirect()->route('verification.notice');
             }
 
             $request->session()->regenerate();
 
-            // Redirect berdasarkan role
             if ($user->role === 1) {
-                Log::info('Admin login successful', ['email' => $user->email]);
-                return redirect()->intended(route('admin.dashboard'));
-            } else {
-                Log::info('User login successful', ['email' => $user->email]);
-                return redirect()->intended(route('user.dashboard'));
+                return redirect()->route('admin.dashboard');
             }
+
+            return redirect()->route('user.dashboard');
         }
 
-        Log::warning('Failed login attempt', ['email' => $request->email]);
-        return back()
-            ->withInput($request->only('email'))
-            ->withErrors(['email' => 'Email atau password salah.']);
+        return back()->withErrors([
+            'email' => 'Email atau password tidak sesuai.',
+        ]);
     }
 
     public function showRegister()
     {
         $agent = new Agent();
-        return view($agent->isMobile() ? 'pages.mobile.auth.register' : 'pages.desktop.auth.register');
+        return view($agent->isMobile() ? 
+            'pages.auth.mobile.register' : 
+            'pages.auth.desktop.register'
+        );
     }
 
     public function register(Request $request)
@@ -101,39 +86,48 @@ class AuthController extends BaseController
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
+            'phone' => 'nullable|string|max:20',
         ]);
-
-        $verificationCode = Str::random(6);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'verification_code' => $verificationCode,
-            'role' => 0, // Default role untuk user biasa
-            'is_active' => true
+            'phone' => $request->phone,
+            'role' => 0,
+            'is_active' => true,
+            'verification_code' => sprintf("%06d", mt_rand(1, 999999))
         ]);
 
         // Kirim email verifikasi
-        Mail::send('emails.verification', ['code' => $verificationCode], function($message) use ($user) {
-            $message->to($user->email);
-            $message->subject('Verifikasi Email Premium Everyday');
+        Mail::send('emails.verification', ['user' => $user], function($message) use ($user) {
+            $message->to($user->email)
+                    ->subject('Verifikasi Email - Premium Everyday');
         });
 
         Auth::login($user);
 
         return redirect()->route('verification.notice')
-            ->with('success', 'Pendaftaran berhasil! Silakan verifikasi email Anda.');
+                        ->with('success', 'Pendaftaran berhasil! Silakan verifikasi email Anda.');
     }
 
     public function showVerification()
     {
-        if (auth()->check() && auth()->user()->email_verified_at) {
-            return $this->redirectBasedOnRole(auth()->user());
+        if (!Auth::check()) {
+            return redirect()->route('login');
+        }
+
+        $user = Auth::user();
+        
+        if ($user->email_verified_at) {
+            return redirect()->route('user.dashboard');
         }
 
         $agent = new Agent();
-        return view($agent->isMobile() ? 'pages.mobile.auth.verify' : 'pages.desktop.auth.verify');
+        return view($agent->isMobile() ? 
+            'pages.auth.mobile.verify' : 
+            'pages.auth.desktop.verify'
+        );
     }
 
     public function verify(Request $request)
@@ -142,39 +136,38 @@ class AuthController extends BaseController
             'verification_code' => 'required|string|size:6',
         ]);
 
-        $user = User::where('verification_code', $request->verification_code)->first();
+        $user = Auth::user();
 
-        if (!$user) {
-            return back()->with('error', 'Kode verifikasi tidak valid.');
+        if ($user->verification_code !== $request->verification_code) {
+            return back()->withErrors([
+                'verification_code' => 'Kode verifikasi tidak valid.',
+            ]);
         }
 
-        $user->update([
-            'email_verified_at' => now(),
-            'verification_code' => null,
-        ]);
+        $user->email_verified_at = now();
+        $user->verification_code = null;
+        $user->save();
 
-        if (!Auth::check()) {
-            Auth::login($user);
-        }
-
-        return $this->redirectBasedOnRole($user)
-            ->with('success', 'Email berhasil diverifikasi!');
+        return redirect()->route('user.dashboard')
+                        ->with('success', 'Email berhasil diverifikasi!');
     }
 
     public function resendVerification()
     {
         $user = Auth::user();
-        
+
         if ($user->email_verified_at) {
-            return $this->redirectBasedOnRole($user);
+            return redirect()->route('user.dashboard');
         }
 
-        $verificationCode = Str::random(6);
-        $user->update(['verification_code' => $verificationCode]);
+        // Generate kode baru
+        $user->verification_code = sprintf("%06d", mt_rand(1, 999999));
+        $user->save();
 
-        Mail::send('emails.verification', ['code' => $verificationCode], function($message) use ($user) {
-            $message->to($user->email);
-            $message->subject('Verifikasi Email Premium Everyday');
+        // Kirim ulang email
+        Mail::send('emails.verification', ['user' => $user], function($message) use ($user) {
+            $message->to($user->email)
+                    ->subject('Verifikasi Email - Premium Everyday');
         });
 
         return back()->with('success', 'Kode verifikasi baru telah dikirim ke email Anda.');
@@ -190,42 +183,33 @@ class AuthController extends BaseController
         try {
             $googleUser = Socialite::driver('google')->user();
             
-            $user = User::where('google_id', $googleUser->id)->first();
+            $user = User::where('email', $googleUser->email)->first();
 
             if (!$user) {
-                // Cek apakah email sudah terdaftar
-                $existingUser = User::where('email', $googleUser->email)->first();
-                
-                if ($existingUser) {
-                    // Update google_id jika email sudah ada
-                    $existingUser->update([
-                        'google_id' => $googleUser->id,
-                        'is_active' => true,
-                        'email_verified_at' => now(),
-                    ]);
-                    
-                    Auth::login($existingUser);
-                    return $this->redirectBasedOnRole($existingUser);
-                }
-
-                // Buat user baru
                 $user = User::create([
                     'name' => $googleUser->name,
                     'email' => $googleUser->email,
                     'google_id' => $googleUser->id,
-                    'role' => 0, // Default role untuk user biasa
+                    'password' => Hash::make(Str::random(24)),
+                    'role' => 0,
                     'is_active' => true,
+                    'email_verified_at' => now(),
+                ]);
+            } else {
+                $user->update([
+                    'google_id' => $googleUser->id,
                     'email_verified_at' => now(),
                 ]);
             }
 
             Auth::login($user);
-            return $this->redirectBasedOnRole($user);
+
+            return redirect()->route('user.dashboard')
+                            ->with('success', 'Login dengan Google berhasil!');
 
         } catch (\Exception $e) {
-            Log::error('Google login error', ['error' => $e->getMessage()]);
             return redirect()->route('login')
-                ->with('error', 'Terjadi kesalahan saat login dengan Google.');
+                            ->with('error', 'Login dengan Google gagal. Silakan coba lagi.');
         }
     }
 
@@ -234,67 +218,76 @@ class AuthController extends BaseController
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect()->route('home');
+        return redirect()->route('login');
     }
 
-    protected function redirectBasedOnRole($user)
-    {
-        return $user->role === 1 
-            ? redirect()->route('admin.dashboard')
-            : redirect()->route('user.dashboard');
-    }
-
-    // Password Reset Methods
     public function showForgotPassword()
     {
         $agent = new Agent();
-        return view($agent->isMobile() ? 'pages.mobile.auth.forgot-password' : 'pages.desktop.auth.forgot-password');
+        return view($agent->isMobile() ? 
+            'pages.auth.mobile.forgot-password' : 
+            'pages.auth.desktop.forgot-password'
+        );
     }
 
     public function sendResetLink(Request $request)
     {
         $request->validate([
-            'email' => 'required|email|exists:users,email',
+            'email' => 'required|email|exists:users,email'
         ]);
 
-        $status = Password::sendResetLink(
-            $request->only('email')
-        );
+        $token = Str::random(64);
 
-        return $status === Password::RESET_LINK_SENT
-            ? back()->with(['status' => __($status)])
-            : back()->withErrors(['email' => __($status)]);
+        \DB::table('password_reset_tokens')->insert([
+            'email' => $request->email,
+            'token' => $token,
+            'created_at' => now()
+        ]);
+
+        Mail::send('emails.reset-password', ['token' => $token], function($message) use ($request) {
+            $message->to($request->email)
+                    ->subject('Reset Password - Premium Everyday');
+        });
+
+        return back()->with('success', 'Link reset password telah dikirim ke email Anda.');
     }
 
-    public function showResetPassword(string $token)
+    public function showResetPassword($token)
     {
         $agent = new Agent();
-        return view($agent->isMobile() ? 'pages.mobile.auth.reset-password' : 'pages.desktop.auth.reset-password', ['token' => $token]);
+        return view($agent->isMobile() ? 
+            'pages.auth.mobile.reset-password' : 
+            'pages.auth.desktop.reset-password', 
+            ['token' => $token]
+        );
     }
 
     public function resetPassword(Request $request)
     {
         $request->validate([
             'token' => 'required',
-            'email' => 'required|email',
-            'password' => 'required|min:8|confirmed',
+            'email' => 'required|email|exists:users',
+            'password' => 'required|string|min:8|confirmed',
         ]);
 
-        $status = Password::reset(
-            $request->only('email', 'password', 'password_confirmation', 'token'),
-            function (User $user, string $password) {
-                $user->forceFill([
-                    'password' => Hash::make($password)
-                ])->setRememberToken(Str::random(60));
+        $updatePassword = \DB::table('password_reset_tokens')
+            ->where([
+                'email' => $request->email,
+                'token' => $request->token
+            ])->first();
 
-                $user->save();
+        if (!$updatePassword) {
+            return back()->withErrors(['email' => 'Token tidak valid!']);
+        }
 
-                event(new PasswordReset($user));
-            }
-        );
+        User::where('email', $request->email)->update([
+            'password' => Hash::make($request->password)
+        ]);
 
-        return $status === Password::PASSWORD_RESET
-            ? redirect()->route('login')->with('status', __($status))
-            : back()->withErrors(['email' => [__($status)]]);
+        \DB::table('password_reset_tokens')
+            ->where(['email' => $request->email])->delete();
+
+        return redirect()->route('login')
+                        ->with('success', 'Password berhasil diubah!');
     }
 }
