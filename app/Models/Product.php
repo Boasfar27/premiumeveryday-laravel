@@ -23,4 +23,11 @@ class Product extends Model
         'featured' => 'boolean',
         'active' => 'boolean'
     ];
+
+    protected $appends = ['image_url'];
+
+    public function getImageUrlAttribute()
+    {
+        return $this->image ? asset($this->image) : asset('images/placeholder.webp');
+    }
 }

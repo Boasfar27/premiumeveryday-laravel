@@ -1,54 +1,82 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Premium Everyday')</title>
-    
+
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
-    
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
+
     <!-- Styles -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#B03052',
+                        'primary-dark': '#3D0301',
+                        secondary: '#D76C82',
+                        'secondary-light': '#E98E9F'
+                    }
+                }
+            }
+        }
+    </script>
 
     <!-- Alpine.js -->
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
     @yield('styles')
-    
+
     <style>
         body {
             font-family: 'Inter', sans-serif;
         }
-        
+
         .navbar-fixed {
-            @apply fixed top-0 left-0 w-full z-50 transition-all duration-300 ease-in-out;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 50;
+            transition: all 0.3s ease-in-out;
         }
-        
+
         .navbar-fixed.scrolled {
-            @apply bg-white shadow-md;
+            background-color: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
-        
+
         .auth-page {
-            @apply min-h-screen flex flex-col;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
-        
+
         .auth-page .navbar {
             @apply hidden;
         }
-        
+
         .auth-page .footer {
             @apply hidden;
         }
     </style>
 </head>
-<body class="@if(request()->is('login') || request()->is('register')) auth-page @endif font-sans antialiased bg-gray-100" x-data="{ mobileMenu: false }">
-    @if(!request()->is('login') && !request()->is('register'))
+
+<body class="font-sans antialiased bg-gray-100" x-data="{ mobileMenu: false }">
+    @if (
+        !request()->is('login') &&
+            !request()->is('register') &&
+            !request()->is('password/reset') &&
+            !request()->is('password/reset/*'))
         @include('components.navbar.main')
     @endif
 
@@ -74,7 +102,11 @@
         @yield('content')
     </main>
 
-    @if(!request()->is('login') && !request()->is('register'))
+    @if (
+        !request()->is('login') &&
+            !request()->is('register') &&
+            !request()->is('password/reset') &&
+            !request()->is('password/reset/*'))
         @include('components.footer.main')
     @endif
 
@@ -102,7 +134,8 @@
             });
         }
     </script>
-    
+
     @stack('scripts')
 </body>
-</html> 
+
+</html>

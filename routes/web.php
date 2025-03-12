@@ -68,8 +68,7 @@ Route::middleware('auth')->group(function () {
 
     // Email Verification Routes
     Route::get('/email/verify', [AuthController::class, 'showVerification'])
-        ->name('verification.notice')
-        ->middleware('auth.verify');
+        ->name('verification.notice');
     
     Route::get('/email/verify/{code}', [AuthController::class, 'verify'])
         ->name('verification.verify');
@@ -79,7 +78,7 @@ Route::middleware('auth')->group(function () {
         ->middleware(['throttle:6,1']);
 
     // User Routes
-    Route::middleware(['auth.verify'])->prefix('user')->name('user.')->group(function () {
+    Route::middleware(['verify.user'])->prefix('user')->name('user.')->group(function () {
         Route::get('/dashboard', [UserDashboardController::class, 'index'])->name('dashboard');
         Route::get('/profile', [UserDashboardController::class, 'profile'])->name('profile');
         Route::put('/profile', [UserDashboardController::class, 'updateProfile'])->name('profile.update');
@@ -92,7 +91,7 @@ Route::middleware('auth')->group(function () {
     });
 
     // Admin Routes
-    Route::middleware(['auth.verify', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::middleware(['verify.user', 'admin'])->prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
         Route::resource('products', ProductManagementController::class);
         Route::get('/users', [UserManagementController::class, 'index'])->name('users.index');
