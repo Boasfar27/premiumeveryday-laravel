@@ -5,37 +5,42 @@ namespace App\Http\Controllers\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use App\Http\Requests\UpdateProfileRequest;
-use App\Http\Requests\UpdatePasswordRequest;
+use Jenssegers\Agent\Agent;
 
 class ProfileController extends Controller
 {
     public function show()
     {
-        return view('pages.user.profile');
+        $agent = new Agent();
+        return view($agent->isMobile() ? 'pages.user.mobile.profile' : 'pages.user.desktop.profile');
     }
 
-    public function update(UpdateProfileRequest $request)
+    public function update(Request $request)
     {
-        $user = auth()->user();
-        
-        $user->update($request->validated());
-
-        return back()->with('success', 'Profil berhasil diperbarui');
-    }
-
-    public function updatePassword(UpdatePasswordRequest $request)
-    {
-        $user = auth()->user();
-
-        if (!Hash::check($request->current_password, $user->password)) {
-            return back()->withErrors(['current_password' => 'Password saat ini tidak sesuai']);
-        }
-
-        $user->update([
-            'password' => Hash::make($request->password)
+        $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'phone' => ['required', 'string', 'max:20', 'unique:users,phone,' . auth()->id()],
         ]);
 
-        return back()->with('success', 'Password berhasil diubah');
+        auth()->user()->update([
+            'name' => $request->name,
+            'phone' => $request->phone,
+        ]);
+
+        return back()->with('success', 'Profil berhasil diperbarui.');
+    }
+
+    public function updatePassword(Request $request)
+    {
+        $request->validate([
+            'current_password' => ['required', 'current_password'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        auth()->user()->update([
+            'password' => Hash::make($request->password),
+        ]);
+
+        return back()->with('success', 'Password berhasil diperbarui.');
     }
 } 
