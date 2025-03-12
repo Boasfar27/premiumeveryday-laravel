@@ -132,20 +132,25 @@ class AuthController extends Controller
         return view($agent->isMobile() ? 'pages.auth.mobile.verify' : 'pages.auth.desktop.verify');
     }
 
-    public function verify(Request $request)
+    public function verify(Request $request, $code)
     {
-        $user = User::where('verification_code', $request->code)->first();
+        $user = User::where('verification_code', $code)->first();
 
         if (!$user) {
             return redirect()->route('verification.notice')
                 ->withErrors(['error' => 'Kode verifikasi tidak valid.']);
         }
 
-        $user->email_verified_at = now();
+        if ($user->hasVerifiedEmail()) {
+            return redirect()->route('home')
+                ->with('success', 'Email sudah diverifikasi sebelumnya.');
+        }
+
+        $user->markEmailAsVerified();
         $user->verification_code = null;
         $user->save();
 
-        return redirect()->route('user.dashboard')
+        return redirect()->route('home')
             ->with('success', 'Email Anda berhasil diverifikasi.');
     }
 
@@ -154,10 +159,10 @@ class AuthController extends Controller
         $user = $request->user();
         
         if ($user->hasVerifiedEmail()) {
-            return redirect()->route('user.dashboard');
+            return redirect()->route('home');
         }
 
-        $user->verification_code = Str::random(40);
+        $user->verification_code = Str::random(60);
         $user->save();
 
         try {

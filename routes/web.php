@@ -11,6 +11,7 @@ use App\Http\Controllers\User\OrderController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\ProductManagementController;
 use App\Http\Controllers\Admin\UserManagementController;
+use App\Http\Controllers\User\ProfileController;
 use Jenssegers\Agent\Agent;
 
 /*
@@ -100,6 +101,13 @@ Route::middleware('auth')->group(function () {
             ->name('users.toggle-status');
         Route::post('/users/{user}/toggle-role', [UserManagementController::class, 'toggleRole'])
             ->name('users.toggle-role');
+    });
+
+    // User Profile Routes
+    Route::middleware(['auth', 'verified'])->group(function () {
+        Route::get('/profile', [ProfileController::class, 'show'])->name('user.profile');
+        Route::put('/profile', [ProfileController::class, 'update'])->name('user.profile.update');
+        Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('user.password.update');
     });
 });
 
