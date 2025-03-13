@@ -13,6 +13,10 @@ use App\Http\Controllers\Admin\ProductManagementController;
 use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\User\ProfileController;
 use Jenssegers\Agent\Agent;
+use App\Models\Product;
+use App\Models\Timeline;
+use App\Models\Faq;
+use App\Models\Contact;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,12 +27,32 @@ use Jenssegers\Agent\Agent;
 // Public Routes
 Route::get('/', function () {
     $agent = new Agent();
-    $featuredProducts = \App\Models\Product::where('is_active', true)
+    
+    // Get featured products
+    $featuredProducts = Product::where('is_active', true)
         ->orderBy('order')
         ->take(4)
         ->get();
     
-    return view($agent->isMobile() ? 'pages.mobile.home' : 'pages.desktop.home', compact('featuredProducts'));
+    // Get timelines
+    $timelines = Timeline::where('is_active', true)
+        ->orderBy('order')
+        ->get();
+    
+    // Get FAQs
+    $faqs = Faq::where('is_active', true)
+        ->orderBy('order')
+        ->get();
+    
+    // Get contacts
+    $contacts = Contact::where('is_active', true)
+        ->orderBy('order')
+        ->get();
+    
+    return view(
+        $agent->isMobile() ? 'pages.mobile.home' : 'pages.desktop.home',
+        compact('featuredProducts', 'timelines', 'faqs', 'contacts')
+    );
 })->name('home');
 
 Route::get('/products', [ProductController::class, 'index'])->name('products');
@@ -36,6 +60,7 @@ Route::get('/products/{id}', [ProductController::class, 'show'])->name('products
 Route::get('/timeline', [TimelineController::class, 'index'])->name('timeline');
 Route::get('/faq', [FaqController::class, 'index'])->name('faq');
 Route::get('/contact', [ContactController::class, 'index'])->name('contact');
+Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
 
 // Authentication Routes
 Route::middleware('guest')->group(function () {

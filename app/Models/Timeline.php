@@ -1,3 +1,5 @@
+<?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -13,12 +15,12 @@ class Timeline extends Model
         'date',
         'icon',
         'is_active',
-        'order',
+        'order'
     ];
 
     protected $casts = [
-        'is_active' => 'boolean',
         'date' => 'datetime',
-        'order' => 'integer',
+        'is_active' => 'boolean',
+        'order' => 'integer'
     ];
 } 

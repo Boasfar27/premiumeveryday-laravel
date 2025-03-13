@@ -5,19 +5,20 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Faq extends Model
+class ContactMessage extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'question',
-        'answer',
-        'is_active',
-        'order'
+        'name',
+        'email',
+        'message',
+        'status',
+        'admin_notes',
     ];
 
     protected $casts = [
-        'is_active' => 'boolean',
-        'order' => 'integer'
+        'read_at' => 'datetime',
+        'replied_at' => 'datetime',
     ];
 } 
