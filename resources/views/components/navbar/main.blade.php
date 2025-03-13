@@ -4,14 +4,15 @@
         ['route' => 'products', 'name' => 'Product'],
         ['route' => 'timeline', 'name' => 'Timeline'],
         ['route' => 'faq', 'name' => 'FAQ'],
+        ['route' => 'feedback', 'name' => 'Feedback'],
         ['route' => 'contact', 'name' => 'Contact'],
     ];
 @endphp
 
-<nav class="bg-white shadow-lg fixed w-full top-0 z-50" x-data="{ mobileMenuOpen: false, userDropdownOpen: false }">
+<nav class="bg-transparent backdrop-blur-sm shadow-lg fixed w-full top-0 z-50" x-data="{ mobileMenuOpen: false, userDropdownOpen: false }">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
-            <div class="flex">
+        <div class="flex justify-between h-20">
+            <div class="flex items-center">
                 <!-- Logo -->
                 @include('components.navbar.partials.logo')
 
@@ -38,4 +39,4 @@
 </nav>
 
 <!-- Spacer untuk fixed navbar -->
-<div class="h-16"></div>
+<div class="h-20"></div>
