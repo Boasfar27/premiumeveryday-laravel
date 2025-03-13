@@ -3,47 +3,60 @@
 @section('title', 'Premium Everyday - Solusi Kebutuhan Premium Anda')
 
 @section('content')
-<div class="bg-white">
-    <!-- Hero Section -->
-    <div class="relative bg-primary">
-        <div class="px-4 py-12">
-            <div class="text-center">
-                <h1 class="text-3xl font-extrabold tracking-tight text-white">
-                    Premium Everyday
-                </h1>
-                <p class="mt-3 text-base text-gray-300">
-                    Solusi terbaik untuk kebutuhan premium Anda setiap hari.
-                </p>
-                <div class="mt-5">
-                    <a href="{{ route('products') }}" class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-primary bg-white hover:bg-gray-100">
-                        Lihat Produk
-                    </a>
-                </div>
-            </div>
-        </div>  
-    </div>
-
-    <!-- Featured Products Section -->
-    <div class="px-4 py-8">
-        <h2 class="text-xl font-bold text-gray-900">Produk Unggulan</h2>
-        <div class="mt-6 grid grid-cols-2 gap-4">
-            @foreach($featuredProducts as $product)
-            <div class="group relative">
-                <div class="w-full bg-gray-200 rounded-md overflow-hidden aspect-w-1 aspect-h-1">
-                    <img src="{{ $product->image_url }}" alt="{{ $product->name }}" class="w-full h-full object-center object-cover">
-                </div>
-                <div class="mt-2">
-                    <h3 class="text-sm font-medium text-gray-700">
-                        <a href="{{ route('products.show', $product->id) }}">
-                            {{ $product->name }}
+    <div class="bg-white">
+        <!-- Hero Section -->
+        <div class="relative bg-primary min-h-screen flex items-center">
+            <div class="absolute inset-0 bg-gradient-to-b from-primary-dark/50 to-primary/30"></div>
+            <div class="relative w-full px-4">
+                <div class="text-center">
+                    <h1 class="text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
+                        Premium Everyday
+                    </h1>
+                    <p class="mt-6 text-lg text-gray-100 mx-auto max-w-sm">
+                        Solusi terbaik untuk kebutuhan premium Anda setiap hari.
+                    </p>
+                    <div class="mt-8">
+                        <a href="#products"
+                            class="inline-flex items-center justify-center px-8 py-4 border border-transparent text-lg font-medium rounded-md text-primary bg-white hover:bg-gray-100 transition duration-300 ease-in-out transform hover:scale-105">
+                            Lihat Produk
                         </a>
-                    </h3>
-                    <p class="mt-1 text-sm text-gray-500">{{ $product->category }}</p>
-                    <p class="mt-1 text-sm font-medium text-gray-900">Rp {{ number_format($product->price, 0, ',', '.') }}</p>
+                    </div>
                 </div>
             </div>
-            @endforeach
+            <!-- Scroll Down Indicator -->
+            <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+                <a href="#products" class="text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                    </svg>
+                </a>
+            </div>
         </div>
+
+        <!-- Products Section -->
+        <section id="products" class="mt-8">
+            @include('components.product.index')
+        </section>
+
+        <!-- Timeline Section -->
+        <section id="timeline">
+            @include('components.timeline.index')
+        </section>
+
+        <!-- FAQ Section -->
+        <section id="faq">
+            @include('components.faq.index')
+        </section>
+
+        <!-- Feedback Section -->
+        <section id="feedback">
+            @include('components.feedback.index')
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact">
+            @include('components.contact.index')
+        </section>
     </div>
-</div>
-@endsection 
+@endsection

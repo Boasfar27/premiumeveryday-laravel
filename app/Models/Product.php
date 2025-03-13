@@ -2,26 +2,30 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'name',
-        'type_sharing',
-        'type_private',
-        'price',
+        'description',
+        'sharing_price',
         'private_price',
+        'sharing_description',
+        'private_description',
         'image',
-        'featured',
-        'active'
+        'is_active',
+        'order',
     ];
 
     protected $casts = [
-        'price' => 'decimal:2',
+        'is_active' => 'boolean',
+        'sharing_price' => 'decimal:2',
         'private_price' => 'decimal:2',
-        'featured' => 'boolean',
-        'active' => 'boolean'
+        'order' => 'integer',
     ];
 
     protected $appends = ['image_url'];

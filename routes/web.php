@@ -23,8 +23,8 @@ use Jenssegers\Agent\Agent;
 // Public Routes
 Route::get('/', function () {
     $agent = new Agent();
-    $featuredProducts = \App\Models\Product::where('featured', true)
-        ->latest()
+    $featuredProducts = \App\Models\Product::where('is_active', true)
+        ->orderBy('order')
         ->take(4)
         ->get();
     

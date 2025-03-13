@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="scroll-smooth">
 
 <head>
     <meta charset="UTF-8">
@@ -37,6 +37,10 @@
     @yield('styles')
 
     <style>
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
         }
@@ -68,6 +72,22 @@
         .auth-page .footer {
             @apply hidden;
         }
+
+        .section-nav {
+            @apply fixed right-4 top-1/2 transform -translate-y-1/2 z-50 hidden lg:block;
+        }
+
+        .section-nav a {
+            @apply block w-3 h-3 mb-4 rounded-full border-2 border-primary transition-all duration-300;
+        }
+
+        .section-nav a.active {
+            @apply bg-primary;
+        }
+
+        .section-nav a:hover {
+            @apply bg-primary-dark border-primary-dark;
+        }
     </style>
 </head>
 
@@ -78,6 +98,15 @@
             !request()->is('password/reset') &&
             !request()->is('password/reset/*'))
         @include('components.navbar.main')
+
+        <!-- Section Navigation Dots -->
+        <nav class="section-nav">
+            <a href="#products" class="nav-dot" data-section="products" title="Produk"></a>
+            <a href="#timeline" class="nav-dot" data-section="timeline" title="Timeline"></a>
+            <a href="#faq" class="nav-dot" data-section="faq" title="FAQ"></a>
+            <a href="#feedback" class="nav-dot" data-section="feedback" title="Testimoni"></a>
+            <a href="#contact" class="nav-dot" data-section="contact" title="Kontak"></a>
+        </nav>
     @endif
 
     <!-- Flash Messages -->
@@ -133,6 +162,34 @@
                 }
             });
         }
+
+        // Section navigation dots
+        document.addEventListener('DOMContentLoaded', () => {
+            const sections = document.querySelectorAll('section[id]');
+            const navDots = document.querySelectorAll('.nav-dot');
+
+            function updateNavDots() {
+                const scrollPosition = window.scrollY + window.innerHeight / 2;
+
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    const sectionHeight = section.offsetHeight;
+                    const sectionId = section.getAttribute('id');
+
+                    if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
+                        navDots.forEach(dot => {
+                            dot.classList.remove('active');
+                            if (dot.getAttribute('href') === `#${sectionId}`) {
+                                dot.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            }
+
+            window.addEventListener('scroll', updateNavDots);
+            updateNavDots();
+        });
     </script>
 
     @stack('scripts')

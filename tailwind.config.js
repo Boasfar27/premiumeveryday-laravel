@@ -8,19 +8,33 @@ export default {
     theme: {
         extend: {
             colors: {
-                primary: {
-                    DEFAULT: '#3D0301',
-                    dark: '#2A0201',
-                },
-                secondary: {
-                    DEFAULT: '#B03052',
-                    light: '#D76C82',
-                }
+                primary: '#B03052',
+                'primary-dark': '#3D0301',
+                secondary: '#D76C82',
+                'secondary-light': '#E98E9F'
             },
-            fontFamily: {
-                sans: ['Inter', 'sans-serif'],
+            spacing: {
+                '128': '32rem',
+            },
+            maxWidth: {
+                '8xl': '88rem',
+                '9xl': '96rem',
+            },
+            screens: {
+                '3xl': '1792px',
+            },
+            zIndex: {
+                '60': '60',
+                '70': '70',
+                '80': '80',
+                '90': '90',
+                '100': '100',
             },
         },
     },
-    plugins: [],
+    plugins: [
+        require('@tailwindcss/forms'),
+        require('@tailwindcss/typography'),
+        require('@tailwindcss/aspect-ratio'),
+    ],
 } 
