@@ -1,10 +1,10 @@
 @php
     $navigation = [
-        ['route' => 'home', 'name' => 'Beranda'],
-        ['route' => 'products', 'name' => 'Produk'],
+        ['route' => 'home', 'name' => 'Home'],
+        ['route' => 'products', 'name' => 'Product'],
         ['route' => 'timeline', 'name' => 'Timeline'],
         ['route' => 'faq', 'name' => 'FAQ'],
-        ['route' => 'contact', 'name' => 'Kontak'],
+        ['route' => 'contact', 'name' => 'Contact'],
     ];
 @endphp
 
@@ -38,4 +38,4 @@
 </nav>
 
 <!-- Spacer untuk fixed navbar -->
-<div class="h-16"></div> 
+<div class="h-16"></div>
