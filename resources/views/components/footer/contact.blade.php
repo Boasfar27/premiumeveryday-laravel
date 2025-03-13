@@ -1,5 +1,5 @@
 <div class="col-span-1">
-    <h4 class="text-lg font-semibold mb-4">Kontak</h4>
+    <h4 class="text-lg font-semibold mb-4">Contact Us</h4>
     <ul class="space-y-2">
         <li class="flex items-center text-sm text-gray-300">
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -22,7 +22,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
-            Jakarta, Indonesia
+            Surabaya, Indonesia
         </li>
     </ul>
 </div>
