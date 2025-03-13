@@ -40,22 +40,22 @@
         </section>
 
         <!-- Timeline Section -->
-        <section id="timeline">
+        <section id="timeline" class="mt-8">
             @include('components.timeline.index')
         </section>
 
         <!-- FAQ Section -->
-        <section id="faq">
+        <section id="faq" class="mt-8">
             @include('components.faq.index')
         </section>
 
         <!-- Feedback Section -->
-        <section id="feedback">
+        <section id="feedback" class="mt-8">
             @include('components.feedback.index')
         </section>
 
         <!-- Contact Section -->
-        <section id="contact">
+        <section id="contact" class="mt-8">
             @include('components.contact.index')
         </section>
     </div>

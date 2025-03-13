@@ -19,6 +19,10 @@ class Product extends Model
         'image',
         'is_active',
         'order',
+        'sharing_discount',
+        'private_discount',
+        'is_promo',
+        'promo_ends_at',
     ];
 
     protected $casts = [

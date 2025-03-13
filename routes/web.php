@@ -31,7 +31,6 @@ Route::get('/', function () {
     // Get featured products
     $featuredProducts = Product::where('is_active', true)
         ->orderBy('order')
-        ->take(4)
         ->get();
     
     // Get timelines
