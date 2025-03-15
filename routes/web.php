@@ -17,6 +17,8 @@ use App\Models\Product;
 use App\Models\Timeline;
 use App\Models\Faq;
 use App\Models\Contact;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\Admin\NotificationManagementController;
 
 /*
 |--------------------------------------------------------------------------
@@ -118,17 +120,23 @@ Route::middleware('auth')->group(function () {
         Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
     });
 
-    // Admin Routes
-    Route::middleware(['verified', 'admin'])->prefix('admin')->name('admin.')->group(function () {
-        Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
-        Route::resource('products', ProductManagementController::class);
-        Route::get('/users', [UserManagementController::class, 'index'])->name('users.index');
-        Route::get('/users/{user}', [UserManagementController::class, 'show'])->name('users.show');
-        Route::post('/users/{user}/toggle-status', [UserManagementController::class, 'toggleStatus'])
-            ->name('users.toggle-status');
-        Route::post('/users/{user}/toggle-role', [UserManagementController::class, 'toggleRole'])
-            ->name('users.toggle-role');
-    });
+    // Notification Routes
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
+    Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
+});
+
+// Admin Routes
+Route::middleware(['verified', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+    Route::resource('products', ProductManagementController::class);
+    Route::get('/users', [UserManagementController::class, 'index'])->name('users.index');
+    Route::get('/users/{user}', [UserManagementController::class, 'show'])->name('users.show');
+    Route::post('/users/{user}/toggle-status', [UserManagementController::class, 'toggleStatus'])
+        ->name('users.toggle-status');
+    Route::post('/users/{user}/toggle-role', [UserManagementController::class, 'toggleRole'])
+        ->name('users.toggle-role');
+    Route::resource('notifications', NotificationManagementController::class);
 });
 
 // Terms and Privacy Routes
