@@ -120,13 +120,20 @@
 </head>
 
 <body class="font-sans antialiased bg-gray-100" x-data="{ mobileMenu: false }">
+    <!-- Header Component -->
     @if (
         !request()->is('login') &&
             !request()->is('register') &&
             !request()->is('password/reset') &&
             !request()->is('password/reset/*'))
-        @include('components.navbar.main')
+        <x-header :user="auth()->user()" />
+    @endif
 
+    @if (
+        !request()->is('login') &&
+            !request()->is('register') &&
+            !request()->is('password/reset') &&
+            !request()->is('password/reset/*'))
         <!-- Section Navigation Dots -->
         <nav class="section-nav">
             <a href="#products" class="nav-dot" data-section="products" title="Produk"></a>
@@ -155,7 +162,7 @@
     @endif
 
     <!-- Main Content -->
-    <main class="flex-grow">
+    <main class="flex-grow pt-16">
         @yield('content')
     </main>
 
