@@ -1,4 +1,4 @@
-@extends('pages.layouts.app')
+@extends('pages.desktop.layouts.app')
 
 @section('title', 'Profil Saya - Premium Everyday')
 

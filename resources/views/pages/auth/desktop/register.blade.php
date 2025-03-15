@@ -1,49 +1,53 @@
-@extends('pages.layouts.app')
+@extends('pages.desktop.layouts.app')
+
+@section('title', 'Register - Premium Everyday')
 
 @section('content')
-    <div class="hidden sm:flex min-h-screen items-center justify-center bg-gray-50">
+    <div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
         <div class="flex w-full max-w-6xl mx-auto shadow-lg rounded-lg overflow-hidden">
             <!-- Left Side - Image/Banner -->
             <div class="hidden lg:block w-1/2 bg-primary relative">
                 <div class="absolute inset-0 bg-gradient-to-r from-primary to-secondary opacity-90"></div>
                 <div class="relative z-10 p-12 text-white">
                     <h2 class="text-4xl font-bold mb-6">Bergabung dengan Kami</h2>
-                    <p class="text-lg mb-8">Dapatkan akses ke berbagai layanan premium kami dengan mendaftar sekarang.</p>
+                    <p class="text-lg mb-8">Daftar sekarang dan nikmati berbagai keuntungan menarik.</p>
                     <div class="space-y-4">
                         <div class="flex items-center">
                             <svg class="w-6 h-6 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7">
+                                </path>
                             </svg>
-                            <span>Produk berkualitas premium</span>
+                            <span>Akses ke semua fitur premium</span>
                         </div>
                         <div class="flex items-center">
                             <svg class="w-6 h-6 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7">
+                                </path>
                             </svg>
-                            <span>Pengiriman cepat ke seluruh Indonesia</span>
+                            <span>Dukungan pelanggan 24/7</span>
                         </div>
                         <div class="flex items-center">
                             <svg class="w-6 h-6 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7">
+                                </path>
                             </svg>
-                            <span>Layanan pelanggan 24/7</span>
+                            <span>Update produk terbaru</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Right Side - Register Form -->
-            <div class="w-full lg:w-1/2 bg-white p-12">
+            <!-- Right Side - Registration Form -->
+            <div class="w-full lg:w-1/2 bg-white p-8 lg:p-12">
                 <div class="max-w-md mx-auto">
                     <div class="text-center mb-8">
-                        <h2 class="text-3xl font-bold text-gray-900 mb-2">Daftar Akun Baru</h2>
+                        <a href="{{ route('home') }}" class="inline-block mb-6">
+                            <img class="h-12 w-auto mx-auto" src="{{ asset('images/logo.webp') }}" alt="Premium Everyday">
+                        </a>
+                        <h2 class="text-3xl font-bold text-gray-900 mb-2">Daftar Akun</h2>
                         <p class="text-gray-600">
                             Sudah punya akun?
-                            <a href="{{ route('login') }}"
-                                class="text-secondary hover:text-secondary-light transition-colors duration-200">
+                            <a href="{{ route('login') }}" class="text-primary hover:text-primary-dark font-medium">
                                 Masuk disini
                             </a>
                         </p>
@@ -68,8 +72,8 @@
                             <label for="name" class="block text-sm font-medium text-gray-700">
                                 Nama Lengkap
                             </label>
-                            <input id="name" name="name" type="text" required
-                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-secondary focus:border-secondary sm:text-sm"
+                            <input id="name" name="name" type="text" autocomplete="name" required
+                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
                                 value="{{ old('name') }}">
                         </div>
 
@@ -78,7 +82,7 @@
                                 Alamat Email
                             </label>
                             <input id="email" name="email" type="email" autocomplete="email" required
-                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-secondary focus:border-secondary sm:text-sm"
+                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
                                 value="{{ old('email') }}">
                         </div>
 
@@ -86,42 +90,32 @@
                             <label for="phone" class="block text-sm font-medium text-gray-700">
                                 Nomor Telepon
                             </label>
-                            <input id="phone" name="phone" type="tel" required
-                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-secondary focus:border-secondary sm:text-sm"
-                                value="{{ old('phone') }}">
+                            <input id="phone" name="phone" type="tel" autocomplete="tel"
+                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
+                                value="{{ old('phone') }}" placeholder="Contoh: 08XXXXXXXXXX">
                         </div>
 
                         <div>
                             <label for="password" class="block text-sm font-medium text-gray-700">
                                 Kata Sandi
                             </label>
-                            <input id="password" name="password" type="password" required
-                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-secondary focus:border-secondary sm:text-sm">
+                            <input id="password" name="password" type="password" autocomplete="new-password" required
+                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
                         </div>
 
                         <div>
                             <label for="password_confirmation" class="block text-sm font-medium text-gray-700">
                                 Konfirmasi Kata Sandi
                             </label>
-                            <input id="password_confirmation" name="password_confirmation" type="password" required
-                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-secondary focus:border-secondary sm:text-sm">
-                        </div>
-
-                        <div class="flex items-center">
-                            <input id="terms" name="terms" type="checkbox" required
-                                class="h-4 w-4 text-secondary focus:ring-secondary border-gray-300 rounded">
-                            <label for="terms" class="ml-2 block text-sm text-gray-900">
-                                Saya setuju dengan <a href="{{ route('terms') }}"
-                                    class="text-secondary hover:text-secondary-light">Syarat dan Ketentuan</a> serta <a
-                                    href="{{ route('privacy') }}"
-                                    class="text-secondary hover:text-secondary-light">Kebijakan Privasi</a>
-                            </label>
+                            <input id="password_confirmation" name="password_confirmation" type="password"
+                                autocomplete="new-password" required
+                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
                         </div>
 
                         <div>
                             <button type="submit"
-                                class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-secondary hover:bg-secondary-light focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary transition-colors duration-200">
-                                Daftar Sekarang
+                                class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                                Daftar
                             </button>
                         </div>
                     </form>
@@ -140,7 +134,7 @@
 
                         <div class="mt-6">
                             <a href="{{ route('auth.google') }}"
-                                class="w-full flex justify-center items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors duration-200">
+                                class="w-full inline-flex justify-center items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
                                 <svg class="w-5 h-5 mr-2" viewBox="0 0 48 48">
                                     <path fill="#FFC107"
                                         d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z" />
@@ -151,7 +145,7 @@
                                     <path fill="#1976D2"
                                         d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z" />
                                 </svg>
-                                Masuk dengan Google
+                                Daftar dengan Google
                             </a>
                         </div>
                     </div>

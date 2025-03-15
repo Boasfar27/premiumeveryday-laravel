@@ -17,10 +17,10 @@ class AdminMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!$request->user() || $request->user()->role != 1) {
-            return redirect()->route('home')->with('error', 'Anda tidak memiliki akses ke halaman ini.');
+        if (Auth::check() && Auth::user()->role == 1) {
+            return $next($request);
         }
 
-        return $next($request);
+        return redirect('/')->with('error', 'Unauthorized access. Admin only.');
     }
 }

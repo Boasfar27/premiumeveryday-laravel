@@ -1,6 +1,6 @@
-@extends('pages.layouts.app')
+@extends('pages.desktop.layouts.app')
 
-@section('title', 'Login')
+@section('title', 'Login - Premium Everyday')
 
 @section('styles')
     <style>
@@ -85,7 +85,7 @@
 @endsection
 
 @section('content')
-    <div class="hidden sm:flex min-h-screen items-center justify-center bg-gray-50">
+    <div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
         <div class="flex w-full max-w-6xl mx-auto shadow-lg rounded-lg overflow-hidden">
             <!-- Left Side - Image/Banner -->
             <div class="hidden lg:block w-1/2 bg-primary relative">
@@ -120,14 +120,16 @@
             </div>
 
             <!-- Right Side - Login Form -->
-            <div class="w-full lg:w-1/2 bg-white p-12">
+            <div class="w-full lg:w-1/2 bg-white p-8 lg:p-12">
                 <div class="max-w-md mx-auto">
                     <div class="text-center mb-8">
+                        <a href="{{ route('home') }}" class="inline-block mb-6">
+                            <img class="h-12 w-auto mx-auto" src="{{ asset('images/logo.webp') }}" alt="Premium Everyday">
+                        </a>
                         <h2 class="text-3xl font-bold text-gray-900 mb-2">Masuk</h2>
                         <p class="text-gray-600">
                             Belum punya akun?
-                            <a href="{{ route('register') }}"
-                                class="text-secondary hover:text-secondary-light transition-colors duration-200">
+                            <a href="{{ route('register') }}" class="text-primary hover:text-primary-dark font-medium">
                                 Daftar disini
                             </a>
                         </p>
@@ -159,7 +161,7 @@
                                 Alamat Email
                             </label>
                             <input id="email" name="email" type="email" autocomplete="email" required
-                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-secondary focus:border-secondary sm:text-sm"
+                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
                                 value="{{ old('email') }}">
                         </div>
 
@@ -168,13 +170,13 @@
                                 Kata Sandi
                             </label>
                             <input id="password" name="password" type="password" autocomplete="current-password" required
-                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-secondary focus:border-secondary sm:text-sm">
+                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
                         </div>
 
                         <div class="flex items-center justify-between">
                             <div class="flex items-center">
                                 <input id="remember_me" name="remember" type="checkbox"
-                                    class="h-4 w-4 text-secondary focus:ring-secondary border-gray-300 rounded">
+                                    class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded">
                                 <label for="remember_me" class="ml-2 block text-sm text-gray-900">
                                     Ingat Saya
                                 </label>
@@ -182,7 +184,7 @@
 
                             <div class="text-sm">
                                 <a href="{{ route('password.request') }}"
-                                    class="font-medium text-secondary hover:text-secondary-light transition-colors duration-200">
+                                    class="font-medium text-primary hover:text-primary-dark">
                                     Lupa kata sandi?
                                 </a>
                             </div>
@@ -190,7 +192,7 @@
 
                         <div>
                             <button type="submit"
-                                class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-secondary hover:bg-secondary-light focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary transition-colors duration-200">
+                                class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                                 Masuk
                             </button>
                         </div>
@@ -210,7 +212,7 @@
 
                         <div class="mt-6">
                             <a href="{{ route('auth.google') }}"
-                                class="w-full flex justify-center items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors duration-200">
+                                class="w-full inline-flex justify-center items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
                                 <svg class="w-5 h-5 mr-2" viewBox="0 0 48 48">
                                     <path fill="#FFC107"
                                         d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z" />

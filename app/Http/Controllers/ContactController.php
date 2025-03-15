@@ -12,9 +12,12 @@ class ContactController extends Controller
     public function index()
     {
         $agent = new Agent();
-        $contacts = Contact::where('is_active', true)->orderBy('order')->get();
+        $contacts = Contact::active()->get();
         
-        return view('components.contact.index', compact('contacts'));
+        return view(
+            $agent->isMobile() ? 'pages.mobile.contact.index' : 'pages.desktop.contact.index',
+            compact('contacts')
+        );
     }
 
     public function store(Request $request)

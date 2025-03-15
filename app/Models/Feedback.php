@@ -29,4 +29,15 @@ class Feedback extends Model
     {
         return $this->belongsTo(Product::class);
     }
+
+    /**
+     * Scope a query to only include active feedback.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true)->orderBy('order');
+    }
 }

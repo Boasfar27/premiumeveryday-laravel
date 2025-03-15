@@ -4,12 +4,15 @@ export default {
         "./resources/**/*.blade.php",
         "./resources/**/*.js",
         "./resources/**/*.vue",
+        "./node_modules/flowbite/**/*.js"
     ],
     theme: {
         extend: {
             colors: {
-                primary: '#B03052',
-                'primary-dark': '#3D0301',
+                primary: {
+                    DEFAULT: '#B03052',
+                    dark: '#3D0301',
+                },
                 secondary: '#D76C82',
                 'secondary-light': '#E98E9F'
             },
@@ -30,11 +33,15 @@ export default {
                 '90': '90',
                 '100': '100',
             },
+            fontFamily: {
+                sans: ['Figtree', 'sans-serif'],
+            },
         },
     },
     plugins: [
         require('@tailwindcss/forms'),
         require('@tailwindcss/typography'),
         require('@tailwindcss/aspect-ratio'),
+        require('flowbite/plugin'),
     ],
 } 
