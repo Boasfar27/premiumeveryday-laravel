@@ -1,6 +1,5 @@
 @php
     $navigation = [
-        ['route' => 'home', 'name' => 'Home'],
         ['route' => 'products', 'name' => 'Product'],
         ['route' => 'timeline', 'name' => 'Timeline'],
         ['route' => 'faq', 'name' => 'FAQ'],
