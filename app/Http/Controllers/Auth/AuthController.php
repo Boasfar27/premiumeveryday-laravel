@@ -88,8 +88,57 @@ class AuthController extends Controller
             
             Auth::login($user);
             
-            return redirect()->route('home')
-                ->with('success', 'Registrasi berhasil! Silakan cek email Anda untuk verifikasi.');
+            return redirect()->route('home')->with('swal', [
+                'icon' => 'success',
+                'title' => 'Selamat Bergabung! 🎉',
+                'html' => '
+                    <div class="text-center">
+                        <div class="mb-4">
+                            <lottie-player
+                                src="https://assets2.lottiefiles.com/packages/lf20_s2lryxtd.json"
+                                background="transparent"
+                                speed="1"
+                                style="width: 200px; height: 200px; margin: 0 auto;"
+                                autoplay
+                            ></lottie-player>
+                        </div>
+                        <p class="text-lg mb-2">Hai <strong>' . $request->name . '</strong>!</p>
+                        <p class="mb-4">Akun Anda berhasil dibuat</p>
+                        <div class="bg-pink-50 p-4 rounded-lg mb-4">
+                            <p class="text-pink-600">
+                                <i class="fas fa-envelope mr-2"></i>
+                                Silakan cek email Anda di:
+                            </p>
+                            <p class="font-semibold text-pink-700">' . $request->email . '</p>
+                        </div>
+                        <p class="text-sm text-gray-600">
+                            Kami telah mengirimkan link verifikasi ke email Anda
+                        </p>
+                    </div>
+                ',
+                'showConfirmButton' => true,
+                'confirmButtonText' => 'Saya Mengerti',
+                'confirmButtonColor' => '#EC4899',
+                'showCancelButton' => true,
+                'cancelButtonText' => 'Kirim Ulang Email',
+                'cancelButtonColor' => '#9CA3AF',
+                'allowOutsideClick' => false,
+                'customClass' => [
+                    'container' => 'registration-swal-container',
+                    'popup' => 'registration-swal-popup',
+                    'header' => 'registration-swal-header',
+                    'content' => 'registration-swal-content',
+                    'actions' => 'registration-swal-actions',
+                ],
+                'didOpen' => "(toast) => {
+                    const content = toast.querySelector('.swal2-html-container');
+                    if (content) {
+                        const script = document.createElement('script');
+                        script.src = 'https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js';
+                        document.head.appendChild(script);
+                    }
+                }"
+            ]);
                 
         } catch (\Exception $e) {
             \Log::error('Registration error: ' . $e->getMessage());
@@ -162,16 +211,99 @@ class AuthController extends Controller
         }
 
         if ($user->hasVerifiedEmail()) {
-            return redirect()->route('home')
-                ->with('success', 'Email sudah diverifikasi sebelumnya.');
+            return redirect()->route('home')->with('swal', [
+                'icon' => 'info',
+                'title' => 'Email Sudah Terverifikasi',
+                'html' => '
+                    <div class="text-center">
+                        <div class="mb-4">
+                            <lottie-player
+                                src="https://assets5.lottiefiles.com/packages/lf20_Tkwjw8.json"
+                                background="transparent"
+                                speed="1"
+                                style="width: 200px; height: 200px; margin: 0 auto;"
+                                autoplay
+                            ></lottie-player>
+                        </div>
+                        <p class="text-lg mb-2">Email Anda sudah diverifikasi sebelumnya</p>
+                        <p class="text-sm text-gray-600">
+                            Silakan lanjutkan berbelanja di Premium Everyday
+                        </p>
+                    </div>
+                ',
+                'showConfirmButton' => true,
+                'confirmButtonText' => 'Mulai Belanja',
+                'confirmButtonColor' => '#EC4899',
+                'allowOutsideClick' => false,
+                'customClass' => [
+                    'container' => 'registration-swal-container',
+                    'popup' => 'registration-swal-popup',
+                    'header' => 'registration-swal-header',
+                    'content' => 'registration-swal-content',
+                    'actions' => 'registration-swal-actions',
+                ],
+                'didOpen' => "(toast) => {
+                    const content = toast.querySelector('.swal2-html-container');
+                    if (content) {
+                        const script = document.createElement('script');
+                        script.src = 'https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js';
+                        document.head.appendChild(script);
+                    }
+                }"
+            ]);
         }
 
         $user->markEmailAsVerified();
         $user->verification_code = null;
         $user->save();
 
-        return redirect()->route('home')
-            ->with('success', 'Email Anda berhasil diverifikasi.');
+        return redirect()->route('home')->with('swal', [
+            'icon' => 'success',
+            'title' => 'Email Berhasil Diverifikasi! 🎉',
+            'html' => '
+                <div class="text-center">
+                    <div class="mb-4">
+                        <lottie-player
+                            src="https://assets3.lottiefiles.com/packages/lf20_Zw8DvW.json"
+                            background="transparent"
+                            speed="1"
+                            style="width: 200px; height: 200px; margin: 0 auto;"
+                            autoplay
+                        ></lottie-player>
+                    </div>
+                    <p class="text-lg mb-2">Selamat <strong>' . $user->name . '</strong>!</p>
+                    <p class="mb-4">Email Anda telah berhasil diverifikasi</p>
+                    <div class="bg-green-50 p-4 rounded-lg mb-4">
+                        <p class="text-green-600">
+                            <i class="fas fa-check-circle mr-2"></i>
+                            Akun Anda sudah aktif
+                        </p>
+                    </div>
+                    <p class="text-sm text-gray-600">
+                        Silakan mulai berbelanja di Premium Everyday
+                    </p>
+                </div>
+            ',
+            'showConfirmButton' => true,
+            'confirmButtonText' => 'Mulai Belanja',
+            'confirmButtonColor' => '#EC4899',
+            'allowOutsideClick' => false,
+            'customClass' => [
+                'container' => 'registration-swal-container',
+                'popup' => 'registration-swal-popup',
+                'header' => 'registration-swal-header',
+                'content' => 'registration-swal-content',
+                'actions' => 'registration-swal-actions',
+            ],
+            'didOpen' => "(toast) => {
+                const content = toast.querySelector('.swal2-html-container');
+                if (content) {
+                    const script = document.createElement('script');
+                    script.src = 'https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js';
+                    document.head.appendChild(script);
+                }
+            }"
+        ]);
     }
 
     public function resendVerification(Request $request)
