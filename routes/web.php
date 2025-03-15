@@ -31,6 +31,7 @@ Route::get('/', function () {
     // Get featured products
     $featuredProducts = Product::where('is_active', true)
         ->orderBy('order')
+        ->take(6)
         ->get();
     
     // Get timelines
@@ -58,6 +59,7 @@ Route::get('/products', [ProductController::class, 'index'])->name('products');
 Route::get('/products/{id}', [ProductController::class, 'show'])->name('products.show');
 Route::get('/timeline', [TimelineController::class, 'index'])->name('timeline');
 Route::get('/faq', [FaqController::class, 'index'])->name('faq');
+Route::get('/feedback', [FeedbackController::class, 'index'])->name('feedback');
 Route::get('/contact', [ContactController::class, 'index'])->name('contact');
 Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
 
@@ -103,11 +105,12 @@ Route::middleware('auth')->group(function () {
         ->middleware(['throttle:6,1']);
 
     // User Routes
-    Route::middleware(['verify.user'])->prefix('user')->name('user.')->group(function () {
-        Route::get('/dashboard', [UserDashboardController::class, 'index'])->name('dashboard');
-        Route::get('/profile', [UserDashboardController::class, 'profile'])->name('profile');
-        Route::put('/profile', [UserDashboardController::class, 'updateProfile'])->name('profile.update');
-        Route::put('/password', [UserDashboardController::class, 'updatePassword'])->name('password.update');
+    Route::middleware(['verified'])->prefix('user')->name('user.')->group(function () {
+        
+        // Profile Routes
+        Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
+        Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+        Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('password.update');
         
         // Orders
         Route::get('/orders', [OrderController::class, 'index'])->name('orders');
@@ -116,7 +119,7 @@ Route::middleware('auth')->group(function () {
     });
 
     // Admin Routes
-    Route::middleware(['verify.user', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::middleware(['verified', 'admin'])->prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
         Route::resource('products', ProductManagementController::class);
         Route::get('/users', [UserManagementController::class, 'index'])->name('users.index');
@@ -125,13 +128,6 @@ Route::middleware('auth')->group(function () {
             ->name('users.toggle-status');
         Route::post('/users/{user}/toggle-role', [UserManagementController::class, 'toggleRole'])
             ->name('users.toggle-role');
-    });
-
-    // User Profile Routes
-    Route::middleware(['auth', 'verified'])->group(function () {
-        Route::get('/profile', [ProfileController::class, 'show'])->name('user.profile');
-        Route::put('/profile', [ProfileController::class, 'update'])->name('user.profile.update');
-        Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('user.password.update');
     });
 });
 

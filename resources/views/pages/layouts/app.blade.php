@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Premium Everyday')</title>
 
     <!-- Favicon -->
@@ -33,6 +34,13 @@
 
     <!-- Alpine.js -->
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <!-- Sweet Alert -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
 
     @yield('styles')
 
@@ -87,6 +95,26 @@
 
         .section-nav a:hover {
             @apply bg-primary-dark border-primary-dark;
+        }
+
+        /* Sweet Alert Custom Styles */
+        .swal2-popup {
+            border-radius: 1rem;
+        }
+
+        .swal2-icon {
+            border-color: var(--primary) !important;
+            color: var(--primary) !important;
+        }
+
+        .swal2-confirm {
+            background: linear-gradient(to right, var(--primary), var(--primary-dark)) !important;
+            border-radius: 0.5rem !important;
+        }
+
+        :root {
+            --primary: #B03052;
+            --primary-dark: #3D0301;
         }
     </style>
 </head>
@@ -191,6 +219,28 @@
             updateNavDots();
         });
     </script>
+
+    <!-- Sweet Alert -->
+    @if (session()->has('swal'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const swalData = @json(session('swal'));
+                Swal.fire({
+                    ...swalData,
+                    showClass: {
+                        popup: 'animate__animated animate__fadeInDown'
+                    },
+                    hideClass: {
+                        popup: 'animate__animated animate__fadeOutUp'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = "{{ route('products') }}";
+                    }
+                });
+            });
+        </script>
+    @endif
 
     @stack('scripts')
 </body>
