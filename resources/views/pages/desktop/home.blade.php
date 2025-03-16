@@ -4,7 +4,7 @@
 
 @section('content')
     <!-- Hero Section -->
-    <section class="bg-primary text-white min-h-screen flex items-center">
+    <section id="home" class="bg-primary text-white min-h-screen flex items-center mt-16">
         <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-screen flex items-center">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center w-full">
                 <div>
@@ -28,29 +28,71 @@
 
 
     <!-- Products Section -->
-    @php
-        $activeProducts = \App\Models\Product::active()->latest()->take(6)->get();
-    @endphp
-    @include('pages.desktop.products.featured', ['products' => $activeProducts])
+    <section id="products" class="py-16 bg-gray-50">
+        @php
+            $activeProducts = \App\Models\Product::active()->latest()->take(6)->get();
+        @endphp
+        @include('pages.desktop.products.featured', ['products' => $activeProducts])
+    </section>
 
     <!-- Timeline Section -->
-    @php
-        $timelines = \App\Models\Timeline::active()->latest()->take(3)->get();
-    @endphp
-    @include('pages.desktop.timeline.featured', ['timelines' => $timelines])
+    <section id="timeline" class="py-16">
+        @php
+            $timelines = \App\Models\Timeline::active()->latest()->take(3)->get();
+        @endphp
+        @include('pages.desktop.timeline.featured', ['timelines' => $timelines])
+    </section>
 
     <!-- FAQ Section -->
-    @php
-        $faqs = \App\Models\Faq::active()->take(4)->get();
-    @endphp
-    @include('pages.desktop.faq.featured', ['faqs' => $faqs])
+    <section id="faq" class="py-16 bg-gray-50">
+        @php
+            $faqs = \App\Models\Faq::active()->take(4)->get();
+        @endphp
+        @include('pages.desktop.faq.featured', ['faqs' => $faqs])
+    </section>
 
     <!-- Feedback Section -->
-    @php
-        $feedbacks = \App\Models\Feedback::active()->with('product')->latest()->take(6)->get();
-    @endphp
-    @include('pages.desktop.feedback.featured', ['feedbacks' => $feedbacks])
+    <section id="feedback" class="py-16">
+        @php
+            $feedbacks = \App\Models\Feedback::active()->with('product')->latest()->take(6)->get();
+        @endphp
+        @include('pages.desktop.feedback.featured', ['feedbacks' => $feedbacks])
+    </section>
 
     <!-- Contact Section -->
-    @include('pages.desktop.contact.index')
+    <section id="contact" class="py-16 bg-gray-50">
+        @include('pages.desktop.contact.index')
+    </section>
 @endsection
+
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('nav a');
+
+            function onScroll() {
+                let current = '';
+
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    const sectionHeight = section.clientHeight;
+                    if (pageYOffset >= (sectionTop - 60)) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    link.classList.remove('border-primary', 'text-gray-900');
+                    link.classList.add('border-transparent', 'text-gray-500');
+                    if (link.getAttribute('href').includes(current)) {
+                        link.classList.remove('border-transparent', 'text-gray-500');
+                        link.classList.add('border-primary', 'text-gray-900');
+                    }
+                });
+            }
+
+            window.addEventListener('scroll', onScroll);
+        });
+    </script>
+@endpush
