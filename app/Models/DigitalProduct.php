@@ -95,7 +95,11 @@ class DigitalProduct extends Model
      */
     public function getThumbnailUrlAttribute()
     {
-        return $this->thumbnail ? asset($this->thumbnail) : asset('images/placeholder.webp');
+        if ($this->thumbnail) {
+            return asset($this->thumbnail);
+        }
+        
+        return asset('images/placeholder.webp');
     }
 
     /**
@@ -175,5 +179,29 @@ class DigitalProduct extends Model
                 $query->whereNull('sale_ends_at')
                     ->orWhere('sale_ends_at', '>', now());
             });
+    }
+
+    /**
+     * Get the discounted price of the product
+     * 
+     * @return float
+     */
+    public function getDiscountedPrice()
+    {
+        if ($this->is_on_sale && $this->sale_price > 0 && ($this->sale_ends_at === null || $this->sale_ends_at > now())) {
+            return $this->sale_price;
+        }
+        
+        return $this->price;
+    }
+    
+    /**
+     * Check if the product is new (created within the last 7 days)
+     * 
+     * @return bool
+     */
+    public function isNew()
+    {
+        return $this->created_at->diffInDays(now()) <= 7;
     }
 }

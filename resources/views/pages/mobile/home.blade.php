@@ -1,49 +1,494 @@
 @extends('pages.mobile.layouts.app')
 
-@section('title', 'Premium Everyday - Solusi Kebutuhan Premium Anda')
+@section('title', 'Premium Everyday - Layanan Streaming Premium Terpercaya')
 
 @section('content')
     <!-- Hero Section -->
-    <section class="bg-primary text-white min-h-screen flex flex-col justify-center items-center text-center px-4">
-        <div class="max-w-3xl">
-            <h1 class="text-4xl md:text-5xl font-bold mb-6">Premium Products for Your Everyday Life</h1>
-            <p class="text-lg mb-8">Discover our curated selection of high-quality products designed to enhance your daily
-                experience.</p>
-            <a href="{{ route('products.index') }}"
-                class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-primary bg-white hover:bg-gray-50 transition">
-                Browse Products
-                <svg class="ml-2 -mr-1 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                </svg>
-            </a>
+    <section id="home" class="bg-primary text-white min-h-[80vh] flex items-center pt-16">
+        <div class="container mx-auto px-4">
+            <div class="text-center">
+                <h1 class="text-3xl font-bold mb-4">Akses Premium ke Layanan Streaming Favorit Anda</h1>
+                <p class="text-lg mb-6">Nikmati Netflix, Disney+, Spotify, dan layanan premium lainnya dengan harga
+                    terjangkau.</p>
+                <div class="flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:space-x-3 justify-center">
+                    <a href="{{ route('products.streaming-video') }}"
+                        class="inline-flex justify-center items-center px-5 py-2 border border-transparent text-base font-medium rounded-md text-primary bg-white hover:bg-gray-50 transition">
+                        Streaming Video
+                        <svg class="ml-2 -mr-1 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </a>
+                    <a href="{{ route('products.streaming-music') }}"
+                        class="inline-flex justify-center items-center px-5 py-2 border border-white text-base font-medium rounded-md text-white hover:bg-primary-dark transition">
+                        Streaming Musik
+                        <svg class="ml-2 -mr-1 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </a>
+                </div>
+                <div class="grid grid-cols-4 gap-2 mt-8">
+                    <img src="{{ asset('images/products/netflix.webp') }}" alt="Netflix"
+                        class="w-16 h-16 mx-auto object-contain bg-white rounded-lg p-1">
+                    <img src="{{ asset('images/products/spotify.webp') }}" alt="Spotify"
+                        class="w-16 h-16 mx-auto object-contain bg-white rounded-lg p-1">
+                    <img src="{{ asset('images/products/youtube.webp') }}" alt="YouTube"
+                        class="w-16 h-16 mx-auto object-contain bg-white rounded-lg p-1">
+                    <img src="{{ asset('images/products/appletv.webp') }}" alt="Apple TV+"
+                        class="w-16 h-16 mx-auto object-contain bg-white rounded-lg p-1">
+                </div>
+            </div>
         </div>
     </section>
 
+    <!-- Featured Products Section -->
+    <section id="featured-products" class="py-10 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-8">
+                <h2 class="text-2xl font-bold text-gray-900">Layanan Premium Terpopuler</h2>
+                <p class="mt-2 text-gray-600">Pilihan terbaik dari layanan streaming premium</p>
+            </div>
 
-    <!-- Products Section -->
-    @php
-        $activeProducts = \App\Models\DigitalProduct::active()->orderBy('sort_order')->take(4)->get();
-    @endphp
-    @include('pages.mobile.products.featured', ['products' => $activeProducts])
+            <div class="grid grid-cols-2 gap-4">
+                @foreach ($featuredProducts->take(4) as $product)
+                    <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                        <div class="relative">
+                            <img src="{{ $product->thumbnail_url }}" alt="{{ $product->name }}"
+                                class="w-full h-32 object-cover">
+                            @if ($product->is_on_sale)
+                                <div
+                                    class="absolute top-1 right-1 bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded">
+                                    SALE
+                                </div>
+                            @endif
+                        </div>
+                        <div class="p-3">
+                            <div class="flex items-center mb-1">
+                                <span class="text-xs font-medium text-primary-dark bg-primary-50 rounded-full px-2 py-0.5">
+                                    {{ $product->category->name }}
+                                </span>
+                            </div>
+                            <h3 class="text-sm font-bold text-gray-900 mb-1 truncate">{{ $product->name }}</h3>
+                            <div class="flex items-center justify-between mt-1">
+                                <div>
+                                    @if ($product->is_on_sale)
+                                        <span class="text-gray-400 line-through text-xs">Rp
+                                            {{ number_format($product->price, 0, ',', '.') }}</span>
+                                        <span class="text-sm font-bold text-primary">Rp
+                                            {{ number_format($product->sale_price, 0, ',', '.') }}</span>
+                                    @else
+                                        <span class="text-sm font-bold text-primary">Rp
+                                            {{ number_format($product->price, 0, ',', '.') }}</span>
+                                    @endif
+                                </div>
+                                <a href="{{ route('products.show', $product) }}"
+                                    class="text-xs text-primary hover:text-primary-dark font-medium">
+                                    Detail
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
 
-    <!-- Timeline Section -->
-    @php
-        $timelines = \App\Models\Timeline::active()->latest()->take(3)->get();
-    @endphp
-    @include('pages.mobile.timeline.featured', ['timelines' => $timelines])
+            <div class="text-center mt-6">
+                <a href="{{ route('products.index') }}"
+                    class="inline-flex items-center px-4 py-2 border border-primary text-sm font-medium rounded-md text-primary hover:bg-primary-50 transition">
+                    Lihat Semua Layanan
+                    <svg class="ml-1 -mr-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Streaming Video Section -->
+    <section id="streaming-video" class="py-10">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center mb-4">
+                <div>
+                    <h2 class="text-xl font-bold text-gray-900">Streaming Video</h2>
+                    <p class="mt-1 text-sm text-gray-600">Akses ke layanan streaming video premium</p>
+                </div>
+                <a href="{{ route('products.streaming-video') }}"
+                    class="text-sm text-primary hover:text-primary-dark font-medium">
+                    Lihat Semua
+                    <svg class="inline-block w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </a>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                @foreach ($streamingVideoProducts as $product)
+                    <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                        <div class="relative">
+                            <img src="{{ $product->thumbnail_url }}" alt="{{ $product->name }}"
+                                class="w-full h-28 object-cover">
+                            @if ($product->is_on_sale)
+                                <div
+                                    class="absolute top-1 right-1 bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded">
+                                    SALE
+                                </div>
+                            @endif
+                        </div>
+                        <div class="p-2">
+                            <h3 class="text-sm font-bold text-gray-900 truncate">{{ $product->name }}</h3>
+                            <div class="flex items-center justify-between mt-1">
+                                <div>
+                                    @if ($product->is_on_sale)
+                                        <span class="text-gray-400 line-through text-xs">Rp
+                                            {{ number_format($product->price, 0, ',', '.') }}</span>
+                                        <span class="text-sm font-bold text-primary">Rp
+                                            {{ number_format($product->sale_price, 0, ',', '.') }}</span>
+                                    @else
+                                        <span class="text-sm font-bold text-primary">Rp
+                                            {{ number_format($product->price, 0, ',', '.') }}</span>
+                                    @endif
+                                </div>
+                                <a href="{{ route('products.show', $product) }}"
+                                    class="text-xs text-primary hover:text-primary-dark font-medium">
+                                    Detail
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </section>
+
+    <!-- Streaming Music Section -->
+    <section id="streaming-music" class="py-10 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center mb-4">
+                <div>
+                    <h2 class="text-xl font-bold text-gray-900">Streaming Musik</h2>
+                    <p class="mt-1 text-sm text-gray-600">Akses ke layanan streaming musik premium</p>
+                </div>
+                <a href="{{ route('products.streaming-music') }}"
+                    class="text-sm text-primary hover:text-primary-dark font-medium">
+                    Lihat Semua
+                    <svg class="inline-block w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </a>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                @foreach ($streamingMusicProducts as $product)
+                    <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                        <div class="relative">
+                            <img src="{{ $product->thumbnail_url }}" alt="{{ $product->name }}"
+                                class="w-full h-28 object-cover">
+                            @if ($product->is_on_sale)
+                                <div
+                                    class="absolute top-1 right-1 bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded">
+                                    SALE
+                                </div>
+                            @endif
+                        </div>
+                        <div class="p-2">
+                            <h3 class="text-sm font-bold text-gray-900 truncate">{{ $product->name }}</h3>
+                            <div class="flex items-center justify-between mt-1">
+                                <div>
+                                    @if ($product->is_on_sale)
+                                        <span class="text-gray-400 line-through text-xs">Rp
+                                            {{ number_format($product->price, 0, ',', '.') }}</span>
+                                        <span class="text-sm font-bold text-primary">Rp
+                                            {{ number_format($product->sale_price, 0, ',', '.') }}</span>
+                                    @else
+                                        <span class="text-sm font-bold text-primary">Rp
+                                            {{ number_format($product->price, 0, ',', '.') }}</span>
+                                    @endif
+                                </div>
+                                <a href="{{ route('products.show', $product) }}"
+                                    class="text-xs text-primary hover:text-primary-dark font-medium">
+                                    Detail
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Choose Us Section -->
+    <section id="why-choose-us" class="py-10">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-900">Mengapa Memilih Kami</h2>
+                <p class="mt-2 text-sm text-gray-600">Keunggulan berlangganan layanan streaming melalui Premium Everyday
+                </p>
+            </div>
+
+            <div class="space-y-4">
+                <div class="bg-white p-4 rounded-lg shadow-sm">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div
+                                class="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                                    </path>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-md font-bold text-gray-900">Harga Terjangkau</h3>
+                            <p class="text-sm text-gray-600">Nikmati layanan premium dengan harga yang lebih terjangkau
+                                dibandingkan berlangganan langsung.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 rounded-lg shadow-sm">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div
+                                class="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
+                                    </path>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-md font-bold text-gray-900">Aman & Terpercaya</h3>
+                            <p class="text-sm text-gray-600">Transaksi aman dan akun dikelola dengan baik untuk memastikan
+                                layanan tetap aktif.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 rounded-lg shadow-sm">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div
+                                class="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                                    </path>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-md font-bold text-gray-900">Dukungan 24/7</h3>
+                            <p class="text-sm text-gray-600">Tim dukungan kami siap membantu Anda kapan saja dengan respons
+                                cepat dan solusi efektif.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="py-10 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-900">Apa Kata Pelanggan Kami</h2>
+                <p class="mt-2 text-sm text-gray-600">Pengalaman pelanggan yang telah menggunakan layanan kami</p>
+            </div>
+
+            <div class="space-y-4">
+                @foreach ($testimonials->take(3) as $testimonial)
+                    <div class="bg-white p-4 rounded-lg shadow-sm">
+                        <div class="flex items-center mb-2">
+                            <div class="flex-shrink-0">
+                                <div
+                                    class="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center text-primary font-bold">
+                                    {{ substr($testimonial->name, 0, 1) }}
+                                </div>
+                            </div>
+                            <div class="ml-3">
+                                <h3 class="text-sm font-medium text-gray-900">{{ $testimonial->name }}</h3>
+                                <div class="flex items-center">
+                                    @for ($i = 1; $i <= 5; $i++)
+                                        <svg class="w-3 h-3 {{ $i <= $testimonial->rating ? 'text-yellow-400' : 'text-gray-300' }}"
+                                            fill="currentColor" viewBox="0 0 20 20">
+                                            <path
+                                                d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z">
+                                            </path>
+                                        </svg>
+                                    @endfor
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 text-sm">{{ $testimonial->content }}</p>
+                        @if ($testimonial->feedbackable)
+                            <div class="mt-2 pt-2 border-t border-gray-100">
+                                <span class="text-xs text-gray-500">Tentang: <a
+                                        href="{{ route('products.show', $testimonial->feedbackable) }}"
+                                        class="text-primary hover:text-primary-dark">{{ $testimonial->feedbackable->name }}</a></span>
+                            </div>
+                        @endif
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </section>
 
     <!-- FAQ Section -->
-    @php
-        $faqs = \App\Models\Faq::active()->take(4)->get();
-    @endphp
-    @include('pages.mobile.faq.featured', ['faqs' => $faqs])
+    <section id="faq" class="py-10">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-900">Pertanyaan Umum</h2>
+                <p class="mt-2 text-sm text-gray-600">Jawaban untuk pertanyaan yang sering diajukan</p>
+            </div>
 
-    <!-- Feedback Section -->
-    @php
-        $feedbacks = \App\Models\Feedback::active()->with('feedbackable')->latest()->take(6)->get();
-    @endphp
-    @include('pages.mobile.feedback.featured', ['feedbacks' => $feedbacks])
+            <div class="space-y-4">
+                <div>
+                    <h3 class="text-lg font-bold text-gray-900 mb-2">Umum</h3>
+                    @foreach ($generalFaqs as $faq)
+                        <div class="mb-3 bg-white rounded-lg shadow-sm overflow-hidden">
+                            <details class="group">
+                                <summary class="flex items-center justify-between p-3 cursor-pointer">
+                                    <h4 class="text-sm font-medium text-gray-900">{{ $faq->question }}</h4>
+                                    <svg class="w-4 h-4 text-gray-500 group-open:rotate-180 transition-transform"
+                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 9l-7 7-7-7"></path>
+                                    </svg>
+                                </summary>
+                                <div class="p-3 pt-0 text-gray-600 text-xs">
+                                    {{ $faq->answer }}
+                                </div>
+                            </details>
+                        </div>
+                    @endforeach
+                </div>
+
+                <div>
+                    <h3 class="text-lg font-bold text-gray-900 mb-2">Layanan Streaming</h3>
+                    @foreach ($streamingFaqs as $faq)
+                        <div class="mb-3 bg-white rounded-lg shadow-sm overflow-hidden">
+                            <details class="group">
+                                <summary class="flex items-center justify-between p-3 cursor-pointer">
+                                    <h4 class="text-sm font-medium text-gray-900">{{ $faq->question }}</h4>
+                                    <svg class="w-4 h-4 text-gray-500 group-open:rotate-180 transition-transform"
+                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 9l-7 7-7-7"></path>
+                                    </svg>
+                                </summary>
+                                <div class="p-3 pt-0 text-gray-600 text-xs">
+                                    {{ $faq->answer }}
+                                </div>
+                            </details>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <a href="{{ route('faq') }}"
+                    class="inline-flex items-center text-primary hover:text-primary-dark text-sm font-medium">
+                    Lihat Semua FAQ
+                    <svg class="ml-1 -mr-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </section>
 
     <!-- Contact Section -->
-    @include('pages.mobile.contact.index')
+    <section id="contact" class="py-10 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-900">Hubungi Kami</h2>
+                <p class="mt-2 text-sm text-gray-600">Punya pertanyaan atau butuh bantuan? Jangan ragu untuk menghubungi
+                    kami.</p>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
+                <div class="space-y-3">
+                    @foreach ($contacts as $contact)
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0">
+                                <div
+                                    class="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center text-primary">
+                                    <i class="{{ $contact->icon }}"></i>
+                                </div>
+                            </div>
+                            <div class="ml-3">
+                                <h3 class="text-xs font-medium text-gray-900">{{ ucfirst($contact->type) }}</h3>
+                                <p class="text-sm text-gray-600">
+                                    @if ($contact->link)
+                                        <a href="{{ $contact->link }}"
+                                            class="hover:text-primary">{{ $contact->value }}</a>
+                                    @else
+                                        {{ $contact->value }}
+                                    @endif
+                                </p>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-sm p-4">
+                <h3 class="text-lg font-bold text-gray-900 mb-3">Kirim Pesan</h3>
+                <form action="{{ route('contact.store') }}" method="POST">
+                    @csrf
+                    <div class="mb-3">
+                        <label for="name" class="block text-xs font-medium text-gray-700 mb-1">Nama</label>
+                        <input type="text" id="name" name="name"
+                            class="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary text-sm">
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="block text-xs font-medium text-gray-700 mb-1">Email</label>
+                        <input type="email" id="email" name="email"
+                            class="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary text-sm">
+                    </div>
+                    <div class="mb-3">
+                        <label for="message" class="block text-xs font-medium text-gray-700 mb-1">Pesan</label>
+                        <textarea id="message" name="message" rows="3"
+                            class="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary text-sm"></textarea>
+                    </div>
+                    <button type="submit"
+                        class="w-full bg-primary hover:bg-primary-dark text-white py-2 px-4 rounded-md font-medium transition-colors text-sm">
+                        Kirim Pesan
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
 @endsection
+
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('nav a');
+
+            function onScroll() {
+                let current = '';
+
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    const sectionHeight = section.clientHeight;
+                    if (pageYOffset >= (sectionTop - 60)) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    link.classList.remove('text-primary');
+                    link.classList.add('text-gray-500');
+                    if (link.getAttribute('href').includes(current)) {
+                        link.classList.remove('text-gray-500');
+                        link.classList.add('text-primary');
+                    }
+                });
+            }
+
+            window.addEventListener('scroll', onScroll);
+        });
+    </script>
+@endpush

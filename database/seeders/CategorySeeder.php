@@ -14,44 +14,47 @@ class CategorySeeder extends Seeder
     {
         $categories = [
             [
-                'name' => 'Electronics',
-                'slug' => 'electronics',
-                'description' => 'Electronic devices and gadgets',
+                'name' => 'Streaming Video',
+                'slug' => 'streaming-video',
+                'description' => 'Layanan streaming film, serial TV, dan konten video',
                 'is_active' => true,
                 'sort_order' => 1,
             ],
             [
-                'name' => 'Clothing',
-                'slug' => 'clothing',
-                'description' => 'Fashion and apparel items',
+                'name' => 'Streaming Music',
+                'slug' => 'streaming-music',
+                'description' => 'Layanan streaming musik dan podcast',
                 'is_active' => true,
                 'sort_order' => 2,
             ],
             [
-                'name' => 'Home & Kitchen',
-                'slug' => 'home-kitchen',
-                'description' => 'Products for your home and kitchen',
+                'name' => 'Productivity Tools',
+                'slug' => 'productivity-tools',
+                'description' => 'Aplikasi dan layanan untuk meningkatkan produktivitas',
                 'is_active' => true,
                 'sort_order' => 3,
             ],
             [
-                'name' => 'Beauty & Personal Care',
-                'slug' => 'beauty-personal-care',
-                'description' => 'Beauty products and personal care items',
+                'name' => 'Premium Software',
+                'slug' => 'premium-software',
+                'description' => 'Berbagai software dan aplikasi premium',
                 'is_active' => true,
                 'sort_order' => 4,
             ],
             [
-                'name' => 'Sports & Outdoors',
-                'slug' => 'sports-outdoors',
-                'description' => 'Sports equipment and outdoor gear',
+                'name' => 'Gaming',
+                'slug' => 'gaming',
+                'description' => 'Layanan dan konten premium untuk gaming',
                 'is_active' => true,
                 'sort_order' => 5,
             ],
         ];
 
         foreach ($categories as $categoryData) {
-            Category::create($categoryData);
+            Category::updateOrCreate(
+                ['slug' => $categoryData['slug']],
+                $categoryData
+            );
         }
     }
 } 

@@ -10,6 +10,23 @@
                 </a>
             </div>
 
+            <!-- Cart -->
+            <div class="flex items-center">
+                <a href="{{ route('cart.index') }}" class="relative p-2 text-gray-500">
+                    <span class="sr-only">View cart</span>
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                    </svg>
+                    @if (Session::has('cart') && count(Session::get('cart')) > 0)
+                        <span id="cart-count-mobile"
+                            class="absolute top-1.5 right-1.5 block h-5 w-5 rounded-full bg-primary text-white text-xs font-bold flex items-center justify-center">
+                            {{ count(Session::get('cart')) }}
+                        </span>
+                    @endif
+                </a>
+            </div>
+
             <!-- Menu Button -->
             <button @click="open = !open"
                 class="text-gray-500 hover:text-gray-600 focus:outline-none focus:text-gray-600">

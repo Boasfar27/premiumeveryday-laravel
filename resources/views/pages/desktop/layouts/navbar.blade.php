@@ -43,6 +43,21 @@
 
             <!-- Right Navigation -->
             <div class="hidden sm:ml-6 sm:flex sm:items-center">
+                <!-- Cart -->
+                <a href="{{ route('cart.index') }}" class="relative p-2 text-gray-500 hover:text-gray-700">
+                    <span class="sr-only">View cart</span>
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                    </svg>
+                    @if (Session::has('cart') && count(Session::get('cart')) > 0)
+                        <span id="cart-count"
+                            class="absolute top-1.5 right-1.5 block h-5 w-5 rounded-full bg-primary text-white text-xs font-bold flex items-center justify-center">
+                            {{ count(Session::get('cart')) }}
+                        </span>
+                    @endif
+                </a>
+
                 @auth
                     <!-- Notifications -->
                     <a href="{{ route('notifications.index') }}" class="relative p-2 text-gray-500 hover:text-gray-700">

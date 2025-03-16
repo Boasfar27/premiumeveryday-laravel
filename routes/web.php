@@ -18,6 +18,8 @@ use App\Models\Faq;
 use App\Models\Contact;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\FeedbackController;
+use App\Http\Controllers\CartController;
+use App\Models\Feedback;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,36 +31,85 @@ use App\Http\Controllers\FeedbackController;
 Route::get('/', function () {
     $agent = new Agent();
     
-    // Get featured products
-    $featuredProducts = DigitalProduct::where('is_active', true)
+    // Get featured products with categories
+    $featuredProducts = DigitalProduct::with('category')
+        ->where('is_active', true)
+        ->where('is_featured', true)
         ->orderBy('sort_order')
-        ->take(3)
+        ->take(6)
         ->get();
+    
+    // Get latest products
+    $latestProducts = DigitalProduct::with('category')
+        ->where('is_active', true)
+        ->latest()
+        ->take(8)
+        ->get();
+    
+    // Get products by category
+    $streamingVideoProducts = DigitalProduct::whereHas('category', function($query) {
+        $query->where('slug', 'streaming-video');
+    })->where('is_active', true)->take(4)->get();
+    
+    $streamingMusicProducts = DigitalProduct::whereHas('category', function($query) {
+        $query->where('slug', 'streaming-music');
+    })->where('is_active', true)->take(4)->get();
     
     // Get timelines
     $timelines = Timeline::where('is_active', true)
         ->orderBy('order')
+        ->take(3)
         ->get();
     
-    // Get FAQs
-    $faqs = Faq::where('is_active', true)
+    // Get FAQs by category
+    $generalFaqs = Faq::where('category', 'general')
+        ->where('is_active', true)
         ->orderBy('order')
+        ->take(3)
+        ->get();
+        
+    $streamingFaqs = Faq::whereIn('category', ['streaming-video', 'streaming-music'])
+        ->where('is_active', true)
+        ->orderBy('order')
+        ->take(3)
         ->get();
     
     // Get contacts
     $contacts = Contact::where('is_active', true)
         ->orderBy('order')
         ->get();
+        
+    // Get testimonials/feedback
+    $testimonials = Feedback::with('feedbackable')
+        ->where('is_active', true)
+        ->where('rating', '>=', 4)
+        ->latest()
+        ->take(6)
+        ->get();
     
     return view(
         $agent->isMobile() ? 'pages.mobile.home' : 'pages.desktop.home',
-        compact('featuredProducts', 'timelines', 'faqs', 'contacts')
+        compact(
+            'featuredProducts', 
+            'latestProducts',
+            'streamingVideoProducts',
+            'streamingMusicProducts',
+            'timelines', 
+            'generalFaqs',
+            'streamingFaqs',
+            'contacts',
+            'testimonials'
+        )
     );
 })->name('home');
 
 // Public Product Routes
 Route::prefix('products')->name('products.')->group(function () {
     Route::get('/', [DigitalProductController::class, 'index'])->name('index');
+    Route::get('/streaming-video', [DigitalProductController::class, 'streamingVideo'])->name('streaming-video');
+    Route::get('/streaming-music', [DigitalProductController::class, 'streamingMusic'])->name('streaming-music');
+    Route::get('/productivity-tools', [DigitalProductController::class, 'productivityTools'])->name('productivity-tools');
+    Route::get('/premium-software', [DigitalProductController::class, 'premiumSoftware'])->name('premium-software');
     Route::get('/{product}', [DigitalProductController::class, 'show'])->name('show');
 });
 
@@ -135,6 +186,7 @@ Route::middleware('auth')->group(function () {
         // User Orders
         Route::prefix('orders')->name('orders.')->group(function () {
             Route::get('/', [OrderController::class, 'index'])->name('index');
+            Route::get('/create', [OrderController::class, 'create'])->name('create');
             Route::get('/{order}', [OrderController::class, 'show'])->name('show');
             Route::post('/', [OrderController::class, 'store'])->name('store');
             Route::post('/{order}/cancel', [OrderController::class, 'cancel'])->name('cancel');
@@ -167,3 +219,10 @@ Route::prefix('legal')->name('legal.')->group(function () {
         return view('pages.legal.privacy');
     })->name('privacy');
 });
+
+// Cart Routes
+Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
+Route::patch('/cart/update', [CartController::class, 'update'])->name('cart.update');
+Route::delete('/cart/remove', [CartController::class, 'remove'])->name('cart.remove');
+Route::post('/cart/apply-coupon', [CartController::class, 'applyCoupon'])->name('cart.apply-coupon');

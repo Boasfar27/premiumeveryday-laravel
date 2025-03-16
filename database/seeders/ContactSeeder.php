@@ -14,54 +14,60 @@ class ContactSeeder extends Seeder
     {
         $contacts = [
             [
-                'name' => 'Customer Support',
-                'email' => 'support@premiumeveryday.com',
-                'phone' => '+1-800-123-4567',
-                'address' => '123 Main Street, Suite 100, New York, NY 10001',
-                'hours' => 'Monday-Friday: 9am-5pm EST',
+                'type' => 'email',
+                'value' => 'support@premiumeveryday.com',
+                'icon' => 'far fa-envelope',
+                'link' => 'mailto:support@premiumeveryday.com',
                 'is_active' => true,
                 'order' => 1,
             ],
             [
-                'name' => 'Sales Department',
-                'email' => 'sales@premiumeveryday.com',
-                'phone' => '+1-800-765-4321',
-                'address' => '123 Main Street, Suite 200, New York, NY 10001',
-                'hours' => 'Monday-Friday: 9am-6pm EST',
+                'type' => 'phone',
+                'value' => '+62 812-3456-7890',
+                'icon' => 'fas fa-phone-alt',
+                'link' => 'tel:+6281234567890',
                 'is_active' => true,
                 'order' => 2,
             ],
             [
-                'name' => 'Technical Support',
-                'email' => 'tech@premiumeveryday.com',
-                'phone' => '+1-800-987-6543',
-                'address' => '123 Main Street, Suite 300, New York, NY 10001',
-                'hours' => 'Monday-Sunday: 24/7 Support',
+                'type' => 'whatsapp',
+                'value' => '+62 812-3456-7890',
+                'icon' => 'fab fa-whatsapp',
+                'link' => 'https://wa.me/6281234567890',
                 'is_active' => true,
                 'order' => 3,
             ],
             [
-                'name' => 'Returns & Exchanges',
-                'email' => 'returns@premiumeveryday.com',
-                'phone' => '+1-800-456-7890',
-                'address' => '456 Warehouse Blvd, Jersey City, NJ 07302',
-                'hours' => 'Monday-Friday: 10am-4pm EST',
+                'type' => 'instagram',
+                'value' => '@premiumeveryday',
+                'icon' => 'fab fa-instagram',
+                'link' => 'https://instagram.com/premiumeveryday',
                 'is_active' => true,
                 'order' => 4,
             ],
             [
-                'name' => 'Corporate Headquarters',
-                'email' => 'info@premiumeveryday.com',
-                'phone' => '+1-212-555-1234',
-                'address' => '789 Corporate Plaza, 15th Floor, New York, NY 10022',
-                'hours' => 'By appointment only',
+                'type' => 'telegram',
+                'value' => '@premiumeveryday',
+                'icon' => 'fab fa-telegram-plane',
+                'link' => 'https://t.me/premiumeveryday',
                 'is_active' => true,
                 'order' => 5,
             ],
+            [
+                'type' => 'address',
+                'value' => 'Jl. Gatot Subroto No. 123, Jakarta Selatan, DKI Jakarta 12930',
+                'icon' => 'fas fa-map-marker-alt',
+                'link' => 'https://goo.gl/maps/123',
+                'is_active' => true,
+                'order' => 6,
+            ],
         ];
 
-        foreach ($contacts as $contactData) {
-            Contact::create($contactData);
+        foreach ($contacts as $contact) {
+            Contact::updateOrCreate(
+                ['type' => $contact['type']],
+                $contact
+            );
         }
     }
 } 
