@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
-use App\Http\Controllers\ProductController;
+use App\Http\Controllers\DigitalProductController;
 use App\Http\Controllers\TimelineController;
 use App\Http\Controllers\FaqController;
 use App\Http\Controllers\ContactController;
@@ -12,7 +12,7 @@ use App\Http\Controllers\User\ProfileController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CouponController;
 use Jenssegers\Agent\Agent;
-use App\Models\Product;
+use App\Models\DigitalProduct;
 use App\Models\Timeline;
 use App\Models\Faq;
 use App\Models\Contact;
@@ -30,8 +30,8 @@ Route::get('/', function () {
     $agent = new Agent();
     
     // Get featured products
-    $featuredProducts = Product::where('is_active', true)
-        ->orderBy('order')
+    $featuredProducts = DigitalProduct::where('is_active', true)
+        ->orderBy('sort_order')
         ->take(3)
         ->get();
     
@@ -58,8 +58,8 @@ Route::get('/', function () {
 
 // Public Product Routes
 Route::prefix('products')->name('products.')->group(function () {
-    Route::get('/', [ProductController::class, 'index'])->name('index');
-    Route::get('/{product}', [ProductController::class, 'show'])->name('show');
+    Route::get('/', [DigitalProductController::class, 'index'])->name('index');
+    Route::get('/{product}', [DigitalProductController::class, 'show'])->name('show');
 });
 
 // Categories Routes

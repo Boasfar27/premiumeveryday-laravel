@@ -23,6 +23,10 @@ class TimelineResource extends Resource
     {
         return $form
             ->schema([
+                Forms\Components\Select::make('type')
+                    ->options(Timeline::types())
+                    ->required()
+                    ->default(Timeline::TYPE_GENERAL),
                 Forms\Components\TextInput::make('title')
                     ->required()
                     ->maxLength(255),
@@ -33,6 +37,8 @@ class TimelineResource extends Resource
                     ->required(),
                 Forms\Components\TextInput::make('icon')
                     ->maxLength(255),
+                Forms\Components\ColorPicker::make('color')
+                    ->nullable(),
                 Forms\Components\Toggle::make('is_active')
                     ->required(),
                 Forms\Components\TextInput::make('order')
@@ -46,6 +52,19 @@ class TimelineResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('type')
+                    ->badge()
+                    ->formatStateUsing(fn (string $state): string => Timeline::types()[$state] ?? $state)
+                    ->colors([
+                        'primary' => fn ($state) => $state === Timeline::TYPE_GENERAL,
+                        'success' => fn ($state) => $state === Timeline::TYPE_PRODUCT,
+                        'warning' => fn ($state) => $state === Timeline::TYPE_FEATURE,
+                        'danger' => fn ($state) => $state === Timeline::TYPE_UPDATE,
+                        'info' => fn ($state) => $state === Timeline::TYPE_PROMOTION,
+                        'gray' => fn ($state) => $state === Timeline::TYPE_EVENT,
+                    ])
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('title')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('date')
@@ -53,6 +72,7 @@ class TimelineResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('icon')
                     ->searchable(),
+                Tables\Columns\ColorColumn::make('color'),
                 Tables\Columns\IconColumn::make('is_active')
                     ->boolean(),
                 Tables\Columns\TextColumn::make('order')
@@ -68,7 +88,25 @@ class TimelineResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('type')
+                    ->options(Timeline::types())
+                    ->label('Type'),
+                Tables\Filters\Filter::make('date')
+                    ->form([
+                        Forms\Components\DatePicker::make('from'),
+                        Forms\Components\DatePicker::make('until'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['from'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('date', '>=', $date),
+                            )
+                            ->when(
+                                $data['until'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('date', '<=', $date),
+                            );
+                    }),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

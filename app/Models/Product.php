@@ -4,7 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
+/**
+ * @deprecated This model is deprecated and will be removed in future versions.
+ * Use DigitalProduct and SubscriptionPlan models instead.
+ */
 class Product extends Model
 {
     use HasFactory;
@@ -40,18 +45,27 @@ class Product extends Model
 
     protected $appends = ['image_url'];
 
+    /**
+     * Get the image URL attribute.
+     */
     public function getImageUrlAttribute()
     {
         return $this->image ? asset($this->image) : asset('images/placeholder.webp');
     }
 
-    public function orders()
+    /**
+     * Get the orders for the product.
+     */
+    public function orders(): BelongsToMany
     {
         return $this->belongsToMany(Order::class, 'order_items')
             ->withPivot('quantity', 'price', 'type') // type for sharing/private
             ->withTimestamps();
     }
 
+    /**
+     * Get the actual sharing price attribute.
+     */
     public function getActualSharingPriceAttribute()
     {
         if ($this->is_promo && $this->promo_ends_at > now()) {
@@ -60,6 +74,9 @@ class Product extends Model
         return $this->sharing_price;
     }
 
+    /**
+     * Get the actual private price attribute.
+     */
     public function getActualPrivatePriceAttribute()
     {
         if ($this->is_promo && $this->promo_ends_at > now()) {
@@ -70,9 +87,6 @@ class Product extends Model
 
     /**
      * Scope a query to only include active products.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeActive($query)
     {

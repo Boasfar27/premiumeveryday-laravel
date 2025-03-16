@@ -5,7 +5,7 @@ namespace App\Http\Controllers\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Order;
-use App\Models\Product;
+use App\Models\DigitalProduct;
 use Jenssegers\Agent\Agent;
 
 class OrderController extends Controller
@@ -47,11 +47,11 @@ class OrderController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'product_id' => 'required|exists:products,id',
+            'product_id' => 'required|exists:digital_products,id',
             'duration' => 'required|integer|min:1',
         ]);
 
-        $product = Product::findOrFail($request->product_id);
+        $product = DigitalProduct::findOrFail($request->product_id);
         
         // Hitung total berdasarkan durasi
         $total = $product->price * $request->duration;

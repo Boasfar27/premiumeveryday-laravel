@@ -2,21 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Product;
+use App\Models\DigitalProduct;
 use Illuminate\Http\Request;
 use Jenssegers\Agent\Agent;
 
-class ProductController extends Controller
+class DigitalProductController extends Controller
 {
     /**
-     * Display a listing of all products.
+     * Display a listing of all digital products.
      *
      * @return \Illuminate\View\View
      */
     public function index()
     {
         $agent = new Agent();
-        $products = Product::active()
+        $products = DigitalProduct::active()
             ->when(request('type') === 'promo', function ($query) {
                 return $query->where('is_promo', true)
                     ->where('promo_ends_at', '>', now());
@@ -38,7 +38,7 @@ class ProductController extends Controller
         );
     }
 
-    public function show(Product $product)
+    public function show(DigitalProduct $product)
     {
         if (!$product->is_active) {
             abort(404);
@@ -47,7 +47,7 @@ class ProductController extends Controller
         $agent = new Agent();
         
         // Get related products (same price range or promotional status)
-        $relatedProducts = Product::active()
+        $relatedProducts = DigitalProduct::active()
             ->where('id', '!=', $product->id)
             ->where(function ($query) use ($product) {
                 $query->whereBetween('sharing_price', [

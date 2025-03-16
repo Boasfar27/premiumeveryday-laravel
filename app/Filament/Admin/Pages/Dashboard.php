@@ -11,16 +11,19 @@ class Dashboard extends BasePage
 {
     protected static ?string $navigationIcon = 'heroicon-o-home';
     
-    protected function getHeaderWidgets(): array
+    /**
+     * Override the default widgets to prevent duplication and define custom layout
+     * 
+     * This replaces both getHeaderWidgets() and getFooterWidgets() with a single method
+     * that controls all widgets displayed on the dashboard.
+     */
+    public function getWidgets(): array
     {
         return [
+            // Stats widgets at the top
             StatsOverview::class,
-        ];
-    }
-
-    protected function getFooterWidgets(): array
-    {
-        return [
+            
+            // Charts and tables below
             OrdersChart::class,
             LatestOrders::class,
         ];

@@ -21,8 +21,8 @@
                         @endif
                         <div class="ml-4">
                             <h3 class="text-lg font-medium text-gray-900">{{ $feedback->name }}</h3>
-                            @if ($feedback->product)
-                                <p class="text-sm text-gray-500">on {{ $feedback->product->name }}</p>
+                            @if ($feedback->feedbackable)
+                                <p class="text-sm text-gray-500">on {{ $feedback->feedbackable->name }}</p>
                             @endif
                         </div>
                     </div>

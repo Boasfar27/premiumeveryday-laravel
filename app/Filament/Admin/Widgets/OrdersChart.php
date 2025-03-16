@@ -56,8 +56,8 @@ class OrdersChart extends ChartWidget
 
             // Sum revenue for this day
             $dailyRevenue = Order::whereDate('created_at', $date)
-                ->where('status', 'approved')
-                ->sum('final_amount') ?? 0;
+                ->where('payment_status', 'paid')
+                ->sum('total') ?? 0;
             $revenue[] = $dailyRevenue / 1000; // Divide by 1000 to make the chart more readable
         }
 

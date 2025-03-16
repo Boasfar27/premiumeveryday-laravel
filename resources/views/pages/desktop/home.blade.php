@@ -30,7 +30,7 @@
     <!-- Products Section -->
     <section id="products" class="py-16 bg-gray-50">
         @php
-            $activeProducts = \App\Models\Product::active()->latest()->take(6)->get();
+            $activeProducts = \App\Models\DigitalProduct::active()->orderBy('sort_order')->take(6)->get();
         @endphp
         @include('pages.desktop.products.featured', ['products' => $activeProducts])
     </section>
@@ -54,7 +54,7 @@
     <!-- Feedback Section -->
     <section id="feedback" class="py-16">
         @php
-            $feedbacks = \App\Models\Feedback::active()->with('product')->latest()->take(6)->get();
+            $feedbacks = \App\Models\Feedback::active()->with('feedbackable')->latest()->take(6)->get();
         @endphp
         @include('pages.desktop.feedback.featured', ['feedbacks' => $feedbacks])
     </section>

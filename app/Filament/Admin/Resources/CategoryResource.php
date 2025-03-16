@@ -56,6 +56,10 @@ class CategoryResource extends Resource
                 Tables\Columns\TextColumn::make('sort_order')
                     ->numeric()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('digitalProducts_count')
+                    ->counts('digitalProducts')
+                    ->label('Digital Products')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -81,7 +85,8 @@ class CategoryResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\DigitalProductsRelationManager::class,
+            RelationManagers\ProductsRelationManager::class,
         ];
     }
 

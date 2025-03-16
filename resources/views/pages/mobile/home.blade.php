@@ -22,7 +22,7 @@
 
     <!-- Products Section -->
     @php
-        $activeProducts = \App\Models\Product::active()->latest()->take(4)->get();
+        $activeProducts = \App\Models\DigitalProduct::active()->orderBy('sort_order')->take(4)->get();
     @endphp
     @include('pages.mobile.products.featured', ['products' => $activeProducts])
 
@@ -40,7 +40,7 @@
 
     <!-- Feedback Section -->
     @php
-        $feedbacks = \App\Models\Feedback::active()->with('product')->latest()->take(6)->get();
+        $feedbacks = \App\Models\Feedback::active()->with('feedbackable')->latest()->take(6)->get();
     @endphp
     @include('pages.mobile.feedback.featured', ['feedbacks' => $feedbacks])
 

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Product;
+use App\Models\DigitalProduct;
 use Illuminate\Http\Request;
 use Jenssegers\Agent\Agent;
 
@@ -11,7 +11,7 @@ class HomeController extends Controller
     public function index()
     {
         $agent = new Agent();
-        $products = Product::active()
+        $products = DigitalProduct::active()
             ->latest()
             ->paginate(8);
 

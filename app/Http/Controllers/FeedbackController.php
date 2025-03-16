@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Feedback;
-use App\Models\Product;
+use App\Models\DigitalProduct;
 use Illuminate\Http\Request;
 use Jenssegers\Agent\Agent;
 
@@ -13,7 +13,7 @@ class FeedbackController extends Controller
     {
         $agent = new Agent();
         $feedbacks = Feedback::active()
-            ->with('product')
+            ->with('feedbackable')
             ->latest()
             ->paginate(9);
         
@@ -29,14 +29,23 @@ class FeedbackController extends Controller
             'name' => 'required|string|max:255',
             'content' => 'required|string|max:1000',
             'rating' => 'required|integer|min:1|max:5',
-            'product_id' => 'nullable|exists:products,id'
+            'feedbackable_id' => 'nullable|integer',
+            'feedbackable_type' => 'nullable|string'
         ]);
+
+        // Validate that the feedbackable exists if provided
+        if (!empty($validated['feedbackable_id']) && !empty($validated['feedbackable_type'])) {
+            $request->validate([
+                'feedbackable_id' => 'exists:' . $validated['feedbackable_type'] . ',id'
+            ]);
+        }
 
         $feedback = Feedback::create([
             'name' => $validated['name'],
             'content' => $validated['content'],
             'rating' => $validated['rating'],
-            'product_id' => $validated['product_id'] ?? null,
+            'feedbackable_id' => $validated['feedbackable_id'] ?? null,
+            'feedbackable_type' => $validated['feedbackable_type'] ?? null,
             'is_active' => true,
             'order' => Feedback::max('order') + 1
         ]);
@@ -47,7 +56,7 @@ class FeedbackController extends Controller
     public function featured()
     {
         $feedbacks = Feedback::active()
-            ->with('product')
+            ->with('feedbackable')
             ->latest()
             ->take(6)
             ->get();

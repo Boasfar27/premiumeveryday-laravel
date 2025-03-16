@@ -4,43 +4,83 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Order extends Model
 {
     use HasFactory;
 
     protected $fillable = [
+        'order_number',
         'user_id',
-        'product_id',
+        'order_type',
         'name',
         'email',
         'whatsapp',
-        'product_name',
-        'subscription_type',
-        'amount',
-        'payment_proof',
-        'status',
-        'coupon_code',
+        'subtotal',
+        'tax',
+        'shipping',
         'discount_amount',
-        'final_amount',
+        'total',
+        'payment_method',
+        'payment_status',
+        'status',
+        'payment_proof',
+        'paid_at',
+        'billing_details',
+        'customer_notes',
+        'admin_notes',
+        'coupon_code',
     ];
 
     protected $casts = [
-        'expired_at' => 'datetime',
+        'subtotal' => 'decimal:2',
+        'tax' => 'decimal:2',
+        'shipping' => 'decimal:2',
+        'discount_amount' => 'decimal:2',
+        'total' => 'decimal:2',
+        'paid_at' => 'datetime',
+        'billing_details' => 'array',
     ];
 
     protected $appends = ['status_color'];
 
-    public function user()
+    /**
+     * Get the user that owns the order.
+     */
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function product()
+    /**
+     * Get the items for the order.
+     */
+    public function items(): HasMany
     {
-        return $this->belongsTo(Product::class);
+        return $this->hasMany(OrderItem::class);
     }
 
+    /**
+     * Get the user subscriptions for the order.
+     */
+    public function userSubscriptions(): HasMany
+    {
+        return $this->hasMany(UserSubscription::class);
+    }
+
+    /**
+     * Get the licenses for the order.
+     */
+    public function licenses(): HasMany
+    {
+        return $this->hasMany(DigitalProductLicense::class);
+    }
+
+    /**
+     * Get the status color for the order.
+     */
     public function getStatusColorAttribute()
     {
         return match($this->status) {
@@ -53,11 +93,17 @@ class Order extends Model
         };
     }
 
+    /**
+     * Get the formatted total for the order.
+     */
     public function getFormattedTotalAttribute()
     {
         return 'Rp ' . number_format($this->total, 0, ',', '.');
     }
 
+    /**
+     * Get the formatted status for the order.
+     */
     public function getFormattedStatusAttribute()
     {
         return match($this->status) {
@@ -70,21 +116,45 @@ class Order extends Model
         };
     }
 
+    /**
+     * Calculate the order totals.
+     */
+    public function calculateTotals()
+    {
+        $this->subtotal = $this->items->sum('subtotal');
+        $this->tax = $this->items->sum('tax');
+        $this->total = $this->subtotal + $this->tax + $this->shipping - $this->discount_amount;
+        
+        return $this;
+    }
+
+    /**
+     * Scope a query to only include active orders.
+     */
     public function scopeActive($query)
     {
         return $query->whereIn('status', ['active', 'processing']);
     }
 
+    /**
+     * Scope a query to only include pending orders.
+     */
     public function scopePending($query)
     {
         return $query->where('status', 'pending');
     }
 
+    /**
+     * Scope a query to only include completed orders.
+     */
     public function scopeCompleted($query)
     {
         return $query->where('status', 'completed');
     }
 
+    /**
+     * Scope a query to only include cancelled orders.
+     */
     public function scopeCancelled($query)
     {
         return $query->where('status', 'cancelled');

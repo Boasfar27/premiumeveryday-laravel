@@ -32,8 +32,8 @@
                                 <div class="flex items-center justify-between">
                                     <div>
                                         <h4 class="text-sm font-medium text-gray-900">{{ $feedback->name }}</h4>
-                                        @if ($feedback->product)
-                                            <p class="text-xs text-gray-500">{{ $feedback->product->name }}</p>
+                                        @if ($feedback->feedbackable)
+                                            <p class="text-xs text-gray-500">{{ $feedback->feedbackable->name }}</p>
                                         @endif
                                     </div>
                                     <time class="text-xs text-gray-500"

@@ -21,22 +21,23 @@ class LatestOrders extends BaseWidget
                 Order::query()->latest()->limit(5)
             )
             ->columns([
-                Tables\Columns\TextColumn::make('id')
-                    ->label('Order ID')
+                Tables\Columns\TextColumn::make('order_number')
+                    ->label('Order Number')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('user.name')
                     ->label('Customer')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('final_amount')
+                Tables\Columns\TextColumn::make('total')
                     ->label('Amount')
                     ->money('IDR')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('status')
+                Tables\Columns\TextColumn::make('payment_status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'pending' => 'warning',
-                        'approved' => 'success',
-                        'cancelled' => 'danger',
+                        'paid' => 'success',
+                        'failed' => 'danger',
+                        'refunded' => 'gray',
                         default => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('created_at')

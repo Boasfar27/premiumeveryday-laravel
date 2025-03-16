@@ -23,6 +23,10 @@ class FaqResource extends Resource
     {
         return $form
             ->schema([
+                Forms\Components\Select::make('category')
+                    ->options(Faq::categories())
+                    ->required()
+                    ->default(Faq::CATEGORY_GENERAL),
                 Forms\Components\TextInput::make('question')
                     ->required()
                     ->maxLength(255),
@@ -42,6 +46,19 @@ class FaqResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('category')
+                    ->badge()
+                    ->formatStateUsing(fn (string $state): string => Faq::categories()[$state] ?? $state)
+                    ->colors([
+                        'primary' => fn ($state) => $state === Faq::CATEGORY_GENERAL,
+                        'success' => fn ($state) => $state === Faq::CATEGORY_ACCOUNT,
+                        'warning' => fn ($state) => $state === Faq::CATEGORY_SUBSCRIPTION,
+                        'danger' => fn ($state) => $state === Faq::CATEGORY_PAYMENT,
+                        'info' => fn ($state) => $state === Faq::CATEGORY_PRODUCT,
+                        'gray' => fn ($state) => $state === Faq::CATEGORY_TECHNICAL,
+                    ])
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('question')
                     ->searchable(),
                 Tables\Columns\IconColumn::make('is_active')
@@ -59,7 +76,9 @@ class FaqResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('category')
+                    ->options(Faq::categories())
+                    ->label('Category'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

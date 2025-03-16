@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Feedback extends Model
 {
@@ -11,10 +13,13 @@ class Feedback extends Model
 
     protected $fillable = [
         'name',
+        'email',
         'avatar',
         'content',
         'rating',
-        'product_id',
+        'user_id',
+        'feedbackable_id',
+        'feedbackable_type',
         'is_active',
         'order',
     ];
@@ -25,19 +30,51 @@ class Feedback extends Model
         'order' => 'integer',
     ];
 
-    public function product()
+    /**
+     * Get the user who left the feedback.
+     */
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the feedbackable model (digital product or subscription plan).
+     */
+    public function feedbackable(): MorphTo
+    {
+        return $this->morphTo();
     }
 
     /**
      * Scope a query to only include active feedback.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeActive($query)
     {
         return $query->where('is_active', true)->orderBy('order');
+    }
+
+    /**
+     * Scope a query to only include verified feedback (from registered users).
+     */
+    public function scopeVerified($query)
+    {
+        return $query->whereNotNull('user_id');
+    }
+
+    /**
+     * Scope a query to only include feedback with a specific rating.
+     */
+    public function scopeWithRating($query, $rating)
+    {
+        return $query->where('rating', $rating);
+    }
+
+    /**
+     * Scope a query to only include feedback with a rating greater than or equal to a specific value.
+     */
+    public function scopeWithMinRating($query, $rating)
+    {
+        return $query->where('rating', '>=', $rating);
     }
 }

@@ -65,6 +65,38 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser
     }
 
     /**
+     * Get user's subscriptions
+     */
+    public function subscriptions()
+    {
+        return $this->hasMany(UserSubscription::class);
+    }
+
+    /**
+     * Get user's active subscriptions
+     */
+    public function activeSubscriptions()
+    {
+        return $this->subscriptions()->active();
+    }
+
+    /**
+     * Get user's licenses
+     */
+    public function licenses()
+    {
+        return $this->hasMany(DigitalProductLicense::class);
+    }
+
+    /**
+     * Get user's active licenses
+     */
+    public function activeLicenses()
+    {
+        return $this->licenses()->active();
+    }
+
+    /**
      * Check if user is admin
      */
     public function isAdmin(): bool
