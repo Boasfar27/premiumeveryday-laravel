@@ -1,4 +1,4 @@
-@extends('pages.layouts.app')
+@extends('pages.mobile.layouts.app')
 
 @section('title', 'Verifikasi Email - Premium Everyday')
 

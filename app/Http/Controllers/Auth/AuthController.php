@@ -274,7 +274,7 @@ class AuthController extends Controller
                     <p class="text-lg mb-2">Selamat <strong>' . $user->name . '</strong>!</p>
                     <p class="mb-4">Email Anda telah berhasil diverifikasi</p>
                     <div class="bg-green-50 p-4 rounded-lg mb-4">
-                        <p class="text-green-600">
+                        <p class="text-green-600">  
                             <i class="fas fa-check-circle mr-2"></i>
                             Akun Anda sudah aktif
                         </p>

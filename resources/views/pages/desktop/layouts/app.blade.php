@@ -22,6 +22,9 @@
 
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body class="font-sans antialiased" x-data="{ mobileMenuOpen: false }">
@@ -42,19 +45,105 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
     <!-- Flash Messages -->
+    @if (session('swal'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const swalData = @json(session('swal'));
+
+                // Parse the didOpen function if it exists
+                if (swalData.didOpen) {
+                    const didOpenFunc = new Function('toast', swalData.didOpen);
+                    swalData.didOpen = didOpenFunc;
+                }
+
+                // Handle different button actions
+                Swal.fire(swalData).then((result) => {
+                        if (result.isConfirmed) {
+                            if (swalData.confirmButtonText === 'Mulai Belanja') {
+                                window.location.href = "{{ route('products.index') }}";
+                            } else if (swalData.confirmButtonText === 'Saya Mengerti') {
+                                // Stay on the current page or redirect to profile
+                                @auth
+                                window.location.href = "{{ route('user.profile') }}";
+                            @endauth
+                        }
+                    } else if (result.dismiss === Swal.DismissReason.cancel && swalData.cancelButtonText ===
+                        'Kirim Ulang Email') {
+                        // Send a request to resend verification email
+                        fetch("{{ route('verification.resend') }}", {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded',
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                                        .getAttribute('content')
+                                },
+                                body: '_token=' + document.querySelector('meta[name="csrf-token"]')
+                                    .getAttribute('content')
+                            })
+                            .then(response => {
+                                if (response.ok) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Email Terkirim!',
+                                        text: 'Link verifikasi baru telah dikirim ke email Anda.',
+                                        timer: 3000,
+                                        timerProgressBar: true
+                                    });
+                                } else {
+                                    throw new Error('Gagal mengirim email');
+                                }
+                            })
+                            .catch(error => {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Gagal!',
+                                    text: 'Gagal mengirim ulang email verifikasi. Silakan coba lagi nanti.',
+                                    timer: 3000,
+                                    timerProgressBar: true
+                                });
+                            });
+                    }
+                });
+            });
+        </script>
+    @endif
+
     @if (session('success'))
-        <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 3000)"
-            class="fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg">
-            {{ session('success') }}
-        </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: '{{ session('success') }}',
+                    timer: 3000,
+                    timerProgressBar: true,
+                    showConfirmButton: false,
+                    position: 'top-end',
+                    toast: true
+                });
+            });
+        </script>
     @endif
 
     @if (session('error'))
-        <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 3000)"
-            class="fixed bottom-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg">
-            {{ session('error') }}
-        </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: '{{ session('error') }}',
+                    timer: 3000,
+                    timerProgressBar: true,
+                    showConfirmButton: false,
+                    position: 'top-end',
+                    toast: true
+                });
+            });
+        </script>
     @endif
+
+    <!-- Additional Scripts -->
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
 </body>
 
 </html>
