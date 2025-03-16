@@ -60,7 +60,7 @@ class AuthController extends BaseController
             $request->session()->regenerate();
 
             if ($user->role === 1) {
-                return redirect()->route('admin.dashboard');
+                return redirect('/admin');
             }
 
             return redirect()->route('user.dashboard');

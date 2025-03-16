@@ -5,6 +5,7 @@ namespace App\Providers\Filament;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\NavigationGroup;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -14,8 +15,10 @@ use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
+use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use App\Filament\Admin\Pages\Dashboard;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -26,14 +29,22 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->registration(false)
+            ->passwordReset(false)
+            ->emailVerification(false)
+            ->profile(false)
+            ->homeUrl('/')
+            ->brandLogo(asset('images/logo.webp'))
+            ->brandName('Premium Everyday Admin')
             ->colors([
-                'primary' => Color::Amber,
-                'gray' => Color::Gray,
+                'primary' => Color::Pink,
             ])
-            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
+            ->discoverResources(in: app_path('Filament/Admin/Resources'), for: 'App\\Filament\\Admin\\Resources')
+            ->discoverPages(in: app_path('Filament/Admin/Pages'), for: 'App\\Filament\\Admin\\Pages')
             ->pages([
-                Pages\Dashboard::class,
+                Dashboard::class,
             ])
+            ->discoverWidgets(in: app_path('Filament/Admin/Widgets'), for: 'App\\Filament\\Admin\\Widgets')
             ->widgets([
                 Widgets\AccountWidget::class,
             ])
@@ -41,6 +52,7 @@ class AdminPanelProvider extends PanelProvider
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
                 StartSession::class,
+                AuthenticateSession::class,
                 ShareErrorsFromSession::class,
                 VerifyCsrfToken::class,
                 SubstituteBindings::class,
@@ -51,14 +63,16 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
             ])
             ->navigationGroups([
-                'Shop',
-                'Content',
-                'Settings',
-            ])
-            ->databaseNotifications()
-            ->sidebarCollapsibleOnDesktop()
-            ->maxContentWidth('full')
-            ->brandName('Premium Everyday')
-            ->homeUrl('/admin');
+                NavigationGroup::make()
+                    ->label('User Management'),
+                NavigationGroup::make()
+                    ->label('Product Management'),
+                NavigationGroup::make()
+                    ->label('Order Management'),
+                NavigationGroup::make()
+                    ->label('Content Management'),
+                NavigationGroup::make()
+                    ->label('Settings'),
+            ]);
     }
 }

@@ -15,7 +15,20 @@ return [
     */
 
     'broadcasting' => [
-        'enabled' => true,
+
+        // 'echo' => [
+        //     'broadcaster' => 'pusher',
+        //     'key' => env('VITE_PUSHER_APP_KEY'),
+        //     'cluster' => env('VITE_PUSHER_APP_CLUSTER'),
+        //     'wsHost' => env('VITE_PUSHER_HOST'),
+        //     'wsPort' => env('VITE_PUSHER_PORT'),
+        //     'wssPort' => env('VITE_PUSHER_PORT'),
+        //     'authEndpoint' => '/broadcasting/auth',
+        //     'disableStats' => true,
+        //     'encrypted' => true,
+        //     'forceTLS' => true,
+        // ],
+
     ],
 
     /*
@@ -73,65 +86,9 @@ return [
 
     'livewire_loading_delay' => 'default',
 
-    'path' => env('FILAMENT_PATH', 'admin'),
+    'path' => 'admin',
     'domain' => env('FILAMENT_DOMAIN'),
-    'home_url' => env('FILAMENT_HOME_URL', '/'),
+    'home_url' => '/',
     'brand' => env('FILAMENT_BRAND_NAME', 'Premium Everyday'),
-    'auth' => [
-        'guard' => env('FILAMENT_AUTH_GUARD', 'web'),
-        'pages' => [
-            'login' => \Filament\Pages\Auth\Login::class,
-        ],
-    ],
-    'pages' => [
-        'namespace' => 'App\\Filament\\Pages',
-        'path' => app_path('Filament/Pages'),
-        'register' => [],
-    ],
-    'resources' => [
-        'namespace' => 'App\\Filament\\Resources',
-        'path' => app_path('Filament/Resources'),
-        'register' => [],
-    ],
-    'widgets' => [
-        'namespace' => 'App\\Filament\\Widgets',
-        'path' => app_path('Filament/Widgets'),
-        'register' => [],
-    ],
-    'livewire' => [
-        'namespace' => 'App\\Filament',
-        'path' => app_path('Filament'),
-    ],
-    'dark_mode' => [
-        'enabled' => true,
-        'auto' => true,
-    ],
-    'database_notifications' => [
-        'enabled' => true,
-        'polling_interval' => '30s',
-    ],
-    'layout' => [
-        'forms' => [
-            'actions' => [
-                'alignment' => 'left',
-            ],
-            'have_inline_labels' => false,
-        ],
-        'footer' => [
-            'should_show_logo' => true,
-        ],
-        'max_content_width' => null,
-        'notifications' => [
-            'vertical_alignment' => 'top',
-            'alignment' => 'right',
-        ],
-        'sidebar' => [
-            'is_collapsible_on_desktop' => true,
-            'groups' => [
-                'are_collapsible' => true,
-            ],
-            'width' => null,
-            'collapsed_width' => null,
-        ],
-    ],
+
 ];

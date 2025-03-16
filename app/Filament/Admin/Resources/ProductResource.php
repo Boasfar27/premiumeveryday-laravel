@@ -12,36 +12,12 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\Str;
 
 class ProductResource extends Resource
 {
     protected static ?string $model = Product::class;
 
-    protected static ?string $slug = 'products';
-
-    protected static ?string $recordTitleAttribute = 'name';
-
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-
-    protected static ?string $navigationGroup = 'Shop';
-
-    protected static ?int $navigationSort = 0;
-
-    public static function getNavigationLabel(): string
-    {
-        return 'Products';
-    }
-
-    public static function getModelLabel(): string
-    {
-        return 'Product';
-    }
-
-    public static function getPluralModelLabel(): string
-    {
-        return 'Products';
-    }
+    protected static ?string $navigationIcon = 'heroicon-o-shopping-bag';
 
     public static function form(Form $form): Form
     {
@@ -49,9 +25,7 @@ class ProductResource extends Resource
             ->schema([
                 Forms\Components\TextInput::make('name')
                     ->required()
-                    ->maxLength(255)
-                    ->reactive()
-                    ->afterStateUpdated(fn ($state, callable $set) => $set('slug', Str::slug($state))),
+                    ->maxLength(255),
                 Forms\Components\TextInput::make('slug')
                     ->required()
                     ->maxLength(255),
@@ -63,10 +37,9 @@ class ProductResource extends Resource
                 Forms\Components\TextInput::make('price')
                     ->required()
                     ->numeric()
-                    ->prefix('Rp'),
+                    ->prefix('$'),
                 Forms\Components\TextInput::make('old_price')
-                    ->numeric()
-                    ->prefix('Rp'),
+                    ->numeric(),
                 Forms\Components\TextInput::make('stock')
                     ->required()
                     ->numeric()
@@ -77,12 +50,10 @@ class ProductResource extends Resource
                     ->required(),
                 Forms\Components\TextInput::make('sharing_price')
                     ->required()
-                    ->numeric()
-                    ->prefix('Rp'),
+                    ->numeric(),
                 Forms\Components\TextInput::make('private_price')
                     ->required()
-                    ->numeric()
-                    ->prefix('Rp'),
+                    ->numeric(),
                 Forms\Components\Textarea::make('sharing_description')
                     ->columnSpanFull(),
                 Forms\Components\Textarea::make('private_description')
@@ -116,13 +87,12 @@ class ProductResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->searchable()
-                    ->sortable(),
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('slug')
                     ->searchable(),
                 Tables\Columns\ImageColumn::make('featured_image'),
                 Tables\Columns\TextColumn::make('price')
-                    ->money('IDR')
+                    ->money()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('old_price')
                     ->numeric()
@@ -140,11 +110,11 @@ class ProductResource extends Resource
                 Tables\Columns\TextColumn::make('private_price')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\ImageColumn::make('image')
-                    ->circular(),
+                Tables\Columns\ImageColumn::make('image'),
                 Tables\Columns\IconColumn::make('is_active')
                     ->boolean(),
                 Tables\Columns\TextColumn::make('order')
+                    ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
@@ -174,7 +144,6 @@ class ProductResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -197,5 +166,10 @@ class ProductResource extends Resource
             'create' => Pages\CreateProduct::route('/create'),
             'edit' => Pages\EditProduct::route('/{record}/edit'),
         ];
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Product Management';
     }
 }

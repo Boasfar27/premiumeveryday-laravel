@@ -176,7 +176,7 @@ class AuthController extends Controller
             Auth::login($user);
             
             if ($user->role == 1) {
-                return redirect()->route('admin.dashboard');
+                return redirect('/admin/login');
             }
             
             return redirect()->route('user.dashboard');

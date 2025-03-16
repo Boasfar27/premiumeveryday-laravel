@@ -12,14 +12,17 @@ class Order extends Model
     protected $fillable = [
         'user_id',
         'product_id',
-        'order_number',
-        'duration',
-        'total',
-        'status',
-        'payment_status',
-        'payment_method',
+        'name',
+        'email',
+        'whatsapp',
+        'product_name',
+        'subscription_type',
+        'amount',
         'payment_proof',
-        'expired_at',
+        'status',
+        'coupon_code',
+        'discount_amount',
+        'final_amount',
     ];
 
     protected $casts = [

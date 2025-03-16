@@ -9,6 +9,8 @@ use App\Http\Controllers\ContactController;
 use App\Http\Controllers\User\DashboardController as UserDashboardController;
 use App\Http\Controllers\User\OrderController;
 use App\Http\Controllers\User\ProfileController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CouponController;
 use Jenssegers\Agent\Agent;
 use App\Models\Product;
 use App\Models\Timeline;
@@ -58,6 +60,12 @@ Route::get('/', function () {
 Route::prefix('products')->name('products.')->group(function () {
     Route::get('/', [ProductController::class, 'index'])->name('index');
     Route::get('/{product}', [ProductController::class, 'show'])->name('show');
+});
+
+// Categories Routes
+Route::prefix('categories')->name('categories.')->group(function () {
+    Route::get('/', [CategoryController::class, 'index'])->name('index');
+    Route::get('/{category}', [CategoryController::class, 'show'])->name('show');
 });
 
 // Public Information Routes
@@ -116,6 +124,9 @@ Route::middleware('auth')->group(function () {
 
     // User Routes
     Route::middleware(['verified'])->prefix('user')->name('user.')->group(function () {
+        // Dashboard
+        Route::get('/dashboard', [UserDashboardController::class, 'index'])->name('dashboard');
+        
         // Profile Routes
         Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
         Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -126,7 +137,11 @@ Route::middleware('auth')->group(function () {
             Route::get('/', [OrderController::class, 'index'])->name('index');
             Route::get('/{order}', [OrderController::class, 'show'])->name('show');
             Route::post('/', [OrderController::class, 'store'])->name('store');
+            Route::post('/{order}/cancel', [OrderController::class, 'cancel'])->name('cancel');
         });
+
+        // Apply Coupon
+        Route::post('/coupons/apply', [CouponController::class, 'apply'])->name('coupons.apply');
     });
 
     // Notification Routes
@@ -135,11 +150,11 @@ Route::middleware('auth')->group(function () {
         Route::post('/{id}/read', [NotificationController::class, 'markAsRead'])->name('markAsRead');
         Route::post('/read-all', [NotificationController::class, 'markAllAsRead'])->name('markAllAsRead');
     });
-});
-
-// Admin Redirect
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::redirect('/admin/dashboard', '/admin');
+    
+    // Admin Dashboard Route
+    Route::get('/admin/dashboard', function () {
+        return redirect('/admin');
+    })->name('admin.dashboard');
 });
 
 // Legal Routes
@@ -147,7 +162,7 @@ Route::prefix('legal')->name('legal.')->group(function () {
     Route::get('/terms', function () {
         return view('pages.legal.terms');
     })->name('terms');
-
+    
     Route::get('/privacy', function () {
         return view('pages.legal.privacy');
     })->name('privacy');
