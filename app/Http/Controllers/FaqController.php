@@ -13,6 +13,6 @@ class FaqController extends Controller
         $agent = new Agent();
         $faqs = Faq::where('is_active', true)->orderBy('order')->get();
         
-        return view('components.faq.index', compact('faqs'));
+        return view('pages.desktop.faq.index', compact('faqs'));
     }
 } 
