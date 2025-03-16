@@ -9,10 +9,6 @@ use App\Http\Controllers\ContactController;
 use App\Http\Controllers\User\DashboardController as UserDashboardController;
 use App\Http\Controllers\User\OrderController;
 use App\Http\Controllers\User\ProfileController;
-use App\Http\Controllers\Admin\AdminController;
-use App\Http\Controllers\Admin\UserController as AdminUserController;
-use App\Http\Controllers\Admin\ProductController as AdminProductController;
-use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use Jenssegers\Agent\Agent;
 use App\Models\Product;
 use App\Models\Timeline;
@@ -139,37 +135,11 @@ Route::middleware('auth')->group(function () {
         Route::post('/{id}/read', [NotificationController::class, 'markAsRead'])->name('markAsRead');
         Route::post('/read-all', [NotificationController::class, 'markAllAsRead'])->name('markAllAsRead');
     });
+});
 
-    // Admin Routes
-    Route::middleware(['verified', 'admin'])->prefix('admin')->name('admin.')->group(function () {
-        // Dashboard
-        Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
-        
-        // User Management
-        Route::prefix('users')->name('users.')->group(function () {
-            Route::get('/', [AdminUserController::class, 'index'])->name('index');
-            Route::get('/{user}/edit', [AdminUserController::class, 'edit'])->name('edit');
-            Route::put('/{user}', [AdminUserController::class, 'update'])->name('update');
-            Route::delete('/{user}', [AdminUserController::class, 'destroy'])->name('delete');
-        });
-        
-        // Product Management
-        Route::prefix('products')->name('products.')->group(function () {
-            Route::get('/', [AdminProductController::class, 'index'])->name('index');
-            Route::get('/create', [AdminProductController::class, 'create'])->name('create');
-            Route::post('/', [AdminProductController::class, 'store'])->name('store');
-            Route::get('/{product}/edit', [AdminProductController::class, 'edit'])->name('edit');
-            Route::put('/{product}', [AdminProductController::class, 'update'])->name('update');
-            Route::delete('/{product}', [AdminProductController::class, 'destroy'])->name('delete');
-        });
-        
-        // Order Management
-        Route::prefix('orders')->name('orders.')->group(function () {
-            Route::get('/', [AdminOrderController::class, 'index'])->name('index');
-            Route::get('/{order}', [AdminOrderController::class, 'show'])->name('show');
-            Route::put('/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('status');
-        });
-    });
+// Admin Redirect
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::redirect('/admin/dashboard', '/admin');
 });
 
 // Legal Routes

@@ -79,7 +79,7 @@
                 </div>
                 <div class="mt-3 space-y-1">
                     @if (Auth::user()->role === 1)
-                        <a href="{{ route('admin.dashboard') }}"
+                        <a href="{{ route('filament.admin.pages.dashboard') }}"
                             class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">Dashboard
                             Admin</a>
                     @endif

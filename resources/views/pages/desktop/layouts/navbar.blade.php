@@ -61,18 +61,20 @@
                     <div class="ml-3 relative" x-data="{ open: false }" @click.away="open = false">
                         <div>
                             <button @click="open = !open" type="button"
-                                class="flex rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                                class="flex items-center rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 space-x-2"
                                 id="user-menu-button">
                                 <span class="sr-only">Open user menu</span>
                                 @if (auth()->user()->avatar)
                                     <img class="h-8 w-8 rounded-full object-cover"
                                         src="{{ asset(auth()->user()->avatar) }}" alt="{{ auth()->user()->name }}">
-                                @else
-                                    <div
-                                        class="h-8 w-8 rounded-full bg-primary-100 flex items-center justify-center text-primary-600">
-                                        {{ substr(auth()->user()->name, 0, 1) }}
-                                    </div>
                                 @endif
+                                <span class="text-gray-700 font-medium">{{ auth()->user()->name }}</span>
+                                <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                    fill="currentColor">
+                                    <path fill-rule="evenodd"
+                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                        clip-rule="evenodd" />
+                                </svg>
                             </button>
                         </div>
 
@@ -85,9 +87,10 @@
                             class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
                             role="menu">
                             @if (auth()->user()->role === 1)
-                                <a href="{{ route('admin.dashboard') }}"
-                                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                    role="menuitem">Dashboard Admin</a>
+                                <a href="/admin/dashboard"
+                                    class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100">
+                                    Dashboard Admin
+                                </a>
                             @endif
                             <a href="{{ route('user.profile') }}"
                                 class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">Profile</a>
@@ -175,7 +178,7 @@
 
                 <div class="mt-3 space-y-1">
                     @if (auth()->user()->role === 1)
-                        <a href="{{ route('admin.dashboard') }}"
+                        <a href="/admin/dashboard"
                             class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100">
                             Dashboard Admin
                         </a>
