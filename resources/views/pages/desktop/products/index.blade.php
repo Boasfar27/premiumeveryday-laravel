@@ -1,8 +1,8 @@
 @extends('pages.desktop.layouts.app')
 
 @section('content')
-    <div class="bg-white pt-16">
-        <div class="max-w-2xl px-4 py-16 mx-auto sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
+    <div class="bg-white pt-24">
+        <div class="max-w-2xl px-4 py-8 mx-auto sm:px-6 sm:py-12 lg:max-w-7xl lg:px-8">
             <h2 class="text-2xl font-bold tracking-tight text-gray-900">
                 @if (isset($currentCategory))
                     {{ $currentCategory->name }}

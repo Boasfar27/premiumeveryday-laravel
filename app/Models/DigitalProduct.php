@@ -80,6 +80,14 @@ class DigitalProduct extends Model
     }
 
     /**
+     * Get the feedback for the digital product.
+     */
+    public function feedback(): MorphMany
+    {
+        return $this->morphMany(Feedback::class, 'feedbackable');
+    }
+
+    /**
      * Get the current price of the digital product.
      */
     public function getCurrentPriceAttribute()
