@@ -20,6 +20,9 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\CartController;
 use App\Models\Feedback;
+use App\Http\Controllers\User\OrderFeedbackController;
+use App\Http\Controllers\User\PaymentController;
+use App\Http\Controllers\User\PaymentHistoryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -184,13 +187,23 @@ Route::middleware('auth')->group(function () {
         Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('password.update');
         
         // User Orders
-        Route::prefix('orders')->name('orders.')->group(function () {
+        Route::prefix('orders')->middleware(['auth', 'verified'])->name('orders.')->group(function () {
             Route::get('/', [OrderController::class, 'index'])->name('index');
             Route::get('/create', [OrderController::class, 'create'])->name('create');
             Route::get('/{order}', [OrderController::class, 'show'])->name('show');
             Route::post('/', [OrderController::class, 'store'])->name('store');
             Route::post('/{order}/cancel', [OrderController::class, 'cancel'])->name('cancel');
+            
+            // Order Feedback Routes
+            Route::get('/{order}/feedback', [OrderFeedbackController::class, 'create'])->name('feedback.create');
+            Route::post('/{order}/feedback', [OrderFeedbackController::class, 'store'])->name('feedback.store');
+            Route::get('/{order}/feedback/{feedback}/edit', [OrderFeedbackController::class, 'edit'])->name('feedback.edit');
+            Route::put('/{order}/feedback/{feedback}', [OrderFeedbackController::class, 'update'])->name('feedback.update');
+            Route::delete('/{order}/feedback/{feedback}', [OrderFeedbackController::class, 'destroy'])->name('feedback.destroy');
         });
+
+        // Payment History
+        Route::get('/payments/history', [PaymentHistoryController::class, 'index'])->middleware(['auth', 'verified'])->name('payments.history');
 
         // Apply Coupon
         Route::post('/coupons/apply', [CouponController::class, 'apply'])->name('coupons.apply');

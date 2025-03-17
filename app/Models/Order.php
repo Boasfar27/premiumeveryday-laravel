@@ -79,6 +79,14 @@ class Order extends Model
     }
 
     /**
+     * Get the feedback for the order.
+     */
+    public function feedback(): HasMany
+    {
+        return $this->hasMany(Feedback::class);
+    }
+
+    /**
      * Get the status color for the order.
      */
     public function getStatusColorAttribute()

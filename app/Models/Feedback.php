@@ -20,6 +20,7 @@ class Feedback extends Model
         'user_id',
         'feedbackable_id',
         'feedbackable_type',
+        'order_id',
         'is_active',
         'order',
     ];
@@ -44,6 +45,14 @@ class Feedback extends Model
     public function feedbackable(): MorphTo
     {
         return $this->morphTo();
+    }
+
+    /**
+     * Get the order associated with this feedback.
+     */
+    public function order(): BelongsTo
+    {
+        return $this->belongsTo(Order::class);
     }
 
     /**

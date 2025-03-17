@@ -111,6 +111,9 @@
                                 class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">Profile</a>
                             <a href="{{ route('user.orders.index') }}"
                                 class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">Orders</a>
+                            <a href="{{ route('user.payments.history') }}"
+                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">Payment
+                                History</a>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
                                 <button type="submit"
@@ -205,6 +208,10 @@
                     <a href="{{ route('user.orders.index') }}"
                         class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100">
                         Orders
+                    </a>
+                    <a href="{{ route('user.payments.history') }}"
+                        class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100">
+                        Payment History
                     </a>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf

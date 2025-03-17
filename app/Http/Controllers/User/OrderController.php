@@ -12,7 +12,7 @@ class OrderController extends Controller
 {
     public function __construct()
     {
-        $this->middleware(['auth', 'verified']);
+        // Perbaikan: tidak menggunakan $this->middleware disini
     }
 
     public function index()
@@ -23,8 +23,8 @@ class OrderController extends Controller
 
         $agent = new Agent();
         return view($agent->isMobile() ? 
-            'pages.user.mobile.orders.index' : 
-            'pages.user.desktop.orders.index',
+            'pages.mobile.orders.index' : 
+            'pages.desktop.orders.index',
             compact('orders')
         );
     }
@@ -36,11 +36,14 @@ class OrderController extends Controller
             abort(403);
         }
 
+        // Load feedback for this order
+        $feedback = $order->feedback()->where('user_id', auth()->id())->first();
+
         $agent = new Agent();
         return view($agent->isMobile() ? 
-            'pages.user.mobile.orders.show' : 
-            'pages.user.desktop.orders.show',
-            compact('order')
+            'pages.mobile.orders.show' : 
+            'pages.desktop.orders.show',
+            compact('order', 'feedback')
         );
     }
 

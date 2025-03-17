@@ -108,6 +108,9 @@
                         class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">Profile</a>
                     <a href="{{ route('user.orders.index') }}"
                         class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">Orders</a>
+                    <a href="{{ route('user.payments.history') }}"
+                        class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">Payment
+                        History</a>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit"

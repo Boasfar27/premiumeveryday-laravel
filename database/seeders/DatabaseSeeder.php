@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             FaqSeeder::class,
             FeedbackSeeder::class,
             ContactSeeder::class,
+            PaymentDataSeeder::class,
         ]);
     }
 } 
