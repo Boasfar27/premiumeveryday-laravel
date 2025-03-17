@@ -3,18 +3,13 @@
 @section('title', $product->name . ' - Premium Everyday')
 
 @section('content')
-    <div class="bg-white py-16">
+    <div class="bg-white py-16 pt-24">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Breadcrumbs -->
             <nav class="flex mb-8" aria-label="Breadcrumb">
                 <ol class="inline-flex items-center space-x-1 md:space-x-3">
                     <li class="inline-flex items-center">
                         <a href="{{ route('home') }}" class="text-gray-500 hover:text-primary">
-                            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                <path
-                                    d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z">
-                                </path>
-                            </svg>
                             Home
                         </a>
                     </li>
@@ -250,77 +245,131 @@
                     </div>
 
                     <!-- Reviews Tab -->
-                    <div x-show="activeTab === 'reviews'" class="text-gray-500">
-                        <div class="mb-8">
-                            <h3 class="text-lg font-medium text-gray-900 mb-4">Customer Reviews</h3>
-
-                            <!-- Review Form -->
-                            <form class="bg-gray-50 p-6 rounded-lg mb-8">
-                                <h4 class="text-base font-medium text-gray-900 mb-4">Write a Review</h4>
-
-                                <div class="mb-4">
-                                    <label for="rating"
-                                        class="block text-sm font-medium text-gray-700 mb-1">Rating</label>
-                                    <div class="flex items-center">
+                    <div x-show="activeTab === 'reviews'" class="prose prose-sm max-w-none text-gray-500">
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                            <div class="lg:col-span-1">
+                                <div class="text-center p-6 bg-gray-50 rounded-lg">
+                                    <div class="text-4xl font-bold text-primary mb-2">4.5</div>
+                                    <div class="flex justify-center mb-2">
                                         @for ($i = 1; $i <= 5; $i++)
-                                            <button type="button"
-                                                class="text-gray-300 hover:text-yellow-400 focus:outline-none">
-                                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path
-                                                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                                </svg>
-                                            </button>
+                                            <svg class="w-5 h-5 {{ $i <= 4 ? 'text-yellow-400' : 'text-gray-300' }}"
+                                                fill="currentColor" viewBox="0 0 20 20">
+                                                <path
+                                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                            </svg>
                                         @endfor
                                     </div>
+                                    <p class="text-sm text-gray-500">Based on {{ rand(50, 200) }} reviews</p>
+
+                                    <button type="button"
+                                        class="mt-4 inline-flex items-center px-4 py-2 border border-primary text-sm font-medium rounded-md text-primary hover:bg-primary-50 transition">
+                                        Write a Review
+                                    </button>
                                 </div>
+                            </div>
 
-                                <div class="mb-4">
-                                    <label for="review"
-                                        class="block text-sm font-medium text-gray-700 mb-1">Review</label>
-                                    <textarea id="review" name="review" rows="4"
-                                        class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"></textarea>
-                                </div>
+                            <div class="lg:col-span-2">
+                                <h3 class="text-lg font-medium text-gray-900 mb-4">Recent Reviews</h3>
 
-                                <button type="submit"
-                                    class="bg-primary hover:bg-primary-dark text-white py-2 px-4 rounded-md transition-colors">
-                                    Submit Review
-                                </button>
-                            </form>
-
-                            <!-- Sample Reviews -->
-                            <div class="space-y-6">
-                                <div class="border-b border-gray-200 pb-6">
-                                    <div class="flex items-center mb-2">
-                                        <div class="flex items-center">
-                                            @for ($i = 1; $i <= 5; $i++)
-                                                <svg class="w-4 h-4 {{ $i <= 5 ? 'text-yellow-400' : 'text-gray-300' }}"
-                                                    fill="currentColor" viewBox="0 0 20 20">
-                                                    <path
-                                                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                                </svg>
-                                            @endfor
+                                <div class="space-y-4">
+                                    @if (isset($feedback) && $feedback->count() > 0)
+                                        @foreach ($feedback as $review)
+                                            <div class="border-b border-gray-200 pb-4">
+                                                <div class="flex items-center mb-2">
+                                                    <div class="flex-shrink-0">
+                                                        <div
+                                                            class="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary font-bold">
+                                                            {{ substr($review->name, 0, 1) }}
+                                                        </div>
+                                                    </div>
+                                                    <div class="ml-3">
+                                                        <h4 class="text-sm font-medium text-gray-900">{{ $review->name }}
+                                                        </h4>
+                                                        <div class="flex items-center">
+                                                            <div class="flex">
+                                                                @for ($i = 1; $i <= 5; $i++)
+                                                                    <svg class="w-4 h-4 {{ $i <= $review->rating ? 'text-yellow-400' : 'text-gray-300' }}"
+                                                                        fill="currentColor" viewBox="0 0 20 20">
+                                                                        <path
+                                                                            d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                                                    </svg>
+                                                                @endfor
+                                                            </div>
+                                                            <span
+                                                                class="text-xs text-gray-500 ml-2">{{ $review->created_at->diffForHumans() }}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <p class="text-sm text-gray-600">{{ $review->content }}</p>
+                                            </div>
+                                        @endforeach
+                                        <button type="button"
+                                            class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition">
+                                            Load More Reviews
+                                        </button>
+                                    @else
+                                        <div class="border-b border-gray-200 pb-4">
+                                            <div class="flex items-center mb-2">
+                                                <div class="flex-shrink-0">
+                                                    <div
+                                                        class="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary font-bold">
+                                                        J
+                                                    </div>
+                                                </div>
+                                                <div class="ml-3">
+                                                    <h4 class="text-sm font-medium text-gray-900">John Doe</h4>
+                                                    <div class="flex items-center">
+                                                        <div class="flex">
+                                                            @for ($i = 1; $i <= 5; $i++)
+                                                                <svg class="w-4 h-4 {{ $i <= 5 ? 'text-yellow-400' : 'text-gray-300' }}"
+                                                                    fill="currentColor" viewBox="0 0 20 20">
+                                                                    <path
+                                                                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                                                </svg>
+                                                            @endfor
+                                                        </div>
+                                                        <span class="text-xs text-gray-500 ml-2">2 weeks ago</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <p class="text-sm text-gray-600">This product exceeded my expectations! The
+                                                quality
+                                                is outstanding and it has all the features I needed.</p>
                                         </div>
-                                        <p class="ml-2 text-sm text-gray-500">John Doe • 2 weeks ago</p>
-                                    </div>
-                                    <p class="text-gray-600">This product exceeded my expectations! The quality is
-                                        outstanding and it has all the features I needed. Highly recommended!</p>
-                                </div>
 
-                                <div class="border-b border-gray-200 pb-6">
-                                    <div class="flex items-center mb-2">
-                                        <div class="flex items-center">
-                                            @for ($i = 1; $i <= 5; $i++)
-                                                <svg class="w-4 h-4 {{ $i <= 4 ? 'text-yellow-400' : 'text-gray-300' }}"
-                                                    fill="currentColor" viewBox="0 0 20 20">
-                                                    <path
-                                                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                                </svg>
-                                            @endfor
+                                        <div class="border-b border-gray-200 pb-4">
+                                            <div class="flex items-center mb-2">
+                                                <div class="flex-shrink-0">
+                                                    <div
+                                                        class="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary font-bold">
+                                                        J
+                                                    </div>
+                                                </div>
+                                                <div class="ml-3">
+                                                    <h4 class="text-sm font-medium text-gray-900">Jane Smith</h4>
+                                                    <div class="flex items-center">
+                                                        <div class="flex">
+                                                            @for ($i = 1; $i <= 5; $i++)
+                                                                <svg class="w-4 h-4 {{ $i <= 4 ? 'text-yellow-400' : 'text-gray-300' }}"
+                                                                    fill="currentColor" viewBox="0 0 20 20">
+                                                                    <path
+                                                                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                                                </svg>
+                                                            @endfor
+                                                        </div>
+                                                        <span class="text-xs text-gray-500 ml-2">1 month ago</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <p class="text-sm text-gray-600">Great product for the price. Fast delivery and
+                                                excellent customer service.</p>
                                         </div>
-                                        <p class="ml-2 text-sm text-gray-500">Jane Smith • 1 month ago</p>
-                                    </div>
-                                    <p class="text-gray-600">Great product for the price. Fast delivery and excellent
-                                        customer service. Would buy from this store again.</p>
+
+                                        <button type="button"
+                                            class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition">
+                                            Load More Reviews
+                                        </button>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -366,14 +415,16 @@
         function changeMainImage(src) {
             document.getElementById('main-image').src = src;
 
-            // Update border for thumbnails
-            document.querySelectorAll('.thumbnail-image').forEach(img => {
-                if (img.src === src) {
-                    img.parentElement.classList.add('border-primary');
-                    img.parentElement.classList.remove('border-transparent');
+            // Update border of selected thumbnail
+            const thumbnails = document.querySelectorAll('.thumbnail-image');
+            thumbnails.forEach(thumbnail => {
+                const parentDiv = thumbnail.parentElement;
+                if (thumbnail.src === src) {
+                    parentDiv.classList.add('border-primary');
+                    parentDiv.classList.remove('border-transparent');
                 } else {
-                    img.parentElement.classList.remove('border-primary');
-                    img.parentElement.classList.add('border-transparent');
+                    parentDiv.classList.remove('border-primary');
+                    parentDiv.classList.add('border-transparent');
                 }
             });
         }
@@ -426,6 +477,14 @@
                         if (cartCountElement) {
                             cartCountElement.textContent = data.cart_count;
                         }
+                    } else {
+                        // Show error message
+                        Swal.fire({
+                            title: 'Error!',
+                            text: data.message || 'Failed to add product to cart',
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
                     }
                 })
                 .catch(error => {
@@ -439,27 +498,29 @@
                 });
         }
 
-        // Countdown timer for promo
-        @if ($product->is_promo && $product->promo_ends_at > now())
-            const countDownDate = new Date("{{ $product->promo_ends_at->format('Y-m-d H:i:s') }}").getTime();
+        document.addEventListener('DOMContentLoaded', function() {
+            // Countdown timer for promo
+            @if ($product->is_promo && $product->promo_ends_at > now())
+                const countDownDate = new Date("{{ $product->promo_ends_at->format('Y-m-d H:i:s') }}").getTime();
 
-            const countdownTimer = setInterval(function() {
-                const now = new Date().getTime();
-                const distance = countDownDate - now;
+                const countdownTimer = setInterval(function() {
+                    const now = new Date().getTime();
+                    const distance = countDownDate - now;
 
-                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-                document.getElementById("countdown").innerHTML = days + "d " + hours + "h " + minutes + "m " +
-                    seconds + "s";
+                    document.getElementById("countdown").innerHTML = days + "d " + hours + "h " +
+                        minutes + "m " + seconds + "s";
 
-                if (distance < 0) {
-                    clearInterval(countdownTimer);
-                    document.getElementById("countdown").innerHTML = "EXPIRED";
-                }
-            }, 1000);
-        @endif
+                    if (distance < 0) {
+                        clearInterval(countdownTimer);
+                        document.getElementById("countdown").innerHTML = "EXPIRED";
+                    }
+                }, 1000);
+            @endif
+        });
     </script>
 @endpush
