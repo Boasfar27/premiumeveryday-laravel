@@ -13,16 +13,22 @@ class Coupon extends Model
     protected $fillable = [
         'code',
         'discount',
+        'value',
         'type',
         'max_uses',
         'used_count',
         'expires_at',
         'is_active',
         'description',
+        'max_discount',
+        'min_purchase',
     ];
 
     protected $casts = [
         'discount' => 'decimal:2',
+        'value' => 'decimal:2',
+        'max_discount' => 'decimal:2',
+        'min_purchase' => 'decimal:2',
         'max_uses' => 'integer',
         'used_count' => 'integer',
         'expires_at' => 'datetime',
@@ -105,5 +111,21 @@ class Coupon extends Model
                 $query->whereNull('max_uses')
                     ->orWhereRaw('used_count < max_uses');
             });
+    }
+
+    /**
+     * Check if the coupon has expired.
+     */
+    public function isExpired(): bool
+    {
+        return $this->expires_at && $this->expires_at < now();
+    }
+    
+    /**
+     * Check if the coupon has reached its usage limit.
+     */
+    public function hasReachedUsageLimit(): bool
+    {
+        return $this->max_uses && $this->used_count >= $this->max_uses;
     }
 }

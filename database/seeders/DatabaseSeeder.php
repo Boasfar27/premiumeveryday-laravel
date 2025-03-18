@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             FeedbackSeeder::class,
             ContactSeeder::class,
             PaymentDataSeeder::class,
+            CouponSeeder::class,
         ]);
     }
 } 

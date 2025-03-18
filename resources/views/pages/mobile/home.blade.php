@@ -63,8 +63,8 @@
                         </div>
                         <div class="p-3">
                             <div class="flex items-center mb-1">
-                                <span class="text-xs font-medium text-primary-dark bg-primary-50 rounded-full px-2 py-0.5">
-                                    {{ $product->category->name }}
+                                <span class="text-xs font-medium text-primary-dark bg-primary-50 rounded-full px-2 py-1">
+                                    {{ $product->category ? $product->category->name : 'Uncategorized' }}
                                 </span>
                             </div>
                             <h3 class="text-sm font-bold text-gray-900 mb-1 truncate">{{ $product->name }}</h3>

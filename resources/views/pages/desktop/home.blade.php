@@ -70,7 +70,7 @@
                         <div class="p-6">
                             <div class="flex items-center mb-2">
                                 <span class="text-xs font-medium text-primary-dark bg-primary-50 rounded-full px-2 py-1">
-                                    {{ $product->category->name }}
+                                    {{ $product->category ? $product->category->name : 'Uncategorized' }}
                                 </span>
                             </div>
                             <h3 class="text-lg font-bold text-gray-900 mb-2">{{ $product->name }}</h3>

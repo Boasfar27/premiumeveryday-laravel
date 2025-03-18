@@ -3,8 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\DigitalProduct;
+use App\Models\Coupon;
+use App\Models\Product;
+use App\Services\MidtransService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class CartController extends Controller
 {
@@ -13,7 +18,504 @@ class CartController extends Controller
      */
     public function index()
     {
+        $cart = session()->get('cart', []);
+        $products = [];
+        $subtotal = 0;
+        $discount = 0;
+        
+        foreach ($cart as $id => $details) {
+            $product = DigitalProduct::find($id);
+            if ($product) {
+                $itemPrice = $details['price'] ?? $product->getDiscountedPrice();
+                $itemQuantity = $details['quantity'] ?? 1;
+                $itemTotal = $itemPrice * $itemQuantity;
+                
+                $products[] = [
+                    'id' => $id,
+                    'product' => $product,
+                    'quantity' => $itemQuantity,
+                    'price' => $itemPrice,
+                    'subscription_type' => $details['subscription_type'] ?? 'monthly',
+                    'duration' => $details['duration'] ?? 1,
+                    'account_type' => $details['account_type'] ?? 'sharing',
+                    'total' => $itemTotal
+                ];
+                
+                $subtotal += $itemTotal;
+            }
+        }
+
+        // Apply coupon discount if exists
+        if (session()->has('applied_coupon')) {
+            $coupon = Coupon::where('code', session('applied_coupon.code'))->first();
+            if ($coupon && $subtotal >= $coupon->min_purchase) {
+                if ($coupon->type === 'percentage') {
+                    $discount = min(($subtotal * $coupon->value / 100), $coupon->max_discount);
+                } else {
+                    $discount = min($coupon->value, $coupon->max_discount);
+                }
+
+                // Update product prices with discount
+                foreach ($products as &$item) {
+                    if ($coupon->type === 'percentage') {
+                        $itemDiscount = min(($item['price'] * $coupon->value / 100), $coupon->max_discount / count($products));
+                    } else {
+                        $itemDiscount = min($coupon->value / count($products), $coupon->max_discount / count($products));
+                    }
+                    $item['discounted_price'] = $item['price'] - $itemDiscount;
+                }
+            }
+        }
+
+        $tax = ($subtotal - $discount) * 0.11;
+        $total = $subtotal - $discount + $tax;
+        
+        $recentProducts = Product::latest()->take(4)->get();
+
+        return view('pages.' . (request()->is('mobile/*') ? 'mobile' : 'desktop') . '.cart.index', compact(
+            'products',
+            'subtotal',
+            'discount',
+            'tax',
+            'total',
+            'recentProducts'
+        ));
+    }
+    
+    /**
+     * Add a product to the cart
+     */
+    public function add(Request $request)
+    {
+        try {
+            // Check if user is authenticated
+            if (!auth()->check()) {
+                if ($request->ajax() || $request->expectsJson()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Please login to purchase products'
+                    ], 401);
+                }
+                
+                return redirect()->route('login')
+                    ->with('error', 'Please login to purchase products')
+                    ->with('redirect', url()->previous());
+            }
+            
+            $validated = $request->validate([
+                'product_id' => 'required|exists:digital_products,id',
+                'quantity' => 'required|integer|min:1',
+                'subscription_type' => 'required|in:monthly,quarterly,semiannual,annual',
+                'duration' => 'required|integer|min:1',
+                'account_type' => 'nullable|in:sharing,private'
+            ]);
+            
+            $productId = $validated['product_id'];
+            $quantity = $validated['quantity'];
+            $subscriptionType = $validated['subscription_type'];
+            $duration = $validated['duration'];
+            $accountType = $validated['account_type'] ?? 'sharing';
+            
+            $product = DigitalProduct::findOrFail($productId);
+            
+            // Calculate price based on subscription type, duration, and account type
+            if ($accountType == 'private') {
+                // For private account, use private_price if available or multiply regular price by 1.5
+                $basePrice = $product->private_price ?? ($product->price * 1.5);
+                
+                // Apply promo discount for private price if applicable
+                if ($product->is_promo && $product->promo_ends_at > now() && ($product->private_discount ?? 0) > 0) {
+                    $basePrice = $basePrice - ($basePrice * ($product->private_discount ?? 0) / 100);
+                }
+            } else {
+                // For sharing account, use normal price with any sale price
+                $basePrice = $product->getDiscountedPrice();
+            }
+            
+            $totalPrice = $basePrice * $duration;
+            
+            // Apply discount based on subscription duration
+            if ($subscriptionType == 'quarterly') {
+                $totalPrice = $basePrice * $duration * 0.9; // 10% discount
+            } elseif ($subscriptionType == 'semiannual') {
+                $totalPrice = $basePrice * $duration * 0.8; // 20% discount
+            } elseif ($subscriptionType == 'annual') {
+                $totalPrice = $basePrice * $duration * 0.7; // 30% discount
+            }
+            
+            // Get cart from session
+            $cart = Session::get('cart', []);
+            
+            // Check if product already exists in cart
+            if (isset($cart[$productId])) {
+                // Update quantity and subscription details
+                $cart[$productId]['quantity'] = $quantity;
+                $cart[$productId]['subscription_type'] = $subscriptionType;
+                $cart[$productId]['duration'] = $duration;
+                $cart[$productId]['account_type'] = $accountType;
+                $cart[$productId]['price'] = $totalPrice;
+            } else {
+                // Add new product to cart
+                $cart[$productId] = [
+                    'quantity' => $quantity,
+                    'subscription_type' => $subscriptionType,
+                    'duration' => $duration,
+                    'account_type' => $accountType,
+                    'price' => $totalPrice
+                ];
+            }
+            
+            Session::put('cart', $cart);
+            
+            if ($request->ajax() || $request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Product added to cart',
+                    'cart_count' => count($cart)
+                ]);
+            }
+            
+            return redirect()->route('cart.index')->with('success', 'Product added to cart');
+        } catch (\Exception $e) {
+            Log::error('Error adding to cart: ' . $e->getMessage());
+            
+            if ($request->ajax() || $request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to add product to cart: ' . $e->getMessage()
+                ], 500);
+            }
+            
+            return redirect()->back()->with('error', 'Failed to add product to cart');
+        }
+    }
+    
+    /**
+     * Update product quantity in cart
+     */
+    public function update(Request $request)
+    {
+        try {
+            Log::info('Cart update request', $request->all());
+            
+            $validated = $request->validate([
+            'product_id' => 'required|exists:digital_products,id',
+            'quantity' => 'required|integer|min:1'
+        ]);
+        
+            $productId = $validated['product_id'];
+            $quantity = $validated['quantity'];
+        
+        // Get current cart
         $cart = Session::get('cart', []);
+        
+            // Check if product exists in cart
+            if (!isset($cart[$productId])) {
+                if ($request->ajax() || $request->expectsJson()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Product not found in cart'
+                    ], 404);
+                }
+                
+                return redirect()->back()->with('error', 'Product not found in cart');
+            }
+            
+            // Handle cart_action for form submissions
+            // If increment/decrement action is present, adjust the quantity
+            if ($request->has('cart_action')) {
+                $action = $request->input('cart_action');
+                
+                if ($action === 'increment') {
+                    $quantity = $cart[$productId]['quantity'] + 1;
+                } elseif ($action === 'decrement' && $cart[$productId]['quantity'] > 1) {
+                    $quantity = $cart[$productId]['quantity'] - 1;
+                }
+            }
+            
+            // Preserve existing subscription info
+            $subscriptionType = $cart[$productId]['subscription_type'] ?? 'monthly';
+            $duration = $cart[$productId]['duration'] ?? 1;
+            $price = $cart[$productId]['price'] ?? null;
+            
+            // If price is not set, calculate it
+            if ($price === null) {
+                $product = DigitalProduct::find($productId);
+                if (!$product) {
+                    if ($request->ajax() || $request->expectsJson()) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Product not found'
+                        ], 404);
+                    }
+                    
+                    return redirect()->back()->with('error', 'Product not found');
+                }
+                
+                $basePrice = $product->getDiscountedPrice();
+                
+                // Apply discount based on subscription type
+                if ($subscriptionType == 'quarterly') {
+                    $price = $basePrice * $duration * 0.9; // 10% discount
+                } elseif ($subscriptionType == 'semiannual') {
+                    $price = $basePrice * $duration * 0.8; // 20% discount
+                } elseif ($subscriptionType == 'annual') {
+                    $price = $basePrice * $duration * 0.7; // 30% discount
+                } else {
+                    $price = $basePrice * $duration;
+                }
+            }
+            
+            // Update cart
+            $cart[$productId]['quantity'] = $quantity;
+            Session::put('cart', $cart);
+            
+            // Calculate new item total
+            $itemTotal = $price * $quantity;
+            
+            // Calculate new cart totals
+            $subtotal = 0;
+            foreach ($cart as $id => $item) {
+                $itemPrice = $item['price'] ?? 0;
+                $itemQuantity = $item['quantity'] ?? 0;
+                $subtotal += $itemPrice * $itemQuantity;
+            }
+            
+            $discount = Session::get('discount', 0);
+            $tax = ($subtotal - $discount) * 0.11; // 11% tax
+            $total = $subtotal - $discount + $tax;
+            
+            if ($request->ajax() || $request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                    'message' => 'Cart updated successfully',
+                'item_total' => $itemTotal,
+                    'cart_count' => count($cart),
+                    'subtotal' => $subtotal,
+                    'discount' => $discount,
+                    'tax' => $tax,
+                    'total' => $total
+                ]);
+            }
+            
+            return redirect()->route('cart.index')->with('success', 'Cart updated successfully');
+        } catch (\Exception $e) {
+            Log::error('Error updating cart: ' . $e->getMessage());
+            
+            if ($request->ajax() || $request->expectsJson()) {
+        return response()->json([
+            'success' => false,
+                    'message' => 'Failed to update cart: ' . $e->getMessage()
+                ], 500);
+            }
+            
+            return redirect()->back()->with('error', 'Failed to update cart: ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * Remove a product from the cart
+     */
+    public function remove(Request $request)
+    {
+        try {
+            Log::info('Cart remove request', $request->all());
+            
+            $validated = $request->validate([
+            'product_id' => 'required|exists:digital_products,id'
+        ]);
+        
+            $productId = $validated['product_id'];
+        
+        // Get current cart
+        $cart = Session::get('cart', []);
+        
+        // Remove product from cart
+        if (isset($cart[$productId])) {
+            unset($cart[$productId]);
+            Session::put('cart', $cart);
+            
+                // Recalculate totals
+                $subtotal = 0;
+                foreach ($cart as $id => $item) {
+                    $itemPrice = $item['price'] ?? 0;
+                    $itemQuantity = $item['quantity'] ?? 0;
+                    $subtotal += $itemPrice * $itemQuantity;
+                }
+                
+                $discount = Session::get('discount', 0);
+                $tax = ($subtotal - $discount) * 0.11; // 11% tax
+                $total = $subtotal - $discount + $tax;
+                
+                if ($request->ajax() || $request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Product removed from cart',
+                        'cart_count' => count($cart),
+                        'subtotal' => $subtotal,
+                        'discount' => $discount,
+                        'tax' => $tax,
+                        'total' => $total
+                    ]);
+                }
+                
+                return redirect()->route('cart.index')->with('success', 'Product removed from cart');
+            }
+            
+            if ($request->ajax() || $request->expectsJson()) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Product not found in cart'
+        ], 404);
+            }
+            
+            return redirect()->route('cart.index')->with('error', 'Product not found in cart');
+        } catch (\Exception $e) {
+            Log::error('Error removing from cart: ' . $e->getMessage());
+            
+            if ($request->ajax() || $request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to remove item: ' . $e->getMessage()
+                ], 500);
+            }
+            
+            return redirect()->back()->with('error', 'Failed to remove item: ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * Apply coupon to cart
+     */
+    public function applyCoupon(Request $request)
+    {
+        $request->validate([
+            'coupon' => 'required|string|max:50',
+        ]);
+
+        $code = strtoupper($request->coupon);
+        $cart = session()->get('cart', []);
+        
+        if (empty($cart)) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Your cart is empty. Please add products before applying a coupon.'
+                ]);
+            }
+            return back()->with('coupon_error', 'Your cart is empty. Please add products before applying a coupon.');
+        }
+
+        $coupon = Coupon::where('code', $code)->where('is_active', true)->first();
+
+        if (!$coupon) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid coupon code. Please try another one.'
+                ]);
+            }
+            return back()->with('coupon_error', 'Invalid coupon code. Please try another one.');
+        }
+
+        // Check if coupon is still valid
+        if ($coupon->isExpired()) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false, 
+                    'message' => 'This coupon has expired.'
+                ]);
+            }
+            return back()->with('coupon_error', 'This coupon has expired.');
+        }
+
+        // Check if coupon has reached its usage limit
+        if ($coupon->hasReachedUsageLimit()) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'This coupon has reached its usage limit.'
+                ]);
+            }
+            return back()->with('coupon_error', 'This coupon has reached its usage limit.');
+        }
+
+        // Calculate cart subtotal
+        $subtotal = 0;
+        foreach ($cart as $item) {
+            $subtotal += ($item['price'] ?? 0) * ($item['quantity'] ?? 1);
+        }
+
+        // Check minimum purchase
+        if ($subtotal < $coupon->min_purchase) {
+            $minAmount = number_format($coupon->min_purchase, 0, ',', '.');
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "Minimum purchase of Rp {$minAmount} required for this coupon."
+                ]);
+            }
+            return back()->with('coupon_error', "Minimum purchase of Rp {$minAmount} required for this coupon.");
+        }
+
+        // Calculate discount
+        $discount = 0;
+        if ($coupon->type === 'percentage') {
+            $discount = min(($subtotal * $coupon->value / 100), $coupon->max_discount);
+        } else {
+            $discount = min($coupon->value, $coupon->max_discount);
+        }
+
+        // Save the coupon and discount to session
+        Session::put('applied_coupon', [
+            'code' => $coupon->code,
+            'value' => $coupon->value,
+            'type' => $coupon->type
+        ]);
+        
+        Session::put('discount', $discount);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Coupon applied successfully!',
+                'discount' => $discount,
+                'formatted_discount' => 'Rp ' . number_format($discount, 0, ',', '.')
+            ]);
+        }
+
+        return back()->with('success', 'Coupon applied successfully!');
+    }
+
+    /**
+     * Remove coupon from cart
+     */
+    public function removeCoupon()
+    {
+        Session::forget(['applied_coupon', 'discount']);
+        
+        if (request()->ajax() || request()->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Coupon has been removed successfully.'
+            ]);
+        }
+        
+        return redirect()->route('cart.index')->with('success', 'Coupon has been removed successfully.');
+    }
+
+    /**
+     * Proceed to checkout
+     */
+    public function checkout()
+    {
+        // Check if cart is empty
+        $cart = Session::get('cart', []);
+        if (count($cart) === 0) {
+            return redirect()->route('cart.index')
+                ->with('error', 'Your cart is empty. Please add products before checkout.');
+        }
+        
         $products = [];
         $subtotal = 0;
         
@@ -25,162 +527,178 @@ class CartController extends Controller
                     'id' => $id,
                     'product' => $product,
                     'quantity' => $item['quantity'],
-                    'total' => $product->getDiscountedPrice() * $item['quantity']
+                    'subscription_type' => $item['subscription_type'] ?? 'monthly',
+                    'duration' => $item['duration'] ?? 1,
+                    'account_type' => $item['account_type'] ?? 'sharing',
+                    'price' => $item['price'] ?? $product->getDiscountedPrice(),
+                    'total' => ($item['price'] ?? $product->getDiscountedPrice()) * $item['quantity']
                 ];
-                $subtotal += $product->getDiscountedPrice() * $item['quantity'];
+                $subtotal += ($item['price'] ?? $product->getDiscountedPrice()) * $item['quantity'];
+            }
+        }
+        
+        // Calculate discount only if coupon exists
+        $discount = 0;
+        if (Session::has('applied_coupon')) {
+            $coupon = Coupon::where('code', Session::get('applied_coupon.code'))->first();
+            if ($coupon && $subtotal >= $coupon->min_purchase) {
+                if ($coupon->type === 'percentage') {
+                    $discount = min(($subtotal * $coupon->value / 100), $coupon->max_discount);
+                } else {
+                    $discount = min($coupon->value, $coupon->max_discount);
+                }
             }
         }
         
         // Calculate tax and total
-        $discount = Session::get('discount', 0);
         $tax = ($subtotal - $discount) * 0.11; // 11% tax
         $total = $subtotal - $discount + $tax;
         
-        // Get recently viewed products
-        $recentlyViewed = Session::get('recently_viewed', []);
-        $recentProducts = DigitalProduct::whereIn('id', $recentlyViewed)
-            ->where('is_active', true)
-            ->take(4)
-            ->get();
-            
-        // Determine if desktop or mobile view
-        $agent = new \Jenssegers\Agent\Agent();
-        $view = $agent->isMobile() ? 'pages.mobile.cart.index' : 'pages.desktop.cart.index';
+        // Generate unique order number
+        $orderNumber = 'ORD-' . time() . '-' . auth()->id();
         
-        return view($view, compact('products', 'subtotal', 'discount', 'tax', 'total', 'recentProducts'));
-    }
-    
-    /**
-     * Add a product to the cart
-     */
-    public function add(Request $request)
-    {
-        $request->validate([
-            'product_id' => 'required|exists:digital_products,id',
-            'quantity' => 'required|integer|min:1'
+        // Store order information in session for payment page
+        Session::put('checkout', [
+            'order_number' => $orderNumber,
+            'subtotal' => $subtotal,
+            'discount' => $discount,
+            'tax' => $tax,
+            'total' => $total,
+            'products' => $products
         ]);
         
-        $productId = $request->product_id;
-        $quantity = $request->quantity;
+        // Determine if desktop or mobile view
+        $agent = new \Jenssegers\Agent\Agent();
+        $view = $agent->isMobile() ? 'pages.mobile.checkout.index' : 'pages.desktop.checkout.index';
         
-        // Get current cart
-        $cart = Session::get('cart', []);
+        return view($view, compact('products', 'subtotal', 'discount', 'tax', 'total', 'orderNumber'));
+    }
+
+    /**
+     * Process payment with Midtrans
+     */
+    public function processPayment(Request $request, MidtransService $midtransService)
+    {
+        // Validate the request
+        $request->validate([
+            'payment_method' => 'required|array',
+            'payment_method.*' => 'required|string|in:mandiri_va,bni_va,bri_va,cimb_va,gopay,permata_va,other_va,qris',
+            'terms' => 'required|accepted'
+        ]);
         
-        // Add or update product in cart
-        if (isset($cart[$productId])) {
-            $cart[$productId]['quantity'] += $quantity;
-        } else {
-            $cart[$productId] = [
-                'quantity' => $quantity
+        // Get checkout information from session
+        $checkout = Session::get('checkout');
+        if (!$checkout) {
+            return redirect()->route('cart.index')
+                ->with('error', 'Checkout information not found. Please try again.');
+        }
+        
+        // Get selected payment methods
+        $paymentMethods = $request->payment_method;
+        
+        // Generate unique transaction ID
+        $transactionId = 'PRMD-' . time() . '-' . Str::random(6);
+        
+        // Create the order
+        $order = \App\Models\Order::create([
+            'user_id' => auth()->id(),
+            'order_number' => $checkout['order_number'],
+            'total' => $checkout['total'],
+            'status' => 'pending',
+            'payment_status' => 'pending',
+            'payment_methods' => json_encode($paymentMethods)
+        ]);
+        
+        // Create order items
+        foreach ($checkout['products'] as $item) {
+            $order->items()->create([
+                'orderable_id' => $item['product']->id,
+                'orderable_type' => get_class($item['product']),
+                'quantity' => $item['quantity'],
+                'price' => $item['price'],
+                'subscription_type' => $item['subscription_type'],
+                'duration' => $item['duration'],
+                'account_type' => $item['account_type'] ?? 'sharing'
+            ]);
+        }
+        
+        // Create a payment record
+        $payment = \App\Models\Payment::create([
+            'user_id' => auth()->id(),
+            'order_id' => $order->id,
+            'amount' => $checkout['total'],
+            'payment_method' => implode(', ', $paymentMethods),
+            'status' => 'pending',
+            'transaction_id' => $transactionId
+        ]);
+        
+        // Prepare items for Midtrans
+        $items = [];
+        foreach ($checkout['products'] as $item) {
+            $items[] = [
+                'id' => $item['id'],
+                'price' => $item['price'],
+                'quantity' => $item['quantity'],
+                'name' => $item['product']->name . ' (' . $item['subscription_type'] . ', ' . $item['duration'] . ' ' . Str::plural('month', $item['duration']) . ', ' . $item['account_type'] . ')'
             ];
         }
         
-        Session::put('cart', $cart);
-        
-        return response()->json([
-            'success' => true,
-            'message' => 'Product added to cart',
-            'cart_count' => count($cart)
-        ]);
-    }
-    
-    /**
-     * Update product quantity in cart
-     */
-    public function update(Request $request)
-    {
-        $request->validate([
-            'product_id' => 'required|exists:digital_products,id',
-            'quantity' => 'required|integer|min:1'
-        ]);
-        
-        $productId = $request->product_id;
-        $quantity = $request->quantity;
-        
-        // Get current cart
-        $cart = Session::get('cart', []);
-        
-        // Update product quantity
-        if (isset($cart[$productId])) {
-            $cart[$productId]['quantity'] = $quantity;
-            Session::put('cart', $cart);
-            
-            // Recalculate cart totals
-            $product = DigitalProduct::find($productId);
-            $itemTotal = $product->getDiscountedPrice() * $quantity;
-            
-            return response()->json([
-                'success' => true,
-                'message' => 'Cart updated',
-                'item_total' => $itemTotal,
-                'cart_count' => count($cart)
-            ]);
+        // Add tax as an item
+        if ($checkout['tax'] > 0) {
+            $items[] = [
+                'id' => 'tax',
+                'price' => $checkout['tax'],
+                'quantity' => 1,
+                'name' => 'Tax (11%)'
+            ];
         }
         
-        return response()->json([
-            'success' => false,
-            'message' => 'Product not found in cart'
-        ], 404);
-    }
-    
-    /**
-     * Remove a product from the cart
-     */
-    public function remove(Request $request)
-    {
-        $request->validate([
-            'product_id' => 'required|exists:digital_products,id'
-        ]);
+        // Subtract discount if any
+        $totalAmount = $checkout['subtotal'] + $checkout['tax'] - $checkout['discount'];
         
-        $productId = $request->product_id;
+        // Prepare Midtrans parameters
+        $params = [
+            'transaction_details' => [
+                'order_id' => $order->order_number,
+                'gross_amount' => $totalAmount
+            ],
+            'item_details' => $items,
+            'customer_details' => [
+                'first_name' => auth()->user()->name,
+                'email' => auth()->user()->email,
+                'phone' => auth()->user()->phone ?? ''
+            ],
+            'enabled_payments' => $paymentMethods,
+            'callbacks' => [
+                'finish' => route('payment.finish', $order->id),
+                'error' => route('payment.error', $order->id),
+                'pending' => route('payment.pending', $order->id)
+            ]
+        ];
         
-        // Get current cart
-        $cart = Session::get('cart', []);
+        // Get Snap Token
+        $snapToken = $midtransService->getSnapToken($params);
         
-        // Remove product from cart
-        if (isset($cart[$productId])) {
-            unset($cart[$productId]);
-            Session::put('cart', $cart);
-            
-            return response()->json([
-                'success' => true,
-                'message' => 'Product removed from cart',
-                'cart_count' => count($cart)
-            ]);
+        if (!$snapToken) {
+            return redirect()->route('cart.index')
+                ->with('error', 'Failed to process payment. Please try again later.');
         }
         
-        return response()->json([
-            'success' => false,
-            'message' => 'Product not found in cart'
-        ], 404);
-    }
-    
-    /**
-     * Apply a coupon code to the cart
-     */
-    public function applyCoupon(Request $request)
-    {
-        $request->validate([
-            'coupon' => 'required|string|max:50'
+        // Save snap token to payment
+        $payment->update(['snap_token' => $snapToken]);
+        
+        // Clear cart and discount, but keep checkout until payment completion
+        Session::forget(['cart', 'discount', 'applied_coupon']);
+        
+        // Store necessary data for the payment page
+        Session::put('payment_data', [
+            'order_id' => $order->id,
+            'order_number' => $order->order_number,
+            'amount' => $totalAmount,
+            'snap_token' => $snapToken
         ]);
         
-        $couponCode = $request->coupon;
-        
-        // Here you would typically check if the coupon is valid in your database
-        // For this example, we'll just check if the code is "DISCOUNT50"
-        if ($couponCode === 'DISCOUNT50') {
-            Session::put('discount', 50000); // 50,000 IDR discount
-            
-            return response()->json([
-                'success' => true,
-                'message' => 'Coupon applied successfully',
-                'discount' => 50000
-            ]);
-        }
-        
-        return response()->json([
-            'success' => false,
-            'message' => 'Invalid coupon code'
-        ], 400);
+        // Redirect to payment page
+        return redirect()->route('payment.show', $order->id);
     }
 }

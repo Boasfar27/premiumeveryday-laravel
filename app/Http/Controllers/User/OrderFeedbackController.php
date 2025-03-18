@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\Feedback;
 use Jenssegers\Agent\Agent;
+use App\Models\Notification;
 
 class OrderFeedbackController extends Controller
 {
@@ -16,87 +17,86 @@ class OrderFeedbackController extends Controller
     }
     
     /**
-     * Show the form to create feedback for an order
+     * Display the form to create a new feedback for an order.
      */
     public function create(Order $order)
     {
-        // Verify this order belongs to the authenticated user
+        // Ensure the order belongs to the authenticated user
         if ($order->user_id !== auth()->id()) {
-            abort(403);
+            abort(403, 'Unauthorized action.');
         }
-        
-        // Check if order is completed/active and can receive feedback
-        if (!in_array($order->status, ['completed', 'active'])) {
-            return back()->with('error', 'You can only leave feedback for completed or active orders.');
+
+        // Ensure the order is completed (payment successful)
+        if ($order->status !== 'completed' && $order->status !== 'active') {
+            return redirect()->route('user.orders.show', $order)
+                ->with('error', 'You can only leave feedback for completed orders with successful payment.');
         }
-        
+
         // Check if feedback already exists
-        $existingFeedback = $order->feedback()->where('user_id', auth()->id())->first();
-        
+        $feedback = $order->feedback()->where('user_id', auth()->id())->first();
+        if ($feedback) {
+            return redirect()->route('user.orders.feedback.edit', [$order, $feedback])
+                ->with('info', 'You have already submitted feedback for this order. You can edit it.');
+        }
+
         $agent = new Agent();
-        return view(
-            $agent->isMobile() ? 'pages.mobile.feedback.create' : 'pages.user.desktop.feedback.create',
-            compact('order', 'existingFeedback')
+        return view($agent->isMobile() ? 
+            'pages.mobile.orders.feedback.create' : 
+            'pages.desktop.orders.feedback.create', 
+            compact('order')
         );
     }
     
     /**
-     * Store feedback for an order
+     * Store a newly created feedback for an order.
      */
     public function store(Request $request, Order $order)
     {
-        // Verify this order belongs to the authenticated user
+        // Ensure the order belongs to the authenticated user
         if ($order->user_id !== auth()->id()) {
-            abort(403);
+            abort(403, 'Unauthorized action.');
         }
-        
-        // Validate request
-        $request->validate([
+
+        // Ensure the order is completed (payment successful)
+        if ($order->status !== 'completed' && $order->status !== 'active') {
+            return redirect()->route('user.orders.show', $order)
+                ->with('error', 'You can only leave feedback for completed orders with successful payment.');
+        }
+
+        // Validate the request
+        $validated = $request->validate([
             'rating' => 'required|integer|min:1|max:5',
             'content' => 'required|string|min:10|max:1000',
         ]);
-        
-        // Check if order is completed/active and can receive feedback
-        if (!in_array($order->status, ['completed', 'active'])) {
-            return back()->with('error', 'You can only leave feedback for completed or active orders.');
-        }
-        
-        // Create or update feedback
-        $feedback = $order->feedback()->updateOrCreate(
-            ['user_id' => auth()->id()],
-            [
-                'name' => auth()->user()->name,
-                'email' => auth()->user()->email,
-                'rating' => $request->rating,
-                'content' => $request->content,
-                'is_active' => true,
-            ]
-        );
-        
-        // If order has products, link feedback to those products
+
+        // Get the ordered product
+        $product = null;
         if ($order->items->isNotEmpty()) {
-            foreach ($order->items as $item) {
-                if ($item->product) {
-                    // Create additional feedback for the specific product
-                    Feedback::updateOrCreate(
-                        [
-                            'user_id' => auth()->id(),
-                            'feedbackable_id' => $item->product->id,
-                            'feedbackable_type' => get_class($item->product)
-                        ],
-                        [
-                            'name' => auth()->user()->name,
-                            'email' => auth()->user()->email,
-                            'rating' => $request->rating,
-                            'content' => $request->content,
-                            'order_id' => $order->id,
-                            'is_active' => true,
-                        ]
-                    );
-                }
-            }
+            $product = $order->items->first()->orderable;
         }
-        
+
+        // Create the feedback
+        $feedback = Feedback::create([
+            'user_id' => auth()->id(),
+            'order_id' => $order->id,
+            'feedbackable_id' => $product ? $product->id : null,
+            'feedbackable_type' => $product ? get_class($product) : null,
+            'name' => auth()->user()->name,
+            'email' => auth()->user()->email,
+            'rating' => $validated['rating'],
+            'content' => $validated['content'],
+            'is_active' => true,
+        ]);
+
+        // Create notification for admin
+        Notification::create([
+            'user_id' => null, // Admin notification
+            'title' => 'New Feedback Submitted',
+            'content' => 'User ' . auth()->user()->name . ' has submitted feedback for order #' . $order->order_number,
+            'type' => 'feedback',
+            'read_at' => null,
+        ]);
+
         return redirect()->route('user.orders.show', $order)
             ->with('success', 'Thank you for your feedback!');
     }
