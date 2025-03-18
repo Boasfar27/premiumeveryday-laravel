@@ -68,7 +68,7 @@ return new class extends Migration
                 $table->id();
                 $table->foreignId('order_id')->constrained()->onDelete('cascade');
                 $table->morphs('orderable'); // For digital_product or subscription_plan
-                $table->string('name');
+                $table->string('name')->nullable(); // Make name field nullable
                 $table->integer('quantity')->default(1);
                 $table->decimal('unit_price', 10, 2);
                 $table->decimal('subtotal', 10, 2);

@@ -81,113 +81,31 @@
                     <!-- Payment Methods -->
                     <div class="bg-white rounded-lg shadow-sm overflow-hidden mt-6">
                         <div class="p-6">
-                            <h2 class="text-xl font-semibold text-gray-900 mb-4">Payment Method</h2>
+                            <h2 class="text-xl font-semibold text-gray-900 mb-4">Pembayaran</h2>
 
                             <form action="{{ route('process.payment') }}" method="POST" id="payment-form">
                                 @csrf
                                 <div class="space-y-4">
-                                    <!-- Payment Options -->
-                                    <div>
-                                        <label class="block text-lg font-medium text-gray-900 mb-4">
-                                            Select Payment Methods
-                                        </label>
-
-                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <!-- Mandiri VA -->
-                                            <label
-                                                class="relative flex items-center p-4 border border-gray-300 rounded-md cursor-pointer hover:border-primary hover:bg-gray-50 transition">
-                                                <input type="checkbox" name="payment_method[]" value="mandiri_va"
-                                                    class="h-5 w-5 text-primary focus:ring-primary rounded">
-                                                <div class="ml-3 flex items-center justify-between flex-1">
-                                                    <span class="text-base font-medium text-gray-900">Mandiri VA</span>
-                                                    <img src="{{ asset('images/payment/mandiri.png') }}" alt="Mandiri VA"
-                                                        class="h-8">
+                                    <!-- Payment Information -->
+                                    <div class="p-4 bg-blue-50 rounded-md">
+                                        <div class="flex">
+                                            <div class="flex-shrink-0">
+                                                <svg class="h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg"
+                                                    viewBox="0 0 20 20" fill="currentColor">
+                                                    <path fill-rule="evenodd"
+                                                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                                                        clip-rule="evenodd" />
+                                                </svg>
+                                            </div>
+                                            <div class="ml-3">
+                                                <h3 class="text-sm font-medium text-blue-800">Informasi Pembayaran</h3>
+                                                <div class="mt-2 text-sm text-blue-700">
+                                                    <p class="mb-1">Setelah mengklik "Bayar Sekarang", Anda akan diarahkan
+                                                        ke halaman pembayaran Midtrans yang aman.</p>
+                                                    <p>Di halaman Midtrans, Anda dapat memilih metode pembayaran yang Anda
+                                                        inginkan seperti Virtual Account, QRIS, GoPay, dan lainnya.</p>
                                                 </div>
-                                            </label>
-
-                                            <!-- BNI VA -->
-                                            <label
-                                                class="relative flex items-center p-4 border border-gray-300 rounded-md cursor-pointer hover:border-primary hover:bg-gray-50 transition">
-                                                <input type="checkbox" name="payment_method[]" value="bni_va"
-                                                    class="h-5 w-5 text-primary focus:ring-primary rounded">
-                                                <div class="ml-3 flex items-center justify-between flex-1">
-                                                    <span class="text-base font-medium text-gray-900">BNI VA</span>
-                                                    <img src="{{ asset('images/payment/bni.png') }}" alt="BNI VA"
-                                                        class="h-8">
-                                                </div>
-                                            </label>
-
-                                            <!-- BRI VA -->
-                                            <label
-                                                class="relative flex items-center p-4 border border-gray-300 rounded-md cursor-pointer hover:border-primary hover:bg-gray-50 transition">
-                                                <input type="checkbox" name="payment_method[]" value="bri_va"
-                                                    class="h-5 w-5 text-primary focus:ring-primary rounded">
-                                                <div class="ml-3 flex items-center justify-between flex-1">
-                                                    <span class="text-base font-medium text-gray-900">BRI VA</span>
-                                                    <img src="{{ asset('images/payment/bri.png') }}" alt="BRI VA"
-                                                        class="h-8">
-                                                </div>
-                                            </label>
-
-                                            <!-- CIMB VA -->
-                                            <label
-                                                class="relative flex items-center p-4 border border-gray-300 rounded-md cursor-pointer hover:border-primary hover:bg-gray-50 transition">
-                                                <input type="checkbox" name="payment_method[]" value="cimb_va"
-                                                    class="h-5 w-5 text-primary focus:ring-primary rounded">
-                                                <div class="ml-3 flex items-center justify-between flex-1">
-                                                    <span class="text-base font-medium text-gray-900">CIMB VA</span>
-                                                    <img src="{{ asset('images/payment/cimb.png') }}" alt="CIMB VA"
-                                                        class="h-8">
-                                                </div>
-                                            </label>
-
-                                            <!-- GO-PAY -->
-                                            <label
-                                                class="relative flex items-center p-4 border border-gray-300 rounded-md cursor-pointer hover:border-primary hover:bg-gray-50 transition">
-                                                <input type="checkbox" name="payment_method[]" value="gopay"
-                                                    class="h-5 w-5 text-primary focus:ring-primary rounded">
-                                                <div class="ml-3 flex items-center justify-between flex-1">
-                                                    <span class="text-base font-medium text-gray-900">GO-PAY</span>
-                                                    <img src="{{ asset('images/payment/gopay.png') }}" alt="GO-PAY"
-                                                        class="h-8">
-                                                </div>
-                                            </label>
-
-                                            <!-- Permata VA -->
-                                            <label
-                                                class="relative flex items-center p-4 border border-gray-300 rounded-md cursor-pointer hover:border-primary hover:bg-gray-50 transition">
-                                                <input type="checkbox" name="payment_method[]" value="permata_va"
-                                                    class="h-5 w-5 text-primary focus:ring-primary rounded">
-                                                <div class="ml-3 flex items-center justify-between flex-1">
-                                                    <span class="text-base font-medium text-gray-900">Permata VA</span>
-                                                    <img src="{{ asset('images/payment/permata.png') }}" alt="Permata VA"
-                                                        class="h-8">
-                                                </div>
-                                            </label>
-
-                                            <!-- Other VA -->
-                                            <label
-                                                class="relative flex items-center p-4 border border-gray-300 rounded-md cursor-pointer hover:border-primary hover:bg-gray-50 transition">
-                                                <input type="checkbox" name="payment_method[]" value="other_va"
-                                                    class="h-5 w-5 text-primary focus:ring-primary rounded">
-                                                <div class="ml-3 flex items-center justify-between flex-1">
-                                                    <span class="text-base font-medium text-gray-900">Other VA</span>
-                                                    <img src="{{ asset('images/payment/other_bank.png') }}"
-                                                        alt="Other VA" class="h-8">
-                                                </div>
-                                            </label>
-
-                                            <!-- Other QRIS -->
-                                            <label
-                                                class="relative flex items-center p-4 border border-gray-300 rounded-md cursor-pointer hover:border-primary hover:bg-gray-50 transition">
-                                                <input type="checkbox" name="payment_method[]" value="qris"
-                                                    class="h-5 w-5 text-primary focus:ring-primary rounded">
-                                                <div class="ml-3 flex items-center justify-between flex-1">
-                                                    <span class="text-base font-medium text-gray-900">Other QRIS</span>
-                                                    <img src="{{ asset('images/payment/qris.png') }}" alt="QRIS"
-                                                        class="h-8">
-                                                </div>
-                                            </label>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -207,7 +125,7 @@
                                 <div class="mt-6">
                                     <button type="submit"
                                         class="w-full bg-primary hover:bg-primary-dark text-white font-medium py-3 px-4 rounded transition">
-                                        Pay Now
+                                        Bayar Sekarang
                                     </button>
                                 </div>
                             </form>
@@ -259,25 +177,7 @@
         <script>
             document.addEventListener('DOMContentLoaded', function() {
                 const paymentForm = document.getElementById('payment-form');
-                const checkboxes = document.querySelectorAll('input[name="payment_method[]"]');
-
-                paymentForm.addEventListener('submit', function(e) {
-                    // Check if at least one payment method is selected
-                    const isAnyChecked = Array.from(checkboxes).some(checkbox => checkbox.checked);
-
-                    if (!isAnyChecked) {
-                        e.preventDefault();
-                        alert('Please select at least one payment method.');
-                        return false;
-                    }
-
-                    return true;
-                });
-
-                // Pre-select first payment method as default
-                if (checkboxes.length > 0 && !Array.from(checkboxes).some(checkbox => checkbox.checked)) {
-                    checkboxes[0].checked = true;
-                }
+                // Form validation logic if needed can be added here
             });
         </script>
     @endpush

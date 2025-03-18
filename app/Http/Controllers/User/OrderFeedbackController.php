@@ -28,7 +28,7 @@ class OrderFeedbackController extends Controller
 
         // Ensure the order is completed (payment successful)
         if ($order->status !== 'completed' && $order->status !== 'active') {
-            return redirect()->route('user.orders.show', $order)
+            return redirect()->route('user.payments.detail', $order)
                 ->with('error', 'You can only leave feedback for completed orders with successful payment.');
         }
 
@@ -59,7 +59,7 @@ class OrderFeedbackController extends Controller
 
         // Ensure the order is completed (payment successful)
         if ($order->status !== 'completed' && $order->status !== 'active') {
-            return redirect()->route('user.orders.show', $order)
+            return redirect()->route('user.payments.detail', $order)
                 ->with('error', 'You can only leave feedback for completed orders with successful payment.');
         }
 
@@ -97,7 +97,7 @@ class OrderFeedbackController extends Controller
             'read_at' => null,
         ]);
 
-        return redirect()->route('user.orders.show', $order)
+        return redirect()->route('user.payments.detail', $order)
             ->with('success', 'Thank you for your feedback!');
     }
     
@@ -162,7 +162,7 @@ class OrderFeedbackController extends Controller
                 ]);
         }
         
-        return redirect()->route('user.orders.show', $order)
+        return redirect()->route('user.payments.detail', $order)
             ->with('success', 'Your feedback has been updated.');
     }
     
@@ -193,7 +193,7 @@ class OrderFeedbackController extends Controller
                 ->delete();
         }
         
-        return redirect()->route('user.orders.show', $order)
+        return redirect()->route('user.payments.detail', $order)
             ->with('success', 'Your feedback has been deleted.');
     }
 }

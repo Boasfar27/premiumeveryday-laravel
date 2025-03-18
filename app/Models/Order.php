@@ -32,6 +32,9 @@ class Order extends Model
         'customer_notes',
         'admin_notes',
         'coupon_code',
+        'payment_methods',
+        'midtrans_url',
+        'midtrans_token',
     ];
 
     protected $casts = [
@@ -84,6 +87,14 @@ class Order extends Model
     public function feedback(): HasMany
     {
         return $this->hasMany(Feedback::class);
+    }
+
+    /**
+     * Get the Midtrans transaction for the order.
+     */
+    public function midtransTransaction()
+    {
+        return $this->hasOne(MidtransTransaction::class);
     }
 
     /**

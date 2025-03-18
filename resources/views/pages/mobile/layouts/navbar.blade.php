@@ -106,11 +106,15 @@
                     @endif
                     <a href="{{ route('user.profile') }}"
                         class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">Profile</a>
-                    <a href="{{ route('user.orders.index') }}"
-                        class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">Orders</a>
                     <a href="{{ route('user.payments.history') }}"
-                        class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">Payment
-                        History</a>
+                        class="group flex items-center px-2 py-2 text-base font-medium rounded-md {{ request()->routeIs('user.payments.*') ? 'text-primary bg-primary-50' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                        <svg class="mr-4 flex-shrink-0 h-6 w-6 {{ request()->routeIs('user.payments.*') ? 'text-primary' : 'text-gray-400 group-hover:text-gray-500' }}"
+                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                        </svg>
+                        Riwayat Pembayaran
+                    </a>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit"

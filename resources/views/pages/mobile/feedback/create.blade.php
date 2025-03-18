@@ -1,15 +1,17 @@
 @extends('pages.mobile.layouts.app')
 
+@section('title', 'Submit Feedback')
+
 @section('content')
     <div class="bg-gray-100 min-h-screen pb-12">
         <div class="bg-white shadow">
             <div class="px-4 py-5">
                 <div class="flex items-center">
-                    <a href="{{ route('user.orders.show', $order->id) }}" class="mr-2">
-                        <svg class="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7">
-                            </path>
+                    <a href="{{ route('user.payments.detail', $order->id) }}" class="mr-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-500" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                         </svg>
                     </a>
                     <h1 class="text-xl font-semibold text-gray-900">Leave Feedback</h1>
@@ -106,7 +108,7 @@
                         </div>
 
                         <div class="flex justify-between">
-                            <a href="{{ route('user.orders.show', $order->id) }}"
+                            <a href="{{ route('user.payments.detail', $order->id) }}"
                                 class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                                 Cancel
                             </a>

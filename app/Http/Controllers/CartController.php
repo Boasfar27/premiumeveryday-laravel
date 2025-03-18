@@ -5,11 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\DigitalProduct;
 use App\Models\Coupon;
 use App\Models\Product;
-use App\Services\MidtransService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 class CartController extends Controller
 {
@@ -564,7 +563,8 @@ class CartController extends Controller
             'discount' => $discount,
             'tax' => $tax,
             'total' => $total,
-            'products' => $products
+            'products' => $products,
+            'created_at' => now()->format('Y-m-d H:i:s')
         ]);
         
         // Determine if desktop or mobile view
@@ -577,12 +577,10 @@ class CartController extends Controller
     /**
      * Process payment with Midtrans
      */
-    public function processPayment(Request $request, MidtransService $midtransService)
+    public function processPayment(Request $request)
     {
         // Validate the request
         $request->validate([
-            'payment_method' => 'required|array',
-            'payment_method.*' => 'required|string|in:mandiri_va,bni_va,bri_va,cimb_va,gopay,permata_va,other_va,qris',
             'terms' => 'required|accepted'
         ]);
         
@@ -593,112 +591,55 @@ class CartController extends Controller
                 ->with('error', 'Checkout information not found. Please try again.');
         }
         
-        // Get selected payment methods
-        $paymentMethods = $request->payment_method;
+        // List all available payment methods for Midtrans
+        $paymentMethods = ['mandiri_va', 'bni_va', 'bri_va', 'cimb_va', 'gopay', 'permata_va', 'other_va', 'qris'];
         
-        // Generate unique transaction ID
-        $transactionId = 'PRMD-' . time() . '-' . Str::random(6);
-        
-        // Create the order
-        $order = \App\Models\Order::create([
+        // Manually insert to orders table to avoid model validation issues
+        $orderId = DB::table('orders')->insertGetId([
             'user_id' => auth()->id(),
             'order_number' => $checkout['order_number'],
+            'subtotal' => $checkout['subtotal'],
+            'tax' => $checkout['tax'],
+            'discount_amount' => $checkout['discount'],
             'total' => $checkout['total'],
             'status' => 'pending',
             'payment_status' => 'pending',
-            'payment_methods' => json_encode($paymentMethods)
+            'payment_methods' => json_encode($paymentMethods),
+            'name' => auth()->user()->name,
+            'email' => auth()->user()->email,
+            'whatsapp' => auth()->user()->phone ?? '',
+            'product_name' => count($checkout['products']) > 0 ? $checkout['products'][0]['product']->name : 'Unknown Product',
+            'subscription_type' => count($checkout['products']) > 0 ? $checkout['products'][0]['duration'] : 'monthly',
+            'amount' => $checkout['subtotal'],
+            'final_amount' => $checkout['total'],
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
+        
+        // Get the order model instance
+        $order = \App\Models\Order::findOrFail($orderId);
         
         // Create order items
         foreach ($checkout['products'] as $item) {
             $order->items()->create([
                 'orderable_id' => $item['product']->id,
                 'orderable_type' => get_class($item['product']),
+                'name' => $item['product']->name,
                 'quantity' => $item['quantity'],
                 'price' => $item['price'],
+                'unit_price' => $item['price'],
+                'subtotal' => $item['price'] * $item['quantity'],
+                'total' => $item['price'] * $item['quantity'],
                 'subscription_type' => $item['subscription_type'],
                 'duration' => $item['duration'],
                 'account_type' => $item['account_type'] ?? 'sharing'
             ]);
         }
         
-        // Create a payment record
-        $payment = \App\Models\Payment::create([
-            'user_id' => auth()->id(),
-            'order_id' => $order->id,
-            'amount' => $checkout['total'],
-            'payment_method' => implode(', ', $paymentMethods),
-            'status' => 'pending',
-            'transaction_id' => $transactionId
-        ]);
+        // Clear cart and checkout session
+        Session::forget(['cart', 'checkout', 'discount', 'applied_coupon']);
         
-        // Prepare items for Midtrans
-        $items = [];
-        foreach ($checkout['products'] as $item) {
-            $items[] = [
-                'id' => $item['id'],
-                'price' => $item['price'],
-                'quantity' => $item['quantity'],
-                'name' => $item['product']->name . ' (' . $item['subscription_type'] . ', ' . $item['duration'] . ' ' . Str::plural('month', $item['duration']) . ', ' . $item['account_type'] . ')'
-            ];
-        }
-        
-        // Add tax as an item
-        if ($checkout['tax'] > 0) {
-            $items[] = [
-                'id' => 'tax',
-                'price' => $checkout['tax'],
-                'quantity' => 1,
-                'name' => 'Tax (11%)'
-            ];
-        }
-        
-        // Subtract discount if any
-        $totalAmount = $checkout['subtotal'] + $checkout['tax'] - $checkout['discount'];
-        
-        // Prepare Midtrans parameters
-        $params = [
-            'transaction_details' => [
-                'order_id' => $order->order_number,
-                'gross_amount' => $totalAmount
-            ],
-            'item_details' => $items,
-            'customer_details' => [
-                'first_name' => auth()->user()->name,
-                'email' => auth()->user()->email,
-                'phone' => auth()->user()->phone ?? ''
-            ],
-            'enabled_payments' => $paymentMethods,
-            'callbacks' => [
-                'finish' => route('payment.finish', $order->id),
-                'error' => route('payment.error', $order->id),
-                'pending' => route('payment.pending', $order->id)
-            ]
-        ];
-        
-        // Get Snap Token
-        $snapToken = $midtransService->getSnapToken($params);
-        
-        if (!$snapToken) {
-            return redirect()->route('cart.index')
-                ->with('error', 'Failed to process payment. Please try again later.');
-        }
-        
-        // Save snap token to payment
-        $payment->update(['snap_token' => $snapToken]);
-        
-        // Clear cart and discount, but keep checkout until payment completion
-        Session::forget(['cart', 'discount', 'applied_coupon']);
-        
-        // Store necessary data for the payment page
-        Session::put('payment_data', [
-            'order_id' => $order->id,
-            'order_number' => $order->order_number,
-            'amount' => $totalAmount,
-            'snap_token' => $snapToken
-        ]);
-        
-        // Redirect to payment page
-        return redirect()->route('payment.show', $order->id);
+        // Redirect to Midtrans payment page
+        return redirect()->route('payment.midtrans.page', $order);
     }
 }

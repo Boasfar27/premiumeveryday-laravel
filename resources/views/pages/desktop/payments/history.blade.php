@@ -1,128 +1,107 @@
 @extends('pages.desktop.layouts.app')
 
 @section('content')
-    <div class="py-12 bg-gray-100 mt-8">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-lg rounded-lg mb-6">
-                <div class="p-8 border-b border-gray-200">
-                    <h1 class="text-2xl font-semibold text-gray-900">Payment History</h1>
-                    <p class="mt-2 text-gray-600">Track and manage all your payment transactions</p>
-                </div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <h1 class="text-2xl font-semibold text-gray-900 mb-6">Riwayat Pembayaran</h1>
 
-                @if (session('success'))
-                    <div class="mx-8 mt-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-md">
-                        {{ session('success') }}
-                    </div>
-                @endif
+        @if (session('success'))
+            <div class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
+                {{ session('success') }}
+            </div>
+        @endif
 
-                @if (session('error'))
-                    <div class="mx-8 mt-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-md">
-                        {{ session('error') }}
-                    </div>
-                @endif
+        @if (session('error'))
+            <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+                {{ session('error') }}
+            </div>
+        @endif
 
-                <div class="p-8">
-                    @if ($payments->isEmpty())
-                        <div class="text-center py-16">
-                            <svg class="h-20 w-20 text-gray-400 mx-auto mb-6" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z">
-                                </path>
-                            </svg>
-                            <h2 class="text-xl font-medium text-gray-900 mb-4">No payment records found</h2>
-                            <p class="text-gray-600 max-w-md mx-auto mb-6">You haven't made any payments yet. Browse our
-                                products and make a purchase to see your payment history here.</p>
-                            <a href="{{ route('products.index') }}"
-                                class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                                Browse Products
-                            </a>
-                        </div>
-                    @else
-                        <div class="grid gap-6">
-                            @foreach ($payments as $payment)
-                                <div
-                                    class="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
-                                    <div class="grid grid-cols-12 gap-4 px-6 py-4">
-                                        <div class="col-span-2">
-                                            <div class="text-sm font-medium text-gray-500 mb-1">Transaction ID</div>
-                                            <div class="text-sm font-semibold text-gray-900 truncate">
-                                                {{ $payment->transaction_id ?? 'N/A' }}</div>
-                                        </div>
+        @if (count($orders) > 0)
+            <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                No. Pembayaran
+                            </th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Tanggal
+                            </th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Total
+                            </th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Status
+                            </th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Aksi
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        @foreach ($orders as $order)
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    {{ $order->order_number }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ $order->created_at->format('d M Y, H:i') }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ $order->getFormattedTotalAttribute() }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span
+                                        class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-{{ $order->status_color }}-100 text-{{ $order->status_color }}-800">
+                                        {{ $order->getFormattedStatusAttribute() }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <a href="{{ route('user.payments.detail', $order->id) }}"
+                                        class="text-indigo-600 hover:text-indigo-900">
+                                        Detail
+                                    </a>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
 
-                                        <div class="col-span-2">
-                                            <div class="text-sm font-medium text-gray-500 mb-1">Date</div>
-                                            <div class="text-sm font-medium text-gray-700">
-                                                {{ $payment->payment_date ? \Carbon\Carbon::parse($payment->payment_date)->format('d M Y') : '-' }}
-                                            </div>
-                                        </div>
-
-                                        <div class="col-span-2">
-                                            <div class="text-sm font-medium text-gray-500 mb-1">Method</div>
-                                            <div class="text-sm font-medium text-gray-700">
-                                                {{ $payment->payment_method ?? 'N/A' }}</div>
-                                        </div>
-
-                                        <div class="col-span-2">
-                                            <div class="text-sm font-medium text-gray-500 mb-1">Amount</div>
-                                            <div class="text-base font-bold text-gray-900">Rp
-                                                {{ number_format($payment->amount ?? 0, 0, ',', '.') }}</div>
-                                        </div>
-
-                                        <div class="col-span-2">
-                                            <div class="text-sm font-medium text-gray-500 mb-1">Order</div>
-                                            <div class="text-sm font-medium text-gray-700">
-                                                @if ($payment->order_id)
-                                                    <a href="{{ url('/user/orders/' . $payment->order_id) }}"
-                                                        class="text-primary hover:text-primary-dark hover:underline">
-                                                        #{{ $payment->order_id }}
-                                                    </a>
-                                                @else
-                                                    N/A
-                                                @endif
-                                            </div>
-                                        </div>
-
-                                        <div class="col-span-2">
-                                            <div class="text-sm font-medium text-gray-500 mb-1">Status</div>
-                                            @php
-                                                $statusColor = match ($payment->status ?? 'unknown') {
-                                                    'pending' => 'yellow',
-                                                    'processing' => 'blue',
-                                                    'completed' => 'green',
-                                                    'failed' => 'red',
-                                                    'refunded' => 'purple',
-                                                    default => 'gray',
-                                                };
-                                            @endphp
-                                            <span
-                                                class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-{{ $statusColor }}-100 text-{{ $statusColor }}-800">
-                                                {{ ucfirst($payment->status ?? 'Unknown') }}
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    @if ($payment->notes)
-                                        <div class="px-6 py-3 bg-gray-50 border-t border-gray-200 text-sm text-gray-600">
-                                            <span class="font-medium">Notes:</span> {{ $payment->notes }}
-                                        </div>
-                                    @endif
-                                </div>
-                            @endforeach
-                        </div>
-
-                        <div class="mt-8">
-                            {{ $payments->links() }}
-                        </div>
-                    @endif
+                <div class="px-6 py-4 border-t border-gray-200">
+                    {{ $orders->links() }}
                 </div>
             </div>
-        </div>
+        @else
+            <div class="bg-white shadow sm:rounded-lg">
+                <div class="px-4 py-5 sm:p-6">
+                    <div class="text-center">
+                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <h3 class="mt-2 text-sm font-medium text-gray-900">Tidak ada riwayat pembayaran</h3>
+                        <p class="mt-1 text-sm text-gray-500">
+                            Anda belum memiliki catatan pembayaran.</p>
+                        <div class="mt-6">
+                            <a href="{{ route('home') }}"
+                                class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                </svg>
+                                Kembali ke Beranda
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
     </div>
 @endsection
-
-@push('scripts')
-    <script>
-        // Script tetap dibiarkan untuk referensi di masa mendatang jika dibutuhkan
-    </script>
-@endpush

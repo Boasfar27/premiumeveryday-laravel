@@ -7,7 +7,6 @@ use App\Http\Controllers\TimelineController;
 use App\Http\Controllers\FaqController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\User\DashboardController as UserDashboardController;
-use App\Http\Controllers\User\OrderController;
 use App\Http\Controllers\User\ProfileController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CouponController;
@@ -23,6 +22,8 @@ use App\Models\Feedback;
 use App\Http\Controllers\User\OrderFeedbackController;
 use App\Http\Controllers\User\PaymentController;
 use App\Http\Controllers\User\PaymentHistoryController;
+use App\Http\Controllers\MidtransController;
+use Illuminate\Http\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -186,24 +187,19 @@ Route::middleware('auth')->group(function () {
         Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
         Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('password.update');
         
-        // User Orders
-        Route::prefix('orders')->middleware(['auth', 'verified'])->name('orders.')->group(function () {
-            Route::get('/', [OrderController::class, 'index'])->name('index');
-            Route::get('/create', [OrderController::class, 'create'])->name('create');
-            Route::get('/{order}', [OrderController::class, 'show'])->name('show');
-            Route::post('/', [OrderController::class, 'store'])->name('store');
-            Route::post('/{order}/cancel', [OrderController::class, 'cancel'])->name('cancel');
+        // User Orders -> ganti dengan Payment History
+        Route::prefix('payments')->middleware(['auth', 'verified'])->name('payments.')->group(function () {
+            Route::get('/', [PaymentHistoryController::class, 'index'])->name('history');
+            Route::get('/{order}', [PaymentHistoryController::class, 'show'])->name('detail');
+            Route::post('/', [PaymentHistoryController::class, 'store'])->name('store');
             
-            // Order Feedback Routes
+            // Payment Feedback Routes
             Route::get('/{order}/feedback', [OrderFeedbackController::class, 'create'])->name('feedback.create');
             Route::post('/{order}/feedback', [OrderFeedbackController::class, 'store'])->name('feedback.store');
             Route::get('/{order}/feedback/{feedback}/edit', [OrderFeedbackController::class, 'edit'])->name('feedback.edit');
             Route::put('/{order}/feedback/{feedback}', [OrderFeedbackController::class, 'update'])->name('feedback.update');
             Route::delete('/{order}/feedback/{feedback}', [OrderFeedbackController::class, 'destroy'])->name('feedback.destroy');
         });
-
-        // Payment History
-        Route::get('/payments/history', [PaymentHistoryController::class, 'index'])->middleware(['auth', 'verified'])->name('payments.history');
 
         // Apply Coupon
         Route::post('/coupons/apply', [CouponController::class, 'apply'])->name('coupons.apply');
@@ -235,7 +231,97 @@ Route::prefix('legal')->name('legal.')->group(function () {
 
 // Cart Routes
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
-Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
-Route::patch('/cart/update', [CartController::class, 'update'])->name('cart.update');
-Route::delete('/cart/remove', [CartController::class, 'remove'])->name('cart.remove');
-Route::post('/cart/apply-coupon', [CartController::class, 'applyCoupon'])->name('cart.apply-coupon');
+Route::post('/cart/add', [CartController::class, 'add'])->middleware('auth')->name('cart.add');
+Route::patch('/cart/update', [CartController::class, 'update'])->middleware('auth')->name('cart.update');
+Route::delete('/cart/remove', [CartController::class, 'remove'])->middleware('auth')->name('cart.remove');
+Route::post('/cart/apply-coupon', [CartController::class, 'applyCoupon'])->middleware('auth')->name('cart.apply-coupon');
+Route::post('/cart/remove-coupon', [CartController::class, 'removeCoupon'])->name('cart.remove-coupon');
+
+// Checkout and Payment Routes
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/checkout', [CartController::class, 'checkout'])->name('checkout');
+    Route::post('/process-payment', [CartController::class, 'processPayment'])->name('process.payment');
+});
+
+// Main routes file with updated Midtrans callback paths
+
+// Add these routes OUTSIDE the payment prefix for direct access
+Route::get('/payment/midtrans/finish', function(Request $request) {
+    // Extract order number from the order_id parameter (format: ORD-123456789-1)
+    $orderNumber = $request->input('order_id');
+    if ($orderNumber) {
+        // Find the order by order_number
+        $order = \App\Models\Order::where('order_number', $orderNumber)->first();
+        if ($order) {
+            // Update order status based on transaction_status
+            if ($request->input('transaction_status') === 'settlement') {
+                $order->update([
+                    'payment_status' => 'paid',
+                    'status' => 'approved',
+                    'paid_at' => now()
+                ]);
+                // Redirect to order details page with success message
+                return redirect()->route('user.payments.detail', $order)
+                    ->with('success', 'Payment completed successfully! Thank you for your purchase.');
+            }
+        }
+    }
+    
+    // Default fallback if order not found or status not settlement
+    return redirect()->route('user.payments.history')
+        ->with('success', 'Payment completed. Thank you!');
+})->name('payment.midtrans.finish');
+
+Route::get('/payment/midtrans/unfinish', function(Request $request) {
+    // Extract order number from the order_id parameter (format: ORD-123456789-1)
+    $orderNumber = $request->input('order_id');
+    if ($orderNumber) {
+        // Find the order by order_number
+        $order = \App\Models\Order::where('order_number', $orderNumber)->first();
+        if ($order) {
+            // Update order status
+            $order->update([
+                'payment_status' => 'pending'
+            ]);
+            
+            // Redirect to order details page with info message
+            return redirect()->route('user.payments.detail', $order)
+                ->with('info', 'Payment is pending. Please complete your payment to proceed.');
+        }
+    }
+    
+    // Default fallback if order not found
+    return redirect()->route('user.payments.history')
+        ->with('info', 'Payment is pending. Please check your payments to complete payment.');
+})->name('payment.midtrans.unfinish');
+
+Route::get('/payment/midtrans/error', function(Request $request) {
+    // Extract order number from the order_id parameter (format: ORD-123456789-1)
+    $orderNumber = $request->input('order_id');
+    if ($orderNumber) {
+        // Find the order by order_number
+        $order = \App\Models\Order::where('order_number', $orderNumber)->first();
+        if ($order) {
+            // Update order status
+            $order->update([
+                'payment_status' => 'failed'
+            ]);
+            
+            // Redirect to order details page with error message
+            return redirect()->route('user.payments.detail', $order)
+                ->with('error', 'Payment failed. Please try again or contact support if the issue persists.');
+        }
+    }
+    
+    // Default fallback if order not found
+    return redirect()->route('user.payments.history')
+        ->with('error', 'Payment failed. Please try again or contact support.');
+})->name('payment.midtrans.error');
+
+// Keep the payment prefix routes for other midtrans functionality
+Route::prefix('payment')->name('payment.')->group(function () {
+    Route::get('/midtrans/{order}', [MidtransController::class, 'paymentPage'])->name('midtrans.page');
+    Route::post('/midtrans/notification', [MidtransController::class, 'handleNotification'])->name('midtrans.notification');
+    Route::get('/midtrans/status/{order}', [MidtransController::class, 'checkStatus'])->name('midtrans.status');
+    Route::get('/midtrans/redirect/{order}', [MidtransController::class, 'redirectToVTWeb'])->name('midtrans.redirect');
+});
