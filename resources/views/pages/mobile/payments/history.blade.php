@@ -41,7 +41,8 @@
                                 <div class="grid grid-cols-2 gap-2 mb-3">
                                     <div>
                                         <p class="text-xs text-gray-500">Tanggal</p>
-                                        <p class="text-sm">{{ $order->created_at->format('d M Y, H:i') }}</p>
+                                        <p class="text-sm">
+                                            {{ $order->created_at->locale('id')->isoFormat('D MMMM Y, HH:mm') }}</p>
                                     </div>
                                     <div>
                                         <p class="text-xs text-gray-500">Total</p>

@@ -131,7 +131,8 @@ class Order extends Model
             'active' => 'Aktif',
             'completed' => 'Selesai',
             'cancelled' => 'Dibatalkan',
-            default => 'Unknown',
+            'approved' => 'Disetujui',
+            default => ucfirst($this->status ?? 'Menunggu'),
         };
     }
 

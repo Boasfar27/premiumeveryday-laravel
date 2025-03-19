@@ -1,7 +1,7 @@
 @extends('pages.desktop.layouts.app')
 
 @section('content')
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:py-8 mt-16">
         <div class="mb-6">
             <a href="{{ route('user.payments.history') }}"
                 class="inline-flex items-center text-sm text-indigo-600 hover:text-indigo-500">
@@ -47,7 +47,8 @@
                 <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
                     <div class="sm:col-span-1">
                         <dt class="text-sm font-medium text-gray-500">Tanggal</dt>
-                        <dd class="mt-1 text-sm text-gray-900">{{ $order->created_at->format('d M Y, H:i') }}</dd>
+                        <dd class="mt-1 text-sm text-gray-900">
+                            {{ $order->created_at->locale('id')->isoFormat('D MMMM Y, HH:mm') }}</dd>
                     </div>
 
                     <div class="sm:col-span-1">
@@ -57,12 +58,34 @@
 
                     <div class="sm:col-span-1">
                         <dt class="text-sm font-medium text-gray-500">Metode Pembayaran</dt>
-                        <dd class="mt-1 text-sm text-gray-900">{{ $order->payment_method ?? 'Bank Transfer' }}</dd>
+                        <dd class="mt-1 text-sm text-gray-900">
+                            @if ($order->payment_method == 'midtrans')
+                                @if ($order->midtransTransaction && $order->midtransTransaction->payment_type)
+                                    {{ ucfirst($order->midtransTransaction->payment_type) }}
+                                @else
+                                    Midtrans Payment Gateway
+                                @endif
+                            @else
+                                {{ ucfirst($order->payment_method ?? 'Bank Transfer') }}
+                            @endif
+                        </dd>
                     </div>
 
                     <div class="sm:col-span-1">
                         <dt class="text-sm font-medium text-gray-500">Status Pembayaran</dt>
-                        <dd class="mt-1 text-sm text-gray-900">{{ $order->payment_status ?? 'Pending' }}</dd>
+                        <dd class="mt-1 text-sm text-gray-900">
+                            @if ($order->payment_status == 'pending')
+                                Menunggu Pembayaran
+                            @elseif($order->payment_status == 'paid')
+                                Sudah Dibayar
+                            @elseif($order->payment_status == 'failed')
+                                Pembayaran Gagal
+                            @elseif($order->payment_status == 'expired')
+                                Kedaluwarsa
+                            @else
+                                {{ ucfirst($order->payment_status) }}
+                            @endif
+                        </dd>
                     </div>
 
                     @if ($order->coupon_code)
@@ -108,7 +131,8 @@
                             <div class="sm:col-span-1">
                                 <dt class="text-sm font-medium text-gray-500">Waktu Transaksi</dt>
                                 <dd class="mt-1 text-sm text-gray-900">
-                                    {{ $order->midtransTransaction->transaction_time->format('d M Y, H:i') }}</dd>
+                                    {{ $order->midtransTransaction->transaction_time->locale('id')->isoFormat('D MMMM Y, HH:mm') }}
+                                </dd>
                             </div>
                         @endif
 
@@ -293,16 +317,43 @@
                 <dl>
                     <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                         <dt class="text-sm font-medium text-gray-500">Status</dt>
-                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ $order->status }}</dd>
+                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                            @if ($order->status == 'pending')
+                                Menunggu Pembayaran
+                            @elseif($order->status == 'processing')
+                                Sedang Diproses
+                            @elseif($order->status == 'completed')
+                                Selesai
+                            @elseif($order->status == 'cancelled')
+                                Dibatalkan
+                            @elseif($order->status == 'active')
+                                Aktif
+                            @else
+                                {{ ucfirst($order->status) }}
+                            @endif
+                        </dd>
                     </div>
                     <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                        <dt class="text-sm font-medium text-gray-500">Payment Status</dt>
-                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ $order->payment_status }}</dd>
+                        <dt class="text-sm font-medium text-gray-500">Status Pembayaran</dt>
+                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                            @if ($order->payment_status == 'pending')
+                                Menunggu Pembayaran
+                            @elseif($order->payment_status == 'paid')
+                                Sudah Dibayar
+                            @elseif($order->payment_status == 'failed')
+                                Pembayaran Gagal
+                            @elseif($order->payment_status == 'expired')
+                                Kedaluwarsa
+                            @else
+                                {{ ucfirst($order->payment_status) }}
+                            @endif
+                        </dd>
                     </div>
                     <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                        <dt class="text-sm font-medium text-gray-500">Order Date</dt>
+                        <dt class="text-sm font-medium text-gray-500">Tanggal Pemesanan</dt>
                         <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                            {{ $order->created_at->format('d M Y H:i') }}</dd>
+                            {{ $order->created_at->locale('id')->isoFormat('D MMMM Y, HH:mm') }}
+                        </dd>
                     </div>
                 </dl>
             </div>
@@ -316,13 +367,6 @@
 
             <div class="px-4 py-5 sm:p-6">
                 @if (in_array($order->status, ['completed', 'active']))
-                    @php
-                        $review = $order
-                            ->reviews()
-                            ->where('user_id', auth()->id())
-                            ->first();
-                    @endphp
-
                     @if ($review)
                         <div class="bg-gray-50 p-4 rounded border border-gray-200 mb-4">
                             <div class="flex items-center mb-2">
@@ -343,7 +387,8 @@
                                         @endif
                                     @endfor
                                 </div>
-                                <span class="ml-2 text-sm text-gray-600">{{ $review->created_at->format('d M Y') }}</span>
+                                <span
+                                    class="ml-2 text-sm text-gray-600">{{ $review->created_at->locale('id')->isoFormat('D MMMM Y') }}</span>
                             </div>
 
                             <p class="text-gray-700">{{ $review->content }}</p>

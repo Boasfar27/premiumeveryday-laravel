@@ -50,7 +50,7 @@
                                     {{ $order->order_number }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {{ $order->created_at->format('d M Y, H:i') }}
+                                    {{ $order->created_at->locale('id')->isoFormat('D MMMM Y, HH:mm') }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                     {{ $order->getFormattedTotalAttribute() }}
