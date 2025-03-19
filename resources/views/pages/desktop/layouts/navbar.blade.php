@@ -30,10 +30,6 @@
                         class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('faq') ? 'border-primary text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700' }}">
                         FAQ
                     </a>
-                    <a href="{{ route('feedback.index') }}"
-                        class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('feedback.*') ? 'border-primary text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700' }}">
-                        Feedback
-                    </a>
                     <a href="{{ route('contact') }}"
                         class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('contact') ? 'border-primary text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700' }}">
                         Contact
@@ -163,10 +159,6 @@
             <a href="{{ route('faq') }}"
                 class="block pl-3 pr-4 py-2 border-l-4 {{ request()->routeIs('faq') ? 'border-primary text-primary bg-primary-50' : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700' }} text-base font-medium">
                 FAQ
-            </a>
-            <a href="{{ route('feedback.index') }}"
-                class="block pl-3 pr-4 py-2 border-l-4 {{ request()->routeIs('feedback.*') ? 'border-primary text-primary bg-primary-50' : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700' }} text-base font-medium">
-                Feedback
             </a>
             <a href="{{ route('contact') }}"
                 class="block pl-3 pr-4 py-2 border-l-4 {{ request()->routeIs('contact') ? 'border-primary text-primary bg-primary-50' : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700' }} text-base font-medium">

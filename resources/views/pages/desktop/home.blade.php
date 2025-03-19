@@ -284,44 +284,49 @@
     <section id="testimonials" class="py-16 bg-gray-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-12">
-                <h2 class="text-3xl font-bold text-gray-900">Apa Kata Pelanggan Kami</h2>
-                <p class="mt-4 text-lg text-gray-600">Pengalaman pelanggan yang telah menggunakan layanan kami</p>
+                <h2 class="text-3xl font-bold text-gray-900">What Our Customers Say</h2>
+                <p class="mt-4 text-lg text-gray-600">Discover what our satisfied customers have to say about our services
+                </p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                @foreach ($testimonials->take(6) as $testimonial)
-                    <div class="bg-white p-6 rounded-lg shadow-sm">
-                        <div class="flex items-center mb-4">
-                            <div class="flex-shrink-0">
+                @if (is_object($testimonials) && count($testimonials) > 0)
+                    @foreach ($testimonials->take(6) as $testimonial)
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <div class="flex items-center mb-4">
                                 <div
-                                    class="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary font-bold">
+                                    class="h-12 w-12 rounded-full bg-primary-100 flex items-center justify-center text-primary font-bold text-xl">
                                     {{ substr($testimonial->name, 0, 1) }}
                                 </div>
-                            </div>
-                            <div class="ml-3">
-                                <h3 class="text-sm font-medium text-gray-900">{{ $testimonial->name }}</h3>
-                                <div class="flex items-center">
-                                    @for ($i = 1; $i <= 5; $i++)
-                                        <svg class="w-4 h-4 {{ $i <= $testimonial->rating ? 'text-yellow-400' : 'text-gray-300' }}"
-                                            fill="currentColor" viewBox="0 0 20 20">
-                                            <path
-                                                d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z">
-                                            </path>
-                                        </svg>
-                                    @endfor
+                                <div class="ml-4">
+                                    <h4 class="text-lg font-semibold text-gray-900">{{ $testimonial->name }}</h4>
+                                    <div class="flex items-center">
+                                        @for ($i = 1; $i <= 5; $i++)
+                                            <svg class="h-5 w-5 {{ $i <= $testimonial->rating ? 'text-yellow-400' : 'text-gray-300' }}"
+                                                fill="currentColor" viewBox="0 0 20 20">
+                                                <path
+                                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z">
+                                                </path>
+                                            </svg>
+                                        @endfor
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <p class="text-gray-600 text-sm">{{ $testimonial->content }}</p>
-                        @if ($testimonial->feedbackable)
-                            <div class="mt-4 pt-4 border-t border-gray-100">
-                                <span class="text-xs text-gray-500">Tentang: <a
+                            <p class="text-gray-600">{{ $testimonial->content }}</p>
+                            @if ($testimonial->feedbackable)
+                                <p class="mt-4 text-sm text-gray-500">Review for <a
                                         href="{{ route('products.show', $testimonial->feedbackable) }}"
                                         class="text-primary hover:text-primary-dark">{{ $testimonial->feedbackable->name }}</a></span>
-                            </div>
-                        @endif
+                                </p>
+                            @endif
+                        </div>
+                    @endforeach
+                @else
+                    <!-- Jika tidak ada testimonial -->
+                    <div class="lg:col-span-3 text-center py-8">
+                        <p class="text-gray-500">There are currently no testimonials available.</p>
                     </div>
-                @endforeach
+                @endif
             </div>
         </div>
     </section>

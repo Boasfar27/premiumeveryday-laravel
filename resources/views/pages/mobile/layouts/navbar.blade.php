@@ -51,13 +51,13 @@
     <!-- Mobile Menu -->
     <div x-show="open" class="px-2 pt-2 pb-3 space-y-1" style="display: none;">
         <a href="{{ route('products.index') }}"
-            class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">Products</a>
+            class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
+            Products
+        </a>
         <a href="{{ route('timeline') }}"
             class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">Timeline</a>
         <a href="{{ route('faq') }}"
             class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">FAQ</a>
-        <a href="{{ route('feedback.index') }}"
-            class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">Feedback</a>
         <a href="{{ route('contact') }}"
             class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">Contact</a>
 

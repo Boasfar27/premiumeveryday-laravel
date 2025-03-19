@@ -19,11 +19,17 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\CartController;
 use App\Models\Feedback;
-use App\Http\Controllers\User\OrderFeedbackController;
 use App\Http\Controllers\User\PaymentController;
 use App\Http\Controllers\User\PaymentHistoryController;
 use App\Http\Controllers\MidtransController;
 use Illuminate\Http\Request;
+use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\UserController;
+use App\Models\Order;
+use App\Models\UserSubscription;
 
 /*
 |--------------------------------------------------------------------------
@@ -84,12 +90,7 @@ Route::get('/', function () {
         ->get();
         
     // Get testimonials/feedback
-    $testimonials = Feedback::with('feedbackable')
-        ->where('is_active', true)
-        ->where('rating', '>=', 4)
-        ->latest()
-        ->take(6)
-        ->get();
+    $testimonials = []; // Removed feedback query
     
     return view(
         $agent->isMobile() ? 'pages.mobile.home' : 'pages.desktop.home',
@@ -128,12 +129,6 @@ Route::get('/timeline', [TimelineController::class, 'index'])->name('timeline');
 Route::get('/faq', [FaqController::class, 'index'])->name('faq');
 Route::get('/contact', [ContactController::class, 'index'])->name('contact');
 Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
-
-// Feedback Routes
-Route::prefix('feedback')->name('feedback.')->group(function () {
-    Route::get('/', [FeedbackController::class, 'index'])->name('index');
-    Route::post('/', [FeedbackController::class, 'store'])->name('store');
-});
 
 // Authentication Routes
 Route::middleware('guest')->group(function () {
@@ -192,13 +187,6 @@ Route::middleware('auth')->group(function () {
             Route::get('/', [PaymentHistoryController::class, 'index'])->name('history');
             Route::get('/{order}', [PaymentHistoryController::class, 'show'])->name('detail');
             Route::post('/', [PaymentHistoryController::class, 'store'])->name('store');
-            
-            // Payment Feedback Routes
-            Route::get('/{order}/feedback', [OrderFeedbackController::class, 'create'])->name('feedback.create');
-            Route::post('/{order}/feedback', [OrderFeedbackController::class, 'store'])->name('feedback.store');
-            Route::get('/{order}/feedback/{feedback}/edit', [OrderFeedbackController::class, 'edit'])->name('feedback.edit');
-            Route::put('/{order}/feedback/{feedback}', [OrderFeedbackController::class, 'update'])->name('feedback.update');
-            Route::delete('/{order}/feedback/{feedback}', [OrderFeedbackController::class, 'destroy'])->name('feedback.destroy');
         });
 
         // Apply Coupon

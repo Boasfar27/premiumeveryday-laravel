@@ -60,6 +60,30 @@
             </nav>
 
             <!-- Product Details -->
+            <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+                <div class="px-4 py-5 sm:px-6">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">Product Details</h3>
+                </div>
+                <div class="border-t border-gray-200">
+                    <dl>
+                        <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                            <dt class="text-sm font-medium text-gray-500">Name</dt>
+                            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ $product->name }}</dd>
+                        </div>
+                        <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                            <dt class="text-sm font-medium text-gray-500">Description</dt>
+                            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ $product->description }}</dd>
+                        </div>
+                        <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                            <dt class="text-sm font-medium text-gray-500">Price</dt>
+                            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">Rp
+                                {{ number_format($product->price, 0, ',', '.') }}</dd>
+                        </div>
+                    </dl>
+                </div>
+            </div>
+
+            <!-- Product Details -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
                 <!-- Left Column - Images -->
                 <div>
@@ -463,97 +487,6 @@
                         }
                     </script>
                 </div>
-            </div>
-
-            <!-- Feedback/Reviews -->
-            <div class="mt-16">
-                <h2 class="text-2xl font-bold text-gray-900 mb-6">Customer Reviews</h2>
-
-                @if ($feedback && $feedback->count() > 0)
-                    <div class="space-y-6">
-                        @foreach ($feedback as $review)
-                            <div class="bg-gray-50 p-4 rounded-lg">
-                                <div class="flex items-center mb-2">
-                                    <div
-                                        class="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary font-bold">
-                                        {{ substr($review->name, 0, 1) }}
-                                    </div>
-                                    <div class="ml-3">
-                                        <p class="text-sm font-medium text-gray-900">{{ $review->name }}</p>
-                                        <div class="flex items-center">
-                                            @for ($i = 1; $i <= 5; $i++)
-                                                <svg class="w-4 h-4 {{ $i <= $review->rating ? 'text-yellow-400' : 'text-gray-300' }}"
-                                                    fill="currentColor" viewBox="0 0 20 20">
-                                                    <path
-                                                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z">
-                                                    </path>
-                                                </svg>
-                                            @endfor
-                                            <span
-                                                class="text-xs text-gray-500 ml-2">{{ $review->created_at->format('d M Y') }}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <p class="text-gray-600">{{ $review->content }}</p>
-                            </div>
-                        @endforeach
-                    </div>
-                @else
-                    <div class="bg-gray-50 p-6 rounded-lg text-center">
-                        <p class="text-gray-600">No reviews yet. Be the first to review this product after purchase!</p>
-                    </div>
-                @endif
-
-                @auth
-                    @if (auth()->user()->orders()->whereHas('items', function ($query) use ($product) {
-                                $query->whereHasMorph('orderable', [\App\Models\DigitalProduct::class], function ($q) use ($product) {
-                                    $q->where('id', $product->id);
-                                });
-                            })->where('status', 'completed')->exists() &&
-                            !$product->feedback()->where('user_id', auth()->id())->exists())
-                        <div class="mt-8">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Write a Review</h3>
-                            <form action="{{ route('feedback.store') }}" method="POST"
-                                class="bg-white p-6 rounded-lg border border-gray-200">
-                                @csrf
-                                <input type="hidden" name="feedbackable_id" value="{{ $product->id }}">
-                                <input type="hidden" name="feedbackable_type" value="App\Models\DigitalProduct">
-
-                                <div class="mb-4">
-                                    <label for="rating" class="block text-sm font-medium text-gray-700 mb-1">Rating</label>
-                                    <div class="flex items-center">
-                                        <div class="flex items-center">
-                                            @for ($i = 1; $i <= 5; $i++)
-                                                <input type="radio" id="rating-{{ $i }}" name="rating"
-                                                    value="{{ $i }}" class="hidden peer" required>
-                                                <label for="rating-{{ $i }}"
-                                                    class="cursor-pointer text-gray-300 peer-checked:text-yellow-400">
-                                                    <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
-                                                        <path
-                                                            d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z">
-                                                        </path>
-                                                    </svg>
-                                                </label>
-                                            @endfor
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="mb-4">
-                                    <label for="content" class="block text-sm font-medium text-gray-700 mb-1">Your
-                                        Review</label>
-                                    <textarea id="content" name="content" rows="4"
-                                        class="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary" required></textarea>
-                                </div>
-
-                                <button type="submit"
-                                    class="bg-primary hover:bg-primary-dark text-white font-medium py-2 px-4 rounded transition">
-                                    Submit Review
-                                </button>
-                            </form>
-                        </div>
-                    @endif
-                @endauth
             </div>
 
             <!-- Related Products -->
