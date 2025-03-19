@@ -16,9 +16,7 @@ use App\Models\Timeline;
 use App\Models\Faq;
 use App\Models\Contact;
 use App\Http\Controllers\NotificationController;
-use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\CartController;
-use App\Models\Feedback;
 use App\Http\Controllers\User\PaymentController;
 use App\Http\Controllers\User\PaymentHistoryController;
 use App\Http\Controllers\MidtransController;
@@ -30,6 +28,9 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserController;
 use App\Models\Order;
 use App\Models\UserSubscription;
+use App\Http\Controllers\User\OrderReviewController;
+use App\Http\Controllers\ReviewController;
+use App\Models\Review;
 
 /*
 |--------------------------------------------------------------------------
@@ -191,12 +192,21 @@ Route::middleware('auth')->group(function () {
 
         // Apply Coupon
         Route::post('/coupons/apply', [CouponController::class, 'apply'])->name('coupons.apply');
+
+        // Review Routes
+        Route::prefix('payments/{order}/review')->name('payments.review.')->group(function () {
+            Route::get('/create', [OrderReviewController::class, 'create'])->name('create');
+            Route::post('/', [OrderReviewController::class, 'store'])->name('store');
+            Route::get('/{review}/edit', [OrderReviewController::class, 'edit'])->name('edit');
+            Route::put('/{review}', [OrderReviewController::class, 'update'])->name('update');
+            Route::delete('/{review}', [OrderReviewController::class, 'destroy'])->name('destroy');
+        });
     });
 
     // Notification Routes
-    Route::prefix('notifications')->name('notifications.')->group(function () {
+    Route::prefix('notifications')->name('notifications.')->middleware(['auth'])->group(function () {
         Route::get('/', [NotificationController::class, 'index'])->name('index');
-        Route::post('/{id}/read', [NotificationController::class, 'markAsRead'])->name('markAsRead');
+        Route::get('/{id}/read', [NotificationController::class, 'markAsRead'])->name('read');
         Route::post('/read-all', [NotificationController::class, 'markAllAsRead'])->name('markAllAsRead');
     });
     

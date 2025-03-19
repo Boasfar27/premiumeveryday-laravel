@@ -36,14 +36,14 @@ class PaymentHistoryController extends Controller
             abort(403);
         }
 
-        // Load feedback for this order
-        $feedback = $order->feedback()->where('user_id', auth()->id())->first();
+        // Load review for this order
+        $review = $order->reviews()->where('user_id', auth()->id())->first();
 
         $agent = new Agent();
         return view($agent->isMobile() ? 
             'pages.mobile.payments.detail' : 
             'pages.desktop.payments.detail',
-            compact('order', 'feedback')
+            compact('order', 'review')
         );
     }
 

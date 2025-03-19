@@ -320,10 +320,10 @@
                                 </div>
                             </div>
                             <p class="text-sm text-gray-600">{{ $testimonial->content }}</p>
-                            @if ($testimonial->feedbackable)
+                            @if ($testimonial->reviewable)
                                 <p class="mt-2 text-xs text-gray-500">Review for <a
-                                        href="{{ route('products.show', $testimonial->feedbackable) }}"
-                                        class="text-primary hover:text-primary-dark">{{ $testimonial->feedbackable->name }}</a></span>
+                                        href="{{ route('products.show', $testimonial->reviewable) }}"
+                                        class="text-primary hover:text-primary-dark">{{ $testimonial->reviewable->name }}</a></span>
                                 </p>
                             @endif
                         </div>

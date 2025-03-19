@@ -80,11 +80,11 @@ class DigitalProduct extends Model
     }
 
     /**
-     * Get the feedback for the digital product.
+     * Get the reviews for the digital product.
      */
-    public function feedback(): MorphMany
+    public function reviews(): MorphMany
     {
-        return $this->morphMany(Feedback::class, 'feedbackable');
+        return $this->morphMany(Review::class, 'reviewable');
     }
 
     /**

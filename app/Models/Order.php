@@ -82,11 +82,11 @@ class Order extends Model
     }
 
     /**
-     * Get the feedback for the order.
+     * Get the reviews for this order.
      */
-    public function feedback(): HasMany
+    public function reviews(): HasMany
     {
-        return $this->hasMany(Feedback::class);
+        return $this->hasMany(Review::class);
     }
 
     /**

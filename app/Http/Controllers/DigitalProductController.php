@@ -194,8 +194,8 @@ class DigitalProductController extends Controller
             ->take(4)
             ->get();
             
-        // Get feedback for this product
-        $feedback = $product->feedback()
+        // Get reviews for this product
+        $reviews = $product->reviews()
             ->where('is_active', true)
             ->latest()
             ->take(5)
@@ -203,7 +203,7 @@ class DigitalProductController extends Controller
         
         return view(
             $agent->isMobile() ? 'pages.mobile.products.show' : 'pages.desktop.products.show',
-            compact('product', 'relatedProducts', 'feedback')
+            compact('product', 'relatedProducts', 'reviews')
         );
     }
 } 
