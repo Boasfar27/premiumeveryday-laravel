@@ -54,4 +54,42 @@ class MidtransTransaction extends Model
     {
         return $this->belongsTo(Order::class);
     }
+
+    /**
+     * Get the formatted amount
+     */
+    public function getFormattedAmountAttribute(): string
+    {
+        return 'Rp ' . number_format($this->gross_amount, 0, ',', '.');
+    }
+
+    /**
+     * Get the formatted transaction time
+     */
+    public function getFormattedTransactionTimeAttribute(): string
+    {
+        return $this->transaction_time ? $this->transaction_time->format('d M Y, H:i') : '-';
+    }
+
+    /**
+     * Get the formatted expiry time
+     */
+    public function getFormattedExpiryTimeAttribute(): string
+    {
+        return $this->expiry_time ? $this->expiry_time->format('d M Y, H:i') : '-';
+    }
+
+    /**
+     * Get the status color for badges
+     */
+    public function getStatusColorAttribute(): string
+    {
+        return match($this->transaction_status) {
+            'settlement' => 'success',
+            'pending' => 'warning',
+            'deny', 'cancel', 'expire' => 'danger',
+            'challenge' => 'info',
+            default => 'secondary',
+        };
+    }
 }

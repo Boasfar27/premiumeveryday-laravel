@@ -35,6 +35,7 @@ class AdminPanelProvider extends PanelProvider
             ->profile(false)
             ->homeUrl('/')
             ->brandLogo(asset('images/logo.webp'))
+            ->brandLogoHeight('40px')
             ->brandName('Premium Everyday Admin')
             ->colors([
                 'primary' => Color::Pink,

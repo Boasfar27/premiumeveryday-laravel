@@ -45,6 +45,15 @@ class Category extends Model
     }
 
     /**
+     * Get the digital products for the category.
+     * This is an alias for products()
+     */
+    public function digitalProducts(): HasMany
+    {
+        return $this->hasMany(DigitalProduct::class);
+    }
+
+    /**
      * Get the active products for the category.
      */
     public function activeProducts(): HasMany

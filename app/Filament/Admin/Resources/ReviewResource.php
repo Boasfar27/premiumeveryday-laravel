@@ -2,9 +2,9 @@
 
 namespace App\Filament\Admin\Resources;
 
-use App\Filament\Admin\Resources\FeedbackResource\Pages;
-use App\Filament\Admin\Resources\FeedbackResource\RelationManagers;
-use App\Models\Feedback;
+use App\Filament\Admin\Resources\ReviewResource\Pages;
+use App\Filament\Admin\Resources\ReviewResource\RelationManagers;
+use App\Models\Review;
 use App\Models\DigitalProduct;
 use App\Models\SubscriptionPlan;
 use App\Models\User;
@@ -15,10 +15,11 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Database\Eloquent\Collection;
 
-class FeedbackResource extends Resource
+class ReviewResource extends Resource
 {
-    protected static ?string $model = Feedback::class;
+    protected static ?string $model = Review::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-left-right';
 
@@ -29,12 +30,16 @@ class FeedbackResource extends Resource
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('email')
-                    ->email()
-                    ->maxLength(255),
-                Forms\Components\FileUpload::make('avatar')
-                    ->image()
-                    ->directory('avatars'),
+                Forms\Components\Select::make('user_id')
+                    ->label('User')
+                    ->relationship('user', 'name')
+                    ->searchable()
+                    ->preload(),
+                Forms\Components\Select::make('order_id')
+                    ->label('Order')
+                    ->relationship('order', 'order_number')
+                    ->searchable()
+                    ->preload(),
                 Forms\Components\Textarea::make('content')
                     ->required()
                     ->columnSpanFull(),
@@ -44,23 +49,18 @@ class FeedbackResource extends Resource
                     ->default(5)
                     ->minValue(1)
                     ->maxValue(5),
-                Forms\Components\Select::make('user_id')
-                    ->label('User')
-                    ->relationship('user', 'name')
-                    ->searchable()
-                    ->preload(),
-                Forms\Components\Select::make('feedbackable_type')
-                    ->label('Feedback Type')
+                Forms\Components\Select::make('reviewable_type')
+                    ->label('Review Type')
                     ->options([
                         DigitalProduct::class => 'Digital Product',
                         SubscriptionPlan::class => 'Subscription Plan',
                     ])
                     ->required()
                     ->reactive(),
-                Forms\Components\Select::make('feedbackable_id')
+                Forms\Components\Select::make('reviewable_id')
                     ->label('Product')
                     ->options(function (callable $get) {
-                        $type = $get('feedbackable_type');
+                        $type = $get('reviewable_type');
                         
                         if (!$type) {
                             return [];
@@ -80,11 +80,8 @@ class FeedbackResource extends Resource
                     ->searchable()
                     ->preload(),
                 Forms\Components\Toggle::make('is_active')
-                    ->required(),
-                Forms\Components\TextInput::make('order')
                     ->required()
-                    ->numeric()
-                    ->default(0),
+                    ->default(true),
             ]);
     }
 
@@ -94,16 +91,16 @@ class FeedbackResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('email')
-                    ->searchable(),
-                Tables\Columns\ImageColumn::make('avatar'),
-                Tables\Columns\TextColumn::make('rating')
-                    ->numeric()
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('user.name')
                     ->label('User')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('feedbackable_type')
+                Tables\Columns\TextColumn::make('order.order_number')
+                    ->label('Order Number')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('rating')
+                    ->numeric()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('reviewable_type')
                     ->label('Type')
                     ->formatStateUsing(fn (string $state): string => match ($state) {
                         DigitalProduct::class => 'Digital Product',
@@ -116,21 +113,18 @@ class FeedbackResource extends Resource
                         SubscriptionPlan::class => 'warning',
                         default => 'gray',
                     }),
-                Tables\Columns\TextColumn::make('feedbackable.name')
+                Tables\Columns\TextColumn::make('reviewable.name')
                     ->label('Product')
                     ->searchable(),
                 Tables\Columns\IconColumn::make('is_active')
                     ->boolean(),
-                Tables\Columns\TextColumn::make('order')
-                    ->numeric()
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('feedbackable_type')
+                Tables\Filters\SelectFilter::make('reviewable_type')
                     ->label('Type')
                     ->options([
                         DigitalProduct::class => 'Digital Product',
@@ -149,10 +143,19 @@ class FeedbackResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\BulkAction::make('activate')
+                        ->label('Aktifkan')
+                        ->icon('heroicon-o-check')
+                        ->action(fn (Collection $records) => $records->each->update(['is_active' => true])),
+                    Tables\Actions\BulkAction::make('deactivate')
+                        ->label('Nonaktifkan')
+                        ->icon('heroicon-o-x-mark')
+                        ->action(fn (Collection $records) => $records->each->update(['is_active' => false])),
                 ]),
             ]);
     }
@@ -167,9 +170,9 @@ class FeedbackResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListFeedback::route('/'),
-            'create' => Pages\CreateFeedback::route('/create'),
-            'edit' => Pages\EditFeedback::route('/{record}/edit'),
+            'index' => Pages\ListReviews::route('/'),
+            'create' => Pages\CreateReview::route('/create'),
+            'edit' => Pages\EditReview::route('/{record}/edit'),
         ];
     }
 
@@ -177,4 +180,4 @@ class FeedbackResource extends Resource
     {
         return 'Content Management';
     }
-}
+} 

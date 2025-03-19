@@ -9,6 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
+use Illuminate\Support\Facades\Session;
 
 class User extends Authenticatable implements MustVerifyEmail, FilamentUser
 {
@@ -77,7 +78,7 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser
      */
     public function activeSubscriptions()
     {
-        return $this->subscriptions()->active();
+        return $this->subscriptions()->where('status', 'active');
     }
 
     /**
@@ -93,7 +94,7 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser
      */
     public function activeLicenses()
     {
-        return $this->licenses()->active();
+        return $this->licenses()->where('status', 'used');
     }
 
     /**
@@ -126,5 +127,26 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser
     public function canAccessPanel(Panel $panel): bool
     {
         return $this->isAdmin();
+    }
+
+    /**
+     * Impersonate another user
+     */
+    public function impersonate(User $user): bool
+    {
+        if ($this->isAdmin()) {
+            Session::put('impersonate', $user->id);
+            return true;
+        }
+        
+        return false;
+    }
+
+    /**
+     * Stop impersonating
+     */
+    public function stopImpersonating(): void
+    {
+        Session::forget('impersonate');
     }
 }
