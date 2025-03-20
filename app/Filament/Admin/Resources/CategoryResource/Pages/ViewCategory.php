@@ -30,6 +30,8 @@ class ViewCategory extends ViewRecord
                                 Infolists\Components\ImageEntry::make('image_url')
                                     ->label('Category Image')
                                     ->height(200)
+                                    ->extraAttributes(['class' => 'object-cover rounded border border-gray-200'])
+                                    ->extraImgAttributes(['loading' => 'lazy'])
                                     ->columnSpan(1),
                                     
                                 Infolists\Components\Group::make()

@@ -30,6 +30,8 @@ class ViewDigitalProduct extends ViewRecord
                                 Infolists\Components\ImageEntry::make('thumbnail_url')
                                     ->label('Product Image')
                                     ->height(200)
+                                    ->extraAttributes(['class' => 'object-cover rounded border border-gray-200'])
+                                    ->extraImgAttributes(['loading' => 'lazy'])
                                     ->columnSpan(1),
                                     
                                 Infolists\Components\Group::make()
@@ -109,7 +111,10 @@ class ViewDigitalProduct extends ViewRecord
                                         Infolists\Components\RepeatableEntry::make('gallery')
                                             ->schema([
                                                 Infolists\Components\ImageEntry::make('')
-                                                    ->disk('public'),
+                                                    ->disk('public')
+                                                    ->height(150)
+                                                    ->extraAttributes(['class' => 'object-cover rounded border border-gray-200'])
+                                                    ->extraImgAttributes(['loading' => 'lazy']),
                                             ]),
                                     ]),
                             ]),
