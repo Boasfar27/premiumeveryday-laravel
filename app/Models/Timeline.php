@@ -17,13 +17,13 @@ class Timeline extends Model
         'icon',
         'color',
         'is_active',
-        'order'
+        'sort_order'
     ];
 
     protected $casts = [
         'date' => 'datetime',
         'is_active' => 'boolean',
-        'order' => 'integer'
+        'sort_order' => 'integer'
     ];
 
     /**
@@ -56,7 +56,7 @@ class Timeline extends Model
      */
     public function scopeActive($query)
     {
-        return $query->where('is_active', true)->orderBy('order');
+        return $query->where('is_active', true)->orderBy('sort_order');
     }
 
     /**

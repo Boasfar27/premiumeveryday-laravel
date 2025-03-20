@@ -2,6 +2,48 @@
 
 @section('title', $product->name . ' - Premium Everyday')
 
+@section('styles')
+    <style>
+        .product-description ul,
+        .product-features ul,
+        .product-requirements ul {
+            list-style-type: disc;
+            margin-left: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .product-description ol,
+        .product-features ol,
+        .product-requirements ol {
+            list-style-type: decimal;
+            margin-left: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .product-description p,
+        .product-features p,
+        .product-requirements p {
+            margin-bottom: 0.75rem;
+        }
+
+        .product-description h1,
+        .product-features h1,
+        .product-requirements h1 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .product-description h2,
+        .product-features h2,
+        .product-requirements h2 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+    </style>
+@endsection
+
 @section('content')
     <div class="bg-white py-4">
         <div class="container mx-auto px-4">
@@ -41,7 +83,8 @@
             <!-- Product Image -->
             <div class="relative mb-4">
                 <img src="{{ $product->thumbnail_url }}" alt="{{ $product->name }}"
-                    class="w-full h-64 object-cover rounded-lg">
+                    class="w-full h-64 object-cover rounded-lg"
+                    onerror="this.onerror=null; this.src='{{ asset('images/placeholder.webp') }}'; console.log('Image failed to load: ' + this.alt);">
                 @if ($product->is_on_sale)
                     <div class="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
                         SALE
@@ -62,7 +105,7 @@
                         </div>
                         <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                             <dt class="text-sm font-medium text-gray-500">Description</dt>
-                            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ $product->description }}</dd>
+                            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{!! $product->description !!}</dd>
                         </div>
                         <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                             <dt class="text-sm font-medium text-gray-500">Price</dt>
@@ -398,7 +441,8 @@
                                 <a href="{{ route('products.show', $related) }}">
                                     <div class="relative">
                                         <img src="{{ $related->thumbnail_url }}" alt="{{ $related->name }}"
-                                            class="w-full h-28 object-cover">
+                                            class="w-full h-28 object-cover"
+                                            onerror="this.onerror=null; this.src='{{ asset('images/placeholder.webp') }}'; console.log('Related image failed to load: ' + this.alt);">
                                         @if ($related->is_on_sale)
                                             <div
                                                 class="absolute top-1 right-1 bg-red-500 text-white text-xxs font-bold px-1.5 py-0.5 rounded">

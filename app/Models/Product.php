@@ -23,7 +23,7 @@ class Product extends Model
         'private_description',
         'image',
         'is_active',
-        'order',
+        'sort_order',
         'sharing_discount',
         'private_discount',
         'is_promo',
@@ -34,7 +34,7 @@ class Product extends Model
         'is_active' => 'boolean',
         'sharing_price' => 'decimal:2',
         'private_price' => 'decimal:2',
-        'order' => 'integer',
+        'sort_order' => 'integer',
         'sharing_discount' => 'integer',
         'private_discount' => 'integer',
         'is_promo' => 'boolean',
@@ -90,6 +90,6 @@ class Product extends Model
      */
     public function scopeActive($query)
     {
-        return $query->where('is_active', true)->orderBy('order');
+        return $query->where('is_active', true)->orderBy('sort_order');
     }
 }

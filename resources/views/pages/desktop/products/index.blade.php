@@ -75,7 +75,8 @@
                         <div
                             class="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-lg bg-gray-200 xl:aspect-h-8 xl:aspect-w-7">
                             <img src="{{ $product->thumbnail_url }}" alt="{{ $product->name }}"
-                                class="h-full w-full object-cover object-center group-hover:opacity-75">
+                                class="h-full w-full object-cover object-center group-hover:opacity-75"
+                                onerror="this.onerror=null; this.src='{{ asset('images/placeholder.webp') }}'; console.log('Image failed to load: ' + this.alt);">
                         </div>
                         <h3 class="mt-4 text-sm text-gray-700">{{ $product->name }}</h3>
                         <div class="flex items-center justify-between">

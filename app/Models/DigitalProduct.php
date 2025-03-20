@@ -200,6 +200,20 @@ class DigitalProduct extends Model
     }
     
     /**
+     * Get the discount percentage
+     * 
+     * @return int
+     */
+    public function getDiscountPercentageAttribute()
+    {
+        if ($this->is_on_sale && $this->sale_price > 0 && $this->price > 0) {
+            return round((($this->price - $this->sale_price) / $this->price) * 100);
+        }
+        
+        return 0;
+    }
+    
+    /**
      * Check if the product is new (created within the last 7 days)
      * 
      * @return bool

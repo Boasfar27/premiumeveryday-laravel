@@ -2,6 +2,48 @@
 
 @section('title', $product->name . ' - Premium Everyday')
 
+@section('styles')
+    <style>
+        .product-description ul,
+        .product-features ul,
+        .product-requirements ul {
+            list-style-type: disc;
+            margin-left: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .product-description ol,
+        .product-features ol,
+        .product-requirements ol {
+            list-style-type: decimal;
+            margin-left: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .product-description p,
+        .product-features p,
+        .product-requirements p {
+            margin-bottom: 0.75rem;
+        }
+
+        .product-description h1,
+        .product-features h1,
+        .product-requirements h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .product-description h2,
+        .product-features h2,
+        .product-requirements h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+    </style>
+@endsection
+
 @section('content')
     <div class="bg-white py-8 mt-16">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -89,14 +131,16 @@
                 <div>
                     <div class="mb-4 overflow-hidden rounded-lg">
                         <img src="{{ $product->thumbnail_url }}" alt="{{ $product->name }}"
-                            class="w-full h-auto object-cover">
+                            class="w-full h-auto object-cover"
+                            onerror="this.onerror=null; this.src='{{ asset('images/placeholder.webp') }}'; console.log('Image failed to load: ' + this.alt);">
                     </div>
                     @if ($product->gallery && count($product->gallery) > 0)
                         <div class="grid grid-cols-4 gap-2">
                             @foreach ($product->gallery as $image)
                                 <div class="overflow-hidden rounded-lg">
-                                    <img src="{{ asset($image) }}" alt="{{ $product->name }}"
-                                        class="w-full h-20 object-cover">
+                                    <img src="{{ asset('storage/' . $image) }}" alt="{{ $product->name }}"
+                                        class="w-full h-20 object-cover"
+                                        onerror="this.onerror=null; this.src='{{ asset('images/placeholder.webp') }}'; console.log('Gallery image failed to load');">
                                 </div>
                             @endforeach
                         </div>
@@ -150,20 +194,20 @@
 
                     <div class="mb-6">
                         <h3 class="text-lg font-semibold text-gray-900 mb-2">Description</h3>
-                        <p class="text-gray-600">{{ $product->description }}</p>
+                        <div class="text-gray-600 product-description">{!! $product->description !!}</div>
                     </div>
 
                     @if ($product->features)
                         <div class="mb-6">
                             <h3 class="text-lg font-semibold text-gray-900 mb-2">Key Features</h3>
-                            <div class="text-gray-600">{{ $product->features }}</div>
+                            <div class="text-gray-600 product-features">{!! $product->features !!}</div>
                         </div>
                     @endif
 
                     @if ($product->requirements)
                         <div class="mb-6">
                             <h3 class="text-lg font-semibold text-gray-900 mb-2">Requirements</h3>
-                            <div class="text-gray-600">{{ $product->requirements }}</div>
+                            <div class="text-gray-600 product-requirements">{!! $product->requirements !!}</div>
                         </div>
                     @endif
 
@@ -500,7 +544,8 @@
                                 <a href="{{ route('products.show', $related) }}">
                                     <div class="relative">
                                         <img src="{{ $related->thumbnail_url }}" alt="{{ $related->name }}"
-                                            class="w-full h-40 object-cover">
+                                            class="w-full h-40 object-cover"
+                                            onerror="this.onerror=null; this.src='{{ asset('images/placeholder.webp') }}'; console.log('Related image failed to load: ' + this.alt);">
                                         @if ($related->is_on_sale)
                                             <div
                                                 class="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
