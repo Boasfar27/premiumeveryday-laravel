@@ -106,4 +106,14 @@ class Category extends Model
     {
         return $query->orderBy('sort_order');
     }
+
+    /**
+     * Get the image URL.
+     *
+     * @return string
+     */
+    public function getImageUrlAttribute()
+    {
+        return get_image_url($this->image);
+    }
 }

@@ -103,11 +103,7 @@ class DigitalProduct extends Model
      */
     public function getThumbnailUrlAttribute()
     {
-        if ($this->thumbnail) {
-            return asset($this->thumbnail);
-        }
-        
-        return asset('images/placeholder.webp');
+        return get_image_url($this->thumbnail);
     }
 
     /**

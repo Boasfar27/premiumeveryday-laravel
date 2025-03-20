@@ -36,10 +36,18 @@ class AdminPanelProvider extends PanelProvider
             ->homeUrl('/')
             ->brandLogo(asset('images/logo.webp'))
             ->brandLogoHeight('40px')
-            ->brandName('Premium Everyday Admin')
+            ->brandName('Premium Everyday')
+            ->sidebarCollapsibleOnDesktop()
             ->colors([
-                'primary' => Color::Pink,
+                'primary' => Color::Rose,
+                'gray' => Color::Slate,
+                'danger' => Color::Rose,
+                'info' => Color::Blue,
+                'success' => Color::Emerald,
+                'warning' => Color::Orange,
             ])
+            ->font('Inter')
+            ->favicon(asset('images/favicon.ico'))
             ->discoverResources(in: app_path('Filament/Admin/Resources'), for: 'App\\Filament\\Admin\\Resources')
             ->discoverPages(in: app_path('Filament/Admin/Pages'), for: 'App\\Filament\\Admin\\Pages')
             ->pages([
@@ -65,15 +73,22 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->navigationGroups([
                 NavigationGroup::make()
-                    ->label('User Management'),
+                    ->label('Product Management')
+                    ->icon('heroicon-o-shopping-bag'),
                 NavigationGroup::make()
-                    ->label('Product Management'),
+                    ->label('User Management')
+                    ->icon('heroicon-o-users'),
                 NavigationGroup::make()
-                    ->label('Order Management'),
+                    ->label('Order Management')
+                    ->icon('heroicon-o-shopping-cart'),
                 NavigationGroup::make()
-                    ->label('Content Management'),
+                    ->label('Content Management')
+                    ->icon('heroicon-o-document-text'),
                 NavigationGroup::make()
-                    ->label('Settings'),
-            ]);
+                    ->label('Settings')
+                    ->icon('heroicon-o-cog-6-tooth'),
+            ])
+            ->databaseNotifications()
+            ->globalSearch();
     }
 }

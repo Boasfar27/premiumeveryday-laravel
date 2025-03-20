@@ -323,3 +323,15 @@ Route::prefix('payment')->name('payment.')->group(function () {
     Route::get('/midtrans/status/{order}', [MidtransController::class, 'checkStatus'])->name('midtrans.status');
     Route::get('/midtrans/redirect/{order}', [MidtransController::class, 'redirectToVTWeb'])->name('midtrans.redirect');
 });
+
+Route::get('/debug-images', function () {
+    $categories = \App\Models\Category::all();
+    $products = \App\Models\DigitalProduct::all();
+    
+    return view('debug-images', compact('categories', 'products'));
+});
+
+Route::get('/test-images', function () {
+    return view('test-images');
+});
+    
