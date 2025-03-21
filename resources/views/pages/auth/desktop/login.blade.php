@@ -17,6 +17,8 @@
             align-items: center;
             justify-content: center;
             padding: 2rem;
+            padding-top: 5rem;
+            margin-top: 1rem;
         }
 
         .auth-card {
@@ -85,7 +87,7 @@
 @endsection
 
 @section('content')
-    <div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 pt-24 md:pt-20">
         <div class="flex w-full max-w-6xl mx-auto shadow-lg rounded-lg overflow-hidden">
             <!-- Left Side - Image/Banner -->
             <div class="hidden lg:block w-1/2 bg-primary relative">

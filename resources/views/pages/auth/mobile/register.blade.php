@@ -5,13 +5,13 @@
 @section('content')
     <div class="min-h-screen bg-white">
         <!-- Header -->
-        <div class="py-6 px-4 bg-primary">
+        {{-- <div class="py-6 px-4 bg-primary">
             <div class="flex items-center justify-between">
                 <a href="{{ route('home') }}" class="flex items-center">
                     <img class="h-8 w-auto" src="{{ asset('images/logo.webp') }}" alt="Premium Everyday">
                 </a>
             </div>
-        </div>
+        </div> --}}
 
         <!-- Registration Form -->
         <div class="px-4 py-8">
