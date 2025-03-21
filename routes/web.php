@@ -47,7 +47,7 @@ Route::get('/', function () {
         ->where('is_active', true)
         ->where('is_featured', true)
         ->orderBy('sort_order')
-        ->take(6)
+        ->take(3)
         ->get();
     
     // Get latest products

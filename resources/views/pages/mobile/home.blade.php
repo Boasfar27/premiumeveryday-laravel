@@ -27,13 +27,13 @@
                     </a>
                 </div>
                 <div class="grid grid-cols-4 gap-2 mt-8">
-                    <img src="{{ asset('images/products/netflix.webp') }}" alt="Netflix"
+                    <img src="{{ asset('storage/products/thumbnails/netflix.webp') }}" alt="Netflix"
                         class="w-16 h-16 mx-auto object-contain bg-white rounded-lg p-1">
-                    <img src="{{ asset('images/products/spotify.webp') }}" alt="Spotify"
+                    <img src="{{ asset('storage/products/thumbnails/spotify.webp') }}" alt="Spotify"
                         class="w-16 h-16 mx-auto object-contain bg-white rounded-lg p-1">
-                    <img src="{{ asset('images/products/youtube.webp') }}" alt="YouTube"
+                    <img src="{{ asset('storage/products/thumbnails/youtube.webp') }}" alt="YouTube"
                         class="w-16 h-16 mx-auto object-contain bg-white rounded-lg p-1">
-                    <img src="{{ asset('images/products/appletv.webp') }}" alt="Apple TV+"
+                    <img src="{{ asset('storage/products/thumbnails/appletv.webp') }}" alt="Apple TV+"
                         class="w-16 h-16 mx-auto object-contain bg-white rounded-lg p-1">
                 </div>
             </div>
