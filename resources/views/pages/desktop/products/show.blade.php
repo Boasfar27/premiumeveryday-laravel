@@ -179,7 +179,7 @@
                                 <span class="text-xl text-gray-500 line-through">Rp
                                     {{ number_format($product->price, 0, ',', '.') }}</span>
                                 <span
-                                    class="bg-red-100 text-red-800 text-xs font-semibold px-2.5 py-0.5 rounded">{{ $product->sharing_discount }}%
+                                    class="bg-red-100 text-red-800 text-xs font-semibold px-2.5 py-0.5 rounded">{{ $product->discount_percentage }}%
                                     OFF</span>
                             @else
                                 <span class="text-3xl font-bold text-primary">Rp
@@ -244,10 +244,10 @@
                                             </div>
                                             <div class="text-right">
                                                 <span class="text-xl font-bold text-primary">Rp
-                                                    {{ number_format($product->actual_sharing_price ?? $product->price, 0, ',', '.') }}</span>
-                                                @if ($product->is_promo && ($product->sharing_discount ?? 0) > 0)
+                                                    {{ number_format($product->current_price, 0, ',', '.') }}</span>
+                                                @if ($product->is_on_sale && $product->discount_percentage > 0)
                                                     <span class="text-sm text-gray-500 line-through block">Rp
-                                                        {{ number_format($product->sharing_price ?? $product->price, 0, ',', '.') }}</span>
+                                                        {{ number_format($product->price, 0, ',', '.') }}</span>
                                                 @endif
                                             </div>
                                         </div>
@@ -282,15 +282,15 @@
                                             </div>
                                             <div class="text-right">
                                                 @php
-                                                    $sharingPrice = $product->actual_sharing_price ?? $product->price;
-                                                    $sharingPrice3Month = $sharingPrice * 3 * 0.9;
-                                                    $sharingRegularPrice3Month =
-                                                        ($product->sharing_price ?? $product->price) * 3;
+                                                    $basePrice = $product->current_price;
+                                                    $regularPrice = $product->price;
+                                                    $discountedPrice3Month = $basePrice * 3 * 0.9;
+                                                    $regularPrice3Month = $regularPrice * 3;
                                                 @endphp
                                                 <span class="text-xl font-bold text-primary">Rp
-                                                    {{ number_format($sharingPrice3Month, 0, ',', '.') }}</span>
+                                                    {{ number_format($discountedPrice3Month, 0, ',', '.') }}</span>
                                                 <span class="text-sm text-gray-500 line-through block">Rp
-                                                    {{ number_format($sharingRegularPrice3Month, 0, ',', '.') }}</span>
+                                                    {{ number_format($regularPrice3Month, 0, ',', '.') }}</span>
                                             </div>
                                         </div>
                                         <form action="{{ route('cart.add') }}" method="POST" class="mt-4">
@@ -329,15 +329,15 @@
                                             </div>
                                             <div class="text-right">
                                                 @php
-                                                    $sharingPrice = $product->actual_sharing_price ?? $product->price;
-                                                    $sharingPrice6Month = $sharingPrice * 6 * 0.8;
-                                                    $sharingRegularPrice6Month =
-                                                        ($product->sharing_price ?? $product->price) * 6;
+                                                    $basePrice = $product->current_price;
+                                                    $regularPrice = $product->price;
+                                                    $discountedPrice6Month = $basePrice * 6 * 0.8;
+                                                    $regularPrice6Month = $regularPrice * 6;
                                                 @endphp
                                                 <span class="text-xl font-bold text-primary">Rp
-                                                    {{ number_format($sharingPrice6Month, 0, ',', '.') }}</span>
+                                                    {{ number_format($discountedPrice6Month, 0, ',', '.') }}</span>
                                                 <span class="text-sm text-gray-500 line-through block">Rp
-                                                    {{ number_format($sharingRegularPrice6Month, 0, ',', '.') }}</span>
+                                                    {{ number_format($regularPrice6Month, 0, ',', '.') }}</span>
                                             </div>
                                         </div>
                                         <form action="{{ route('cart.add') }}" method="POST" class="mt-4">
@@ -380,16 +380,14 @@
                                             </div>
                                             <div class="text-right">
                                                 @php
-                                                    $privatePrice =
-                                                        $product->actual_private_price ?? $product->price * 1.5;
-                                                    $privateRegularPrice =
-                                                        $product->private_price ?? $product->price * 1.5;
+                                                    $basePrice = $product->current_price * 1.5; // Private account = 1.5x price
+                                                    $regularPrice = $product->price * 1.5;
                                                 @endphp
                                                 <span class="text-xl font-bold text-primary">Rp
-                                                    {{ number_format($privatePrice, 0, ',', '.') }}</span>
-                                                @if ($product->is_promo && ($product->private_discount ?? 0) > 0)
+                                                    {{ number_format($basePrice, 0, ',', '.') }}</span>
+                                                @if ($product->is_on_sale && $product->discount_percentage > 0)
                                                     <span class="text-sm text-gray-500 line-through block">Rp
-                                                        {{ number_format($privateRegularPrice, 0, ',', '.') }}</span>
+                                                        {{ number_format($regularPrice, 0, ',', '.') }}</span>
                                                 @endif
                                             </div>
                                         </div>
@@ -424,16 +422,15 @@
                                             </div>
                                             <div class="text-right">
                                                 @php
-                                                    $privatePrice =
-                                                        $product->actual_private_price ?? $product->price * 1.5;
-                                                    $privatePrice3Month = $privatePrice * 3 * 0.9;
-                                                    $privateRegularPrice3Month =
-                                                        ($product->private_price ?? $product->price * 1.5) * 3;
+                                                    $basePrice = $product->current_price * 1.5; // Private account = 1.5x price
+                                                    $regularPrice = $product->price * 1.5;
+                                                    $discountedPrice3Month = $basePrice * 3 * 0.9;
+                                                    $regularPrice3Month = $regularPrice * 3;
                                                 @endphp
                                                 <span class="text-xl font-bold text-primary">Rp
-                                                    {{ number_format($privatePrice3Month, 0, ',', '.') }}</span>
+                                                    {{ number_format($discountedPrice3Month, 0, ',', '.') }}</span>
                                                 <span class="text-sm text-gray-500 line-through block">Rp
-                                                    {{ number_format($privateRegularPrice3Month, 0, ',', '.') }}</span>
+                                                    {{ number_format($regularPrice3Month, 0, ',', '.') }}</span>
                                             </div>
                                         </div>
                                         <form action="{{ route('cart.add') }}" method="POST" class="mt-4">
@@ -472,16 +469,15 @@
                                             </div>
                                             <div class="text-right">
                                                 @php
-                                                    $privatePrice =
-                                                        $product->actual_private_price ?? $product->price * 1.5;
-                                                    $privatePrice6Month = $privatePrice * 6 * 0.8;
-                                                    $privateRegularPrice6Month =
-                                                        ($product->private_price ?? $product->price * 1.5) * 6;
+                                                    $basePrice = $product->current_price * 1.5; // Private account = 1.5x price
+                                                    $regularPrice = $product->price * 1.5;
+                                                    $discountedPrice6Month = $basePrice * 6 * 0.8;
+                                                    $regularPrice6Month = $regularPrice * 6;
                                                 @endphp
                                                 <span class="text-xl font-bold text-primary">Rp
-                                                    {{ number_format($privatePrice6Month, 0, ',', '.') }}</span>
+                                                    {{ number_format($discountedPrice6Month, 0, ',', '.') }}</span>
                                                 <span class="text-sm text-gray-500 line-through block">Rp
-                                                    {{ number_format($privateRegularPrice6Month, 0, ',', '.') }}</span>
+                                                    {{ number_format($regularPrice6Month, 0, ',', '.') }}</span>
                                             </div>
                                         </div>
                                         <form action="{{ route('cart.add') }}" method="POST" class="mt-4">
@@ -561,7 +557,7 @@
                                                     <span class="text-gray-400 line-through text-xs">Rp
                                                         {{ number_format($related->price, 0, ',', '.') }}</span>
                                                     <span class="text-md font-bold text-primary">Rp
-                                                        {{ number_format($related->sale_price, 0, ',', '.') }}</span>
+                                                        {{ number_format($related->current_price, 0, ',', '.') }}</span>
                                                 @else
                                                     <span class="text-md font-bold text-primary">Rp
                                                         {{ number_format($related->price, 0, ',', '.') }}</span>

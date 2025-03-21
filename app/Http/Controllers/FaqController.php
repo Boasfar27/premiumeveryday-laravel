@@ -13,6 +13,13 @@ class FaqController extends Controller
         $agent = new Agent();
         $faqs = Faq::where('is_active', true)->orderBy('order')->get();
         
-        return view('pages.desktop.faq.index', compact('faqs'));
+        // Get all categories that have active FAQs
+        $categories = $faqs->pluck('category')->unique()->values()->all();
+        
+        if ($agent->isMobile()) {
+            return view('pages.mobile.faq.index', compact('faqs', 'categories'));
+        }
+        
+        return view('pages.desktop.faq.index', compact('faqs', 'categories'));
     }
 } 

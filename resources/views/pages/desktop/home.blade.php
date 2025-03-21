@@ -74,14 +74,14 @@
                                 </span>
                             </div>
                             <h3 class="text-lg font-bold text-gray-900 mb-2">{{ $product->name }}</h3>
-                            <p class="text-gray-600 text-sm mb-4 line-clamp-2">{{ $product->description }}</p>
+                            <p class="text-gray-600 text-sm mb-4 line-clamp-2">{!! strip_tags($product->description) !!}</p>
                             <div class="flex items-center justify-between">
                                 <div>
                                     @if ($product->is_on_sale)
                                         <span class="text-gray-400 line-through text-sm">Rp
                                             {{ number_format($product->price, 0, ',', '.') }}</span>
                                         <span class="text-lg font-bold text-primary">Rp
-                                            {{ number_format($product->sale_price, 0, ',', '.') }}</span>
+                                            {{ number_format($product->current_price, 0, ',', '.') }}</span>
                                     @else
                                         <span class="text-lg font-bold text-primary">Rp
                                             {{ number_format($product->price, 0, ',', '.') }}</span>
@@ -151,7 +151,7 @@
                                         <span class="text-gray-400 line-through text-xs">Rp
                                             {{ number_format($product->price, 0, ',', '.') }}</span>
                                         <span class="text-md font-bold text-primary">Rp
-                                            {{ number_format($product->sale_price, 0, ',', '.') }}</span>
+                                            {{ number_format($product->current_price, 0, ',', '.') }}</span>
                                     @else
                                         <span class="text-md font-bold text-primary">Rp
                                             {{ number_format($product->price, 0, ',', '.') }}</span>
@@ -207,7 +207,7 @@
                                         <span class="text-gray-400 line-through text-xs">Rp
                                             {{ number_format($product->price, 0, ',', '.') }}</span>
                                         <span class="text-md font-bold text-primary">Rp
-                                            {{ number_format($product->sale_price, 0, ',', '.') }}</span>
+                                            {{ number_format($product->current_price, 0, ',', '.') }}</span>
                                     @else
                                         <span class="text-md font-bold text-primary">Rp
                                             {{ number_format($product->price, 0, ',', '.') }}</span>
@@ -312,7 +312,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <p class="text-gray-600">{{ $testimonial->content }}</p>
+                            <p class="text-gray-600">{!! $testimonial->content !!}</p>
                             @if ($testimonial->reviewable)
                                 <p class="mt-4 text-sm text-gray-500">Review for <a
                                         href="{{ route('products.show', $testimonial->reviewable) }}"
@@ -354,7 +354,7 @@
                                     </svg>
                                 </summary>
                                 <div class="p-4 pt-0 text-gray-600 text-sm">
-                                    {{ $faq->answer }}
+                                    {!! $faq->answer !!}
                                 </div>
                             </details>
                         </div>
@@ -375,7 +375,7 @@
                                     </svg>
                                 </summary>
                                 <div class="p-4 pt-0 text-gray-600 text-sm">
-                                    {{ $faq->answer }}
+                                    {!! $faq->answer !!}
                                 </div>
                             </details>
                         </div>

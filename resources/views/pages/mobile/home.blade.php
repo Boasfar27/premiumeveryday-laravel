@@ -74,7 +74,7 @@
                                         <span class="text-gray-400 line-through text-xs">Rp
                                             {{ number_format($product->price, 0, ',', '.') }}</span>
                                         <span class="text-sm font-bold text-primary">Rp
-                                            {{ number_format($product->sale_price, 0, ',', '.') }}</span>
+                                            {{ number_format($product->current_price, 0, ',', '.') }}</span>
                                     @else
                                         <span class="text-sm font-bold text-primary">Rp
                                             {{ number_format($product->price, 0, ',', '.') }}</span>
@@ -140,7 +140,7 @@
                                         <span class="text-gray-400 line-through text-xs">Rp
                                             {{ number_format($product->price, 0, ',', '.') }}</span>
                                         <span class="text-sm font-bold text-primary">Rp
-                                            {{ number_format($product->sale_price, 0, ',', '.') }}</span>
+                                            {{ number_format($product->current_price, 0, ',', '.') }}</span>
                                     @else
                                         <span class="text-sm font-bold text-primary">Rp
                                             {{ number_format($product->price, 0, ',', '.') }}</span>
@@ -196,7 +196,7 @@
                                         <span class="text-gray-400 line-through text-xs">Rp
                                             {{ number_format($product->price, 0, ',', '.') }}</span>
                                         <span class="text-sm font-bold text-primary">Rp
-                                            {{ number_format($product->sale_price, 0, ',', '.') }}</span>
+                                            {{ number_format($product->current_price, 0, ',', '.') }}</span>
                                     @else
                                         <span class="text-sm font-bold text-primary">Rp
                                             {{ number_format($product->price, 0, ',', '.') }}</span>
@@ -319,7 +319,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <p class="text-sm text-gray-600">{{ $testimonial->content }}</p>
+                            <p class="text-sm text-gray-600">{!! $testimonial->content !!}</p>
                             @if ($testimonial->reviewable)
                                 <p class="mt-2 text-xs text-gray-500">Review for <a
                                         href="{{ route('products.show', $testimonial->reviewable) }}"
@@ -361,7 +361,7 @@
                                     </svg>
                                 </summary>
                                 <div class="p-3 pt-0 text-gray-600 text-xs">
-                                    {{ $faq->answer }}
+                                    {!! $faq->answer !!}
                                 </div>
                             </details>
                         </div>
@@ -382,7 +382,7 @@
                                     </svg>
                                 </summary>
                                 <div class="p-3 pt-0 text-gray-600 text-xs">
-                                    {{ $faq->answer }}
+                                    {!! $faq->answer !!}
                                 </div>
                             </details>
                         </div>
