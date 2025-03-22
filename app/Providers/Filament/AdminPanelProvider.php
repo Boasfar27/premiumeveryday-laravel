@@ -72,44 +72,57 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
             ])
             ->navigationGroups([
+                // Dashboard Group
                 NavigationGroup::make()
-                    ->label('Products')
+                    ->label('Analytics')
+                    ->icon('heroicon-o-chart-bar')
+                    ->collapsed(),
+                    
+                // Katalog Produk
+                NavigationGroup::make()
+                    ->label('Katalog')
                     ->icon('heroicon-o-shopping-bag')
-                    ->items([
-                        // Items added automatically for resources with this navigation group
-                    ]),
+                    ->collapsible(),
+                
+                // Penjualan dan Pesanan
                 NavigationGroup::make()
-                    ->label('Subscriptions')
-                    ->icon('heroicon-o-credit-card')
-                    ->items([
-                        // Items added automatically for resources with this navigation group
-                    ]),
-                NavigationGroup::make()
-                    ->label('Users')
-                    ->icon('heroicon-o-users')
-                    ->items([
-                        // Items added automatically for resources with this navigation group
-                    ]),
-                NavigationGroup::make()
-                    ->label('Orders')
+                    ->label('Penjualan')
                     ->icon('heroicon-o-shopping-cart')
-                    ->items([
-                        // Items added automatically for resources with this navigation group
-                    ]),
+                    ->collapsible(),
+                
+                // Lisensi dan Aktivasi
                 NavigationGroup::make()
-                    ->label('Content')
+                    ->label('Lisensi & Aktivasi')
+                    ->icon('heroicon-o-key')
+                    ->collapsible(),
+                
+                // Langganan
+                NavigationGroup::make()
+                    ->label('Langganan')
+                    ->icon('heroicon-o-credit-card')
+                    ->collapsible(),
+                
+                // Pengguna
+                NavigationGroup::make()
+                    ->label('Pengguna')
+                    ->icon('heroicon-o-users')
+                    ->collapsible(),
+                
+                // Konten Website
+                NavigationGroup::make()
+                    ->label('Konten')
                     ->icon('heroicon-o-document-text')
-                    ->items([
-                        // Items added automatically for resources with this navigation group
-                    ]),
+                    ->collapsible(),
+                
+                // Pengaturan
                 NavigationGroup::make()
-                    ->label('Settings')
+                    ->label('Pengaturan')
                     ->icon('heroicon-o-cog')
-                    ->items([
-                        // Items added automatically for resources with this navigation group
-                    ]),
+                    ->collapsible(),
             ])
             ->databaseNotifications()
-            ->globalSearch();
+            ->globalSearch(true)
+            ->globalSearchKeyBindings(['command+k', 'ctrl+k'])
+            ->globalSearchDebounce(800);
     }
 }

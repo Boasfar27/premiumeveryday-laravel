@@ -130,6 +130,6 @@ class OrderResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Order Management';
+        return 'Penjualan';
     }
 }

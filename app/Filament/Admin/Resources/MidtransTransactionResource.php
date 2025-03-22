@@ -22,7 +22,7 @@ class MidtransTransactionResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-credit-card';
 
-    protected static ?string $navigationGroup = 'Pembayaran';
+    protected static ?string $navigationGroup = 'Penjualan';
 
     protected static ?string $navigationLabel = 'Transaksi Midtrans';
 

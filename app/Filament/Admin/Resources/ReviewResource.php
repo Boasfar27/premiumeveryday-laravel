@@ -178,6 +178,6 @@ class ReviewResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Content Management';
+        return 'Katalog';
     }
 } 

@@ -108,17 +108,131 @@ class DigitalProductLicenseResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+                // Basic status filter
                 Tables\Filters\SelectFilter::make('status')
                     ->options([
                         'pending' => 'Pending',
                         'active' => 'Active',
                         'expired' => 'Expired',
                         'revoked' => 'Revoked',
-                    ]),
+                    ])
+                    ->label('Status Lisensi'),
+                
+                // Filter licenses expiring soon
                 Tables\Filters\Filter::make('expires_soon')
-                    ->query(fn (Builder $query): Builder => $query->where('expires_at', '<=', now()->addDays(30))
-                        ->where('expires_at', '>=', now()))
-                    ->label('Expires Soon (30 days)'),
+                    ->form([
+                        Forms\Components\Select::make('expires_within')
+                            ->options([
+                                7 => '7 hari ke depan',
+                                30 => '30 hari ke depan',
+                                60 => '60 hari ke depan',
+                                90 => '90 hari ke depan',
+                            ])
+                            ->default(30),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['expires_within'],
+                                fn (Builder $query, $expiresWithin): Builder => $query
+                                    ->where('expires_at', '<=', now()->addDays($expiresWithin))
+                                    ->where('expires_at', '>=', now())
+                                    ->where('status', 'active')
+                            );
+                    })
+                    ->indicateUsing(function (array $data): ?string {
+                        if (! $data['expires_within']) {
+                            return null;
+                        }
+                    
+                        return 'Kedaluwarsa dalam ' . $data['expires_within'] . ' hari';
+                    }),
+                
+                // Filter for never activated licenses
+                Tables\Filters\Filter::make('never_activated')
+                    ->label('Belum Diaktivasi')
+                    ->query(fn (Builder $query): Builder => $query->whereNull('activated_at')),
+                
+                // Filter for licenses created in a date range
+                Tables\Filters\Filter::make('created_at')
+                    ->form([
+                        Forms\Components\DatePicker::make('created_from')
+                            ->label('Dibuat dari'),
+                        Forms\Components\DatePicker::make('created_until')
+                            ->label('Dibuat hingga'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['created_from'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                            )
+                            ->when(
+                                $data['created_until'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                            );
+                    })
+                    ->indicateUsing(function (array $data): array {
+                        $indicators = [];
+                        
+                        if ($data['created_from'] ?? null) {
+                            $indicators[] = 'Dibuat dari ' . \Carbon\Carbon::parse($data['created_from'])->toFormattedDateString();
+                        }
+                        
+                        if ($data['created_until'] ?? null) {
+                            $indicators[] = 'Dibuat hingga ' . \Carbon\Carbon::parse($data['created_until'])->toFormattedDateString();
+                        }
+                        
+                        return $indicators;
+                    }),
+                
+                // Filter for licenses by specific product
+                Tables\Filters\SelectFilter::make('digital_product_id')
+                    ->relationship('digitalProduct', 'name')
+                    ->searchable()
+                    ->preload()
+                    ->label('Produk'),
+                
+                // Filter for licenses with high usage (approaching max activations)
+                Tables\Filters\Filter::make('high_usage')
+                    ->label('Penggunaan Tinggi')
+                    ->query(function (Builder $query): Builder {
+                        return $query->whereRaw('activation_count >= (max_activations * 0.8)');
+                    }),
+                
+                // Filter for recently activated licenses
+                Tables\Filters\Filter::make('recently_activated')
+                    ->form([
+                        Forms\Components\Select::make('activated_within')
+                            ->options([
+                                1 => '24 jam terakhir',
+                                7 => '7 hari terakhir',
+                                30 => '30 hari terakhir',
+                            ])
+                            ->default(7),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['activated_within'],
+                                fn (Builder $query, $activatedWithin): Builder => $query
+                                    ->whereNotNull('activated_at')
+                                    ->where('activated_at', '>=', now()->subDays($activatedWithin))
+                            );
+                    })
+                    ->indicateUsing(function (array $data): ?string {
+                        if (! $data['activated_within']) {
+                            return null;
+                        }
+                        
+                        $labels = [
+                            1 => '24 jam terakhir',
+                            7 => '7 hari terakhir',
+                            30 => '30 hari terakhir',
+                        ];
+                        
+                        return 'Diaktifkan dalam ' . $labels[$data['activated_within']] ?? '';
+                    }),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -156,6 +270,6 @@ class DigitalProductLicenseResource extends Resource
     
     public static function getNavigationGroup(): ?string
     {
-        return 'Products';
+        return 'Lisensi & Aktivasi';
     }
 }

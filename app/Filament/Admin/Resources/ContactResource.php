@@ -99,6 +99,6 @@ class ContactResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Content Management';
+        return 'Konten';
     }
 }

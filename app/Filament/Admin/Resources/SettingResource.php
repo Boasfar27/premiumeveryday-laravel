@@ -276,7 +276,7 @@ class SettingResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Settings';
+        return 'Pengaturan';
     }
 
     public static function getNavigationItems(): array

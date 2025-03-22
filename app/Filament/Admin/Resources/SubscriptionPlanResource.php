@@ -70,14 +70,14 @@ class SubscriptionPlanResource extends Resource
                         Step::make('Informasi Dasar')
                             ->icon('heroicon-o-information-circle')
                             ->description('Atur informasi dasar paket')
-                            ->schema([
-                                Forms\Components\Select::make('digital_product_id')
+            ->schema([
+                Forms\Components\Select::make('digital_product_id')
                                     ->label('Produk Digital')
-                                    ->relationship('digitalProduct', 'name')
-                                    ->required()
+                    ->relationship('digitalProduct', 'name')
+                    ->required()
                                     ->preload()
                                     ->reactive()
-                                    ->searchable()
+                    ->searchable()
                                     ->afterStateUpdated(function (callable $set, callable $get, $state) {
                                         // If a product was selected, get its details
                                         if (!empty($state)) {
@@ -112,22 +112,22 @@ class SubscriptionPlanResource extends Resource
                                         }
                                     }),
                                     
-                                Forms\Components\TextInput::make('name')
+                Forms\Components\TextInput::make('name')
                                     ->label('Nama Paket')
-                                    ->required()
+                    ->required()
                                     ->maxLength(255)
                                     ->reactive()
                                     ->afterStateUpdated(fn ($state, callable $set) => $set('slug', Str::slug($state))),
                                     
-                                Forms\Components\TextInput::make('slug')
+                Forms\Components\TextInput::make('slug')
                                     ->label('Slug')
-                                    ->required()
-                                    ->maxLength(255),
+                    ->required()
+                    ->maxLength(255),
                                     
-                                Forms\Components\Select::make('type')
+                Forms\Components\Select::make('type')
                                     ->label('Jenis Paket')
-                                    ->options([
-                                        'individual' => 'Individual',
+                    ->options([
+                        'individual' => 'Individual',
                                         'team' => 'Team',
                                         'enterprise' => 'Enterprise',
                                     ])
@@ -137,7 +137,7 @@ class SubscriptionPlanResource extends Resource
                                 Forms\Components\Toggle::make('is_active')
                                     ->label('Aktif')
                                     ->default(true)
-                                    ->required(),
+                    ->required(),
                                     
                                 Forms\Components\Toggle::make('is_featured')
                                     ->label('Rekomendasi')
@@ -149,20 +149,20 @@ class SubscriptionPlanResource extends Resource
                             ->icon('heroicon-o-currency-dollar')
                             ->description('Atur harga dan diskon')
                             ->schema([
-                                Forms\Components\TextInput::make('price')
+                Forms\Components\TextInput::make('price')
                                     ->label('Harga Normal')
                                     ->helperText('Harga dasar sebelum diskon durasi')
-                                    ->required()
-                                    ->numeric()
+                    ->required()
+                    ->numeric()
                                     ->reactive(),
                                     
-                                Forms\Components\TextInput::make('discount_price')
+                Forms\Components\TextInput::make('discount_price')
                                     ->label('Harga Diskon')
                                     ->helperText('Harga setelah diskon durasi. Kosongkan untuk menggunakan harga normal')
-                                    ->numeric()
+                    ->numeric()
                                     ->reactive(),
                                 
-                                Forms\Components\Select::make('duration')
+                Forms\Components\Select::make('duration')
                                     ->label('Durasi Langganan')
                                     ->options(function () {
                                         $durationOptions = self::getDurationOptions();
@@ -487,6 +487,6 @@ class SubscriptionPlanResource extends Resource
     
     public static function getNavigationGroup(): ?string
     {
-        return 'Subscriptions';
+        return 'Langganan';
     }
 }

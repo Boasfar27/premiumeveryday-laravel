@@ -446,6 +446,6 @@ class DigitalProductResource extends Resource
     
     public static function getNavigationGroup(): ?string
     {
-        return 'Products';
+        return 'Katalog';
     }
 }

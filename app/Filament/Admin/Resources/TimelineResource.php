@@ -136,6 +136,6 @@ class TimelineResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Content Management';
+        return 'Konten';
     }
 }

@@ -18,8 +18,10 @@
         "laravel/sanctum": "^4.0",
         "laravel/socialite": "^5.18",
         "laravel/tinker": "^2.10.1",
+        "league/csv": "^9.22",
         "midtrans/midtrans-php": "^2.6",
-        "nesbot/carbon": "^3.8"
+        "nesbot/carbon": "^3.8",
+        "phpoffice/phpspreadsheet": "^4.1"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

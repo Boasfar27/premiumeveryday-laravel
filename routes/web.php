@@ -31,6 +31,7 @@ use App\Models\UserSubscription;
 use App\Http\Controllers\User\OrderReviewController;
 use App\Http\Controllers\ReviewController;
 use App\Models\Review;
+use App\Http\Controllers\LicenseController;
 
 /*
 |--------------------------------------------------------------------------
@@ -334,5 +335,14 @@ Route::get('/payment/midtrans/notification', [MidtransController::class, 'handle
 Route::prefix('debug')->name('debug.')->middleware(['auth'])->group(function () {
     Route::get('/images', [App\Http\Controllers\DebugController::class, 'images'])->name('images');
     Route::post('/fix-images', [App\Http\Controllers\DebugController::class, 'fixImages'])->name('fix-images');
+});
+
+// License routes
+Route::prefix('licenses')->group(function () {
+    Route::get('/', [LicenseController::class, 'index'])->name('licenses.index');
+    Route::get('/{license}', [LicenseController::class, 'show'])->name('licenses.show');
+    Route::get('/{license}/activate', [LicenseController::class, 'activate'])->name('licenses.activate');
+    Route::post('/{license}/activate', [LicenseController::class, 'processActivation'])->name('licenses.process-activation');
+    Route::get('/{license}/success-activation', [LicenseController::class, 'showSuccessActivation'])->name('licenses.success-activation');
 });
     
