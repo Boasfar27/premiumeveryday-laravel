@@ -150,7 +150,7 @@
                         @endif
 
                         <div class="flex justify-between text-sm">
-                            <span class="text-gray-600">Tax (11%)</span>
+                            <span class="text-gray-600">Tax ({{ App\Models\Setting::get('tax_rate', 5) }}%)</span>
                             <span class="font-medium">Rp {{ number_format($tax, 0, ',', '.') }}</span>
                         </div>
                     </div>

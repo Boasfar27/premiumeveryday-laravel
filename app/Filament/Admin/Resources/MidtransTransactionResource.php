@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
+use Filament\Forms\Components\KeyValue;
 
 class MidtransTransactionResource extends Resource
 {
@@ -43,6 +44,9 @@ class MidtransTransactionResource extends Resource
                                 Forms\Components\TextInput::make('transaction_id')
                                     ->maxLength(255)
                                     ->label('ID Transaksi'),
+                                Forms\Components\TextInput::make('midtrans_order_id')
+                                    ->maxLength(255)
+                                    ->label('ID Pesanan Midtrans'),
                                 Forms\Components\TextInput::make('payment_type')
                                     ->maxLength(255)
                                     ->label('Metode Pembayaran'),
@@ -79,6 +83,11 @@ class MidtransTransactionResource extends Resource
                                     ->label('URL Instruksi Pembayaran'),
                                 Forms\Components\DateTimePicker::make('expiry_time')
                                     ->label('Waktu Kadaluarsa'),
+                                Forms\Components\KeyValue::make('payment_methods')
+                                    ->label('Metode Pembayaran Tersedia')
+                                    ->keyLabel('Metode')
+                                    ->valueLabel('Status')
+                                    ->columnSpan(2),
                             ]),
                     ]),
                 
@@ -120,6 +129,9 @@ class MidtransTransactionResource extends Resource
                 Tables\Columns\TextColumn::make('transaction_id')
                     ->searchable()
                     ->label('ID Transaksi'),
+                Tables\Columns\TextColumn::make('midtrans_order_id')
+                    ->searchable()
+                    ->label('ID Pesanan Midtrans'),
                 Tables\Columns\TextColumn::make('payment_type')
                     ->searchable()
                     ->label('Metode Pembayaran'),

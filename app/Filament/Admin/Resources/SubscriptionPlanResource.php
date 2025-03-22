@@ -5,6 +5,7 @@ namespace App\Filament\Admin\Resources;
 use App\Filament\Admin\Resources\SubscriptionPlanResource\Pages;
 use App\Filament\Admin\Resources\SubscriptionPlanResource\RelationManagers;
 use App\Models\SubscriptionPlan;
+use App\Models\Setting;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -52,12 +53,21 @@ class SubscriptionPlanResource extends Resource
                     ->numeric()
                     ->prefix('$'),
                 Forms\Components\Select::make('duration')
-                    ->options([
-                        'monthly' => 'Monthly',
-                        'quarterly' => 'Quarterly',
-                        'yearly' => 'Yearly',
-                        'lifetime' => 'Lifetime',
-                    ])
+                    ->options(function () {
+                        $durations = Setting::get('subscription_durations', [
+                            'monthly' => ['label' => 'Monthly'],
+                            'quarterly' => ['label' => 'Quarterly'],
+                            'yearly' => ['label' => 'Yearly'],
+                            'lifetime' => ['label' => 'Lifetime'],
+                        ]);
+                        
+                        $options = [];
+                        foreach ($durations as $key => $data) {
+                            $options[$key] = $data['label'] ?? ucfirst($key);
+                        }
+                        
+                        return $options;
+                    })
                     ->required(),
                 Forms\Components\TextInput::make('duration_in_days')
                     ->numeric()

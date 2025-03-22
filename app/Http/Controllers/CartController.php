@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use App\Models\Setting;
 
 class CartController extends Controller
 {
@@ -66,7 +67,8 @@ class CartController extends Controller
             }
         }
 
-        $tax = ($subtotal - $discount) * 0.11;
+        $taxRate = Setting::get('tax_rate', 5) / 100;
+        $tax = ($subtotal - $discount) * $taxRate;
         $total = $subtotal - $discount + $tax;
         
         $recentProducts = Product::latest()->take(4)->get();
@@ -281,7 +283,8 @@ class CartController extends Controller
             }
             
             $discount = Session::get('discount', 0);
-            $tax = ($subtotal - $discount) * 0.11; // 11% tax
+            $taxRate = Setting::get('tax_rate', 5) / 100;
+            $tax = ($subtotal - $discount) * $taxRate;
             $total = $subtotal - $discount + $tax;
             
             if ($request->ajax() || $request->expectsJson()) {
@@ -343,7 +346,8 @@ class CartController extends Controller
                 }
                 
                 $discount = Session::get('discount', 0);
-                $tax = ($subtotal - $discount) * 0.11; // 11% tax
+                $taxRate = Setting::get('tax_rate', 5) / 100;
+                $tax = ($subtotal - $discount) * $taxRate;
                 $total = $subtotal - $discount + $tax;
                 
                 if ($request->ajax() || $request->expectsJson()) {
@@ -550,7 +554,8 @@ class CartController extends Controller
         }
         
         // Calculate tax and total
-        $tax = ($subtotal - $discount) * 0.11; // 11% tax
+        $taxRate = Setting::get('tax_rate', 5) / 100;
+        $tax = ($subtotal - $discount) * $taxRate;
         $total = $subtotal - $discount + $tax;
         
         // Generate unique order number
