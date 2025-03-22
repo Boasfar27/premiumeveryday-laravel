@@ -151,12 +151,12 @@ Route::middleware('guest')->group(function () {
         return view($agent->isMobile() ? 'pages.auth.mobile.forgot-password' : 'pages.auth.desktop.forgot-password');
     })->name('password.request');
     
-    Route::post('/forgot-password', [AuthController::class, 'sendResetLink'])->name('password.email');
+    Route::post('/forgot-password', [\App\Http\Controllers\Auth\AuthController::class, 'sendResetLink'])->name('password.email');
     Route::get('/reset-password/{token}', function ($token) {
         $agent = new Agent();
         return view($agent->isMobile() ? 'pages.auth.mobile.reset-password' : 'pages.auth.desktop.reset-password', ['token' => $token]);
     })->name('password.reset');
-    Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('password.update');
+    Route::post('/reset-password', [\App\Http\Controllers\Auth\AuthController::class, 'resetPassword'])->name('password.update');
 });
 
 // Protected Routes

@@ -325,4 +325,55 @@ class AuthController extends Controller
             return back()->withErrors(['error' => 'Gagal mengirim email verifikasi. Silakan coba lagi nanti.']);
         }
     }
+
+    public function sendResetLink(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|exists:users,email'
+        ]);
+
+        $token = Str::random(64);
+
+        \DB::table('password_reset_tokens')->insert([
+            'email' => $request->email,
+            'token' => $token,
+            'created_at' => now()
+        ]);
+
+        Mail::send('emails.reset-password', ['token' => $token], function($message) use ($request) {
+            $message->to($request->email)
+                    ->subject('Reset Password - Premium Everyday');
+        });
+
+        return back()->with('status', 'Link reset password telah dikirim ke email Anda.');
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'token' => 'required',
+            'email' => 'required|email|exists:users',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $updatePassword = \DB::table('password_reset_tokens')
+            ->where([
+                'email' => $request->email,
+                'token' => $request->token
+            ])->first();
+
+        if (!$updatePassword) {
+            return back()->withErrors(['email' => 'Token tidak valid!']);
+        }
+
+        User::where('email', $request->email)->update([
+            'password' => Hash::make($request->password)
+        ]);
+
+        \DB::table('password_reset_tokens')
+            ->where(['email' => $request->email])->delete();
+
+        return redirect()->route('login')
+                        ->with('status', 'Password berhasil diubah!');
+    }
 } 
