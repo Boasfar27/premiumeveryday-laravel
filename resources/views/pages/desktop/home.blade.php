@@ -4,7 +4,8 @@
 
 @section('content')
     <!-- Hero Section -->
-    <section id="home" class="bg-gradient-to-r from-pink-600 to-pink-700 text-white min-h-[85vh] flex items-center">
+    <section id="home"
+        class="bg-gradient-to-r from-pink-600 to-pink-700 text-white h-screen flex items-center -mt-[1px]">
         <div class="container mx-auto px-8 py-16">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                 <div>

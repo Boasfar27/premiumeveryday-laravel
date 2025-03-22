@@ -5,7 +5,7 @@
 @section('content')
     <!-- Hero Section -->
     <section id="home"
-        class="bg-gradient-to-r from-pink-600 to-pink-700 text-white min-h-[85vh] flex items-center mt-16">
+        class="bg-gradient-to-r from-pink-600 to-pink-700 text-white min-h-[85vh] flex items-center -mt-[1px]">
         <div class="container mx-auto px-4 py-12">
             <div class="text-center mb-8">
                 <h1 class="text-3xl font-bold mb-4">Akses Premium ke Layanan Streaming Favorit Anda</h1>
