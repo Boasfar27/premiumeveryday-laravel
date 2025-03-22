@@ -6,7 +6,7 @@
 
         <div class="relative">
             <!-- Timeline line -->
-            <div class="absolute left-1/2 transform -translate-x-1/2 h-full w-0.5 bg-gray-200"></div>
+            <div class="absolute left-1/2 transform -translate-x-1/2 h-full w-0.5 bg-pink-200"></div>
 
             <!-- Timeline items -->
             @foreach ($timelines as $timeline)
@@ -15,26 +15,34 @@
                         <!-- Left content (even items) -->
                         @if ($loop->iteration % 2 == 0)
                             <div class="w-5/12 pr-8 text-right">
-                                <h3 class="text-lg font-semibold text-gray-900">{{ $timeline->title }}</h3>
-                                <p class="mt-2 text-gray-600">{{ $timeline->description }}</p>
-                                <span class="block mt-2 text-sm text-gray-500">{{ $timeline->date->format('F Y') }}</span>
+                                <div
+                                    class="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1">
+                                    <h3 class="text-lg font-semibold text-gray-900">{{ $timeline->title }}</h3>
+                                    <p class="mt-2 text-gray-600">{{ $timeline->description }}</p>
+                                    <span
+                                        class="block mt-3 text-sm text-pink-600">{{ $timeline->date->format('F Y') }}</span>
+                                </div>
                             </div>
                             <div
-                                class="absolute left-1/2 transform -translate-x-1/2 flex items-center justify-center w-8 h-8 bg-primary rounded-full">
-                                <span class="text-white">{{ $loop->iteration }}</span>
+                                class="absolute left-1/2 transform -translate-x-1/2 flex items-center justify-center w-10 h-10 bg-pink-600 rounded-full shadow-md z-10">
+                                <span class="text-white font-medium">{{ $loop->iteration }}</span>
                             </div>
                             <div class="w-5/12"></div>
                         @else
                             <!-- Right content (odd items) -->
                             <div class="w-5/12"></div>
                             <div
-                                class="absolute left-1/2 transform -translate-x-1/2 flex items-center justify-center w-8 h-8 bg-primary rounded-full">
-                                <span class="text-white">{{ $loop->iteration }}</span>
+                                class="absolute left-1/2 transform -translate-x-1/2 flex items-center justify-center w-10 h-10 bg-pink-600 rounded-full shadow-md z-10">
+                                <span class="text-white font-medium">{{ $loop->iteration }}</span>
                             </div>
                             <div class="w-5/12 pl-8">
-                                <h3 class="text-lg font-semibold text-gray-900">{{ $timeline->title }}</h3>
-                                <p class="mt-2 text-gray-600">{{ $timeline->description }}</p>
-                                <span class="block mt-2 text-sm text-gray-500">{{ $timeline->date->format('F Y') }}</span>
+                                <div
+                                    class="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1">
+                                    <h3 class="text-lg font-semibold text-gray-900">{{ $timeline->title }}</h3>
+                                    <p class="mt-2 text-gray-600">{{ $timeline->description }}</p>
+                                    <span
+                                        class="block mt-3 text-sm text-pink-600">{{ $timeline->date->format('F Y') }}</span>
+                                </div>
                             </div>
                         @endif
                     </div>
