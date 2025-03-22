@@ -140,4 +140,50 @@ class LicenseController extends Controller
         return redirect()->route('licenses.success-activation', $license)
             ->with('success', 'Lisensi berhasil diaktifkan pada perangkat ' . $request->device_name);
     }
+
+    /**
+     * Export licenses as PDF
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function exportPdf(Request $request)
+    {
+        // Validate request
+        $request->validate([
+            'licenses' => 'required|json',
+        ]);
+        
+        // Decode licenses data
+        $licensesData = json_decode($request->licenses, true);
+        
+        if (empty($licensesData)) {
+            return back()->with('error', 'Tidak ada data lisensi untuk diekspor');
+        }
+        
+        // Get authenticated user
+        $user = auth()->user();
+        
+        // Initialize PDF
+        $pdf = app()->make('dompdf.wrapper');
+        
+        // Generate PDF content
+        $html = view('pages.desktop.licenses.export-pdf', [
+            'licenses' => $licensesData,
+            'user' => $user,
+            'generated_at' => now(),
+        ])->render();
+        
+        // Load PDF content
+        $pdf->loadHTML($html);
+        
+        // Set PDF options (optional)
+        $pdf->setPaper('a4');
+        
+        // Generate filename
+        $filename = 'licenses_' . $user->id . '_' . now()->format('Ymd_His') . '.pdf';
+        
+        // Return PDF for download
+        return $pdf->download($filename);
+    }
 } 

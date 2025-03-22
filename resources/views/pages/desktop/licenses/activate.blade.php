@@ -90,6 +90,51 @@
                     </div>
                 </div>
 
+                <!-- Progress Steps -->
+                <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
+                    <div class="flex justify-between items-center">
+                        <div class="w-full">
+                            <ol class="flex items-center w-full text-sm font-medium text-center text-gray-500">
+                                <li
+                                    class="flex md:w-full items-center text-blue-600 after:content-[''] after:w-full after:h-1 after:border-b after:border-blue-200 after:border-1 after:hidden sm:after:inline-block after:mx-4 xl:after:mx-8 relative">
+                                    <span
+                                        class="flex items-center justify-center w-8 h-8 bg-blue-200 rounded-full shrink-0">
+                                        <svg class="w-3.5 h-3.5 text-blue-600" aria-hidden="true"
+                                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 12">
+                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                                stroke-width="2" d="M1 5.917 5.724 10.5 15 1.5" />
+                                        </svg>
+                                    </span>
+                                    <span class="hidden sm:inline-flex items-center ml-2">Verifikasi Lisensi</span>
+                                </li>
+                                <li
+                                    class="flex md:w-full items-center text-blue-600 after:content-[''] after:w-full after:h-1 after:border-b after:border-gray-200 after:border-1 after:hidden sm:after:inline-block after:mx-4 xl:after:mx-8 relative">
+                                    <span
+                                        class="flex items-center justify-center w-8 h-8 bg-blue-200 rounded-full shrink-0">
+                                        <svg class="w-3.5 h-3.5 text-blue-600" aria-hidden="true"
+                                            xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                            <path
+                                                d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                        </svg>
+                                    </span>
+                                    <span class="hidden sm:inline-flex items-center ml-2">Input Informasi</span>
+                                </li>
+                                <li class="flex items-center">
+                                    <span
+                                        class="flex items-center justify-center w-8 h-8 bg-gray-200 rounded-full shrink-0">
+                                        <svg class="w-3.5 h-3.5 text-gray-500" aria-hidden="true"
+                                            xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 20">
+                                            <path
+                                                d="M16 1h-3.278A1.992 1.992 0 0 0 11 0H7a1.993 1.993 0 0 0-1.722 1H2a2 2 0 0 0-2 2v15a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2ZM7 2h4v3H7V2Zm5.7 8.289-3.975 3.857a1 1 0 0 1-1.393 0L5.3 12.182a1.002 1.002 0 1 1 1.4-1.436l1.328 1.289 3.28-3.181a1 1 0 1 1 1.392 1.435Z" />
+                                        </svg>
+                                    </span>
+                                    <span class="hidden sm:inline-flex items-center ml-2">Selesai</span>
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="px-6 py-5">
                     <div class="mb-5">
                         <h3 class="text-lg font-medium text-gray-900 mb-3">Informasi Aktivasi</h3>
@@ -165,12 +210,29 @@
                                 class="space-y-4">
                                 @csrf
                                 <div>
-                                    <label for="device_name" class="block text-sm font-medium text-gray-700">Nama Perangkat
+                                    <label for="device_name" class="block text-sm font-medium text-gray-700">Nama
+                                        Perangkat
                                         / Domain *</label>
-                                    <div class="mt-1">
+                                    <div class="mt-1 relative">
+                                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400"
+                                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                            </svg>
+                                        </div>
                                         <input type="text" name="device_name" id="device_name"
-                                            class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                                            placeholder="contoh: Laptop Saya, website.com" required>
+                                            class="pl-10 shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                                            placeholder="contoh: Laptop Saya, website.com" required
+                                            value="{{ old('device_name', request()->has('device_name') ? request('device_name') : '') }}">
+                                        <!-- Auto-detected device name suggestion -->
+                                        <div class="mt-1 text-xs text-gray-500">
+                                            <button type="button" id="use-detected-device"
+                                                class="text-blue-600 hover:text-blue-800 focus:outline-none">
+                                                Gunakan nama perangkat terdeteksi: <span
+                                                    id="detected-device-name">...</span>
+                                            </button>
+                                        </div>
                                     </div>
                                     <p class="mt-1 text-sm text-gray-500">Nama yang akan digunakan untuk mengidentifikasi
                                         perangkat atau domain ini.</p>
@@ -179,10 +241,17 @@
                                 <div>
                                     <label for="notes" class="block text-sm font-medium text-gray-700">Catatan
                                         (opsional)</label>
-                                    <div class="mt-1">
+                                    <div class="mt-1 relative">
+                                        <div class="absolute top-3 left-3 pointer-events-none">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400"
+                                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                            </svg>
+                                        </div>
                                         <textarea id="notes" name="notes" rows="3"
-                                            class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                                            placeholder="Tambahkan catatan atau informasi tambahan di sini..."></textarea>
+                                            class="pl-10 shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                                            placeholder="Tambahkan catatan atau informasi tambahan di sini...">{{ old('notes') }}</textarea>
                                     </div>
                                 </div>
 
@@ -212,7 +281,7 @@
                                 </div>
 
                                 <div class="pt-4">
-                                    <button type="submit"
+                                    <button type="submit" id="activate-button"
                                         class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none"
                                             viewBox="0 0 24 24" stroke="currentColor">
@@ -278,4 +347,94 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Detect device name
+            let deviceName = '';
+
+            // Try to get browser and OS information
+            const userAgent = navigator.userAgent;
+            const platform = navigator.platform;
+
+            // Get browser name
+            let browser = '';
+            if (userAgent.indexOf("Chrome") > -1) browser = "Chrome";
+            else if (userAgent.indexOf("Safari") > -1) browser = "Safari";
+            else if (userAgent.indexOf("Firefox") > -1) browser = "Firefox";
+            else if (userAgent.indexOf("MSIE") > -1 || userAgent.indexOf("Trident") > -1) browser =
+                "Internet Explorer";
+            else if (userAgent.indexOf("Edge") > -1) browser = "Edge";
+            else browser = "Unknown Browser";
+
+            // Get OS name
+            let os = '';
+            if (platform.indexOf("Win") > -1) os = "Windows";
+            else if (platform.indexOf("Mac") > -1) os = "MacOS";
+            else if (platform.indexOf("Linux") > -1) os = "Linux";
+            else if (platform.indexOf("Android") > -1) os = "Android";
+            else if (platform.indexOf("iPhone") > -1 || platform.indexOf("iPad") > -1 || platform.indexOf("iPod") >
+                -1) os = "iOS";
+            else os = "Unknown OS";
+
+            // Get hostname if available
+            let hostname = window.location.hostname;
+
+            // Try to get device model information
+            let deviceInfo = '';
+            if (navigator.userAgentData && navigator.userAgentData.getHighEntropyValues) {
+                navigator.userAgentData.getHighEntropyValues(["model", "platformVersion"])
+                    .then(function(data) {
+                        if (data.model) deviceInfo = data.model;
+                        updateDeviceNameUI();
+                    })
+                    .catch(function() {
+                        updateDeviceNameUI();
+                    });
+            } else {
+                updateDeviceNameUI();
+            }
+
+            function updateDeviceNameUI() {
+                if (hostname && hostname !== 'localhost' && !hostname.includes('127.0.0.1')) {
+                    deviceName = hostname;
+                } else {
+                    deviceName = os + ' ' + browser + (deviceInfo ? ' (' + deviceInfo + ')' : '');
+                }
+
+                const detectedDeviceNameEl = document.getElementById('detected-device-name');
+                if (detectedDeviceNameEl) {
+                    detectedDeviceNameEl.textContent = deviceName;
+                }
+
+                const useDetectedDeviceBtn = document.getElementById('use-detected-device');
+                if (useDetectedDeviceBtn) {
+                    useDetectedDeviceBtn.addEventListener('click', function() {
+                        const deviceNameInput = document.getElementById('device_name');
+                        if (deviceNameInput) {
+                            deviceNameInput.value = deviceName;
+                        }
+                    });
+                }
+            }
+
+            // Add loading state to the activate button
+            const activateButton = document.getElementById('activate-button');
+            const activationForm = activateButton ? activateButton.closest('form') : null;
+
+            if (activateButton && activationForm) {
+                activationForm.addEventListener('submit', function() {
+                    activateButton.disabled = true;
+                    activateButton.classList.add('opacity-75');
+                    activateButton.innerHTML = `
+                    <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Memproses...
+                `;
+                });
+            }
+        });
+    </script>
 @endsection

@@ -72,30 +72,67 @@
                     </a>
                 </div>
             @else
-                <div class="mb-6 flex items-center justify-between">
+                <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div>
                         <h2 class="text-lg sm:text-xl font-medium text-gray-900">Daftar Lisensi Anda</h2>
                         <p class="text-sm text-gray-500 mt-1">Menampilkan total {{ $licenses->total() }} lisensi produk</p>
                     </div>
 
-                    <div>
-                        <a href="{{ route('products.index') }}"
-                            class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                            </svg>
-                            Temukan Produk Lainnya
-                        </a>
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <div class="relative">
+                            <input type="text" id="license-search" placeholder="Cari lisensi..."
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </div>
+                        </div>
+
+                        <div class="relative">
+                            <select id="license-filter"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                                <option value="all">Semua Status</option>
+                                <option value="active">Aktif</option>
+                                <option value="expired">Kadaluarsa</option>
+                                <option value="max-activations">Batas Aktivasi</option>
+                            </select>
+                        </div>
+
+                        <div class="flex gap-2">
+                            <button id="exportPdf"
+                                class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5 text-red-500" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                </svg>
+                                PDF
+                            </button>
+
+                            <a href="{{ route('products.index') }}"
+                                class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                                </svg>
+                                Temukan Produk Lainnya
+                            </a>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Licenses grid -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div id="licenses-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     @foreach ($licenses as $license)
-                        <div
-                            class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 hover:shadow-md transition-all duration-200 license-card">
+                        <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 hover:shadow-md transition-all duration-200 license-card"
+                            data-status="{{ $license->isActive() ? 'active' : ($license->isExpired() ? 'expired' : ($license->hasReachedMaxActivations() ? 'max-activations' : 'other')) }}"
+                            data-product="{{ $license->digitalProduct->name }}"
+                            data-date="{{ $license->created_at->format('d M Y') }}"
+                            data-key="{{ $license->license_key }}">
                             <!-- License header with product info -->
                             <div class="p-4 sm:p-5 flex items-center space-x-4">
                                 <div class="flex-shrink-0 relative">
@@ -256,7 +293,24 @@
                     @endforeach
                 </div>
 
-                <!-- Pagination -->
+                <!-- Empty search results message -->
+                <div id="no-results" class="hidden py-8 text-center animate-fade-in">
+                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-400" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-medium text-gray-900 mb-1">Tidak ada hasil</h3>
+                    <p class="text-gray-500 mb-4">Tidak ada lisensi yang cocok dengan pencarian Anda</p>
+                    <button id="reset-search"
+                        class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none">
+                        Reset Pencarian
+                    </button>
+                </div>
+
+                <!-- Pagination links -->
                 <div class="mt-8">
                     {{ $licenses->links() }}
                 </div>
@@ -300,36 +354,142 @@
     </div>
 
     <script>
-        function copyToClipboard(text) {
-            navigator.clipboard.writeText(text).then(function() {
-                showToast('Kunci lisensi berhasil disalin!', 'success');
-            }, function() {
-                showToast('Gagal menyalin kunci lisensi.', 'error');
-            });
-        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('license-search');
+            const filterSelect = document.getElementById('license-filter');
+            const resetButton = document.getElementById('reset-search');
+            const licenseCards = document.querySelectorAll('.license-card');
+            const licensesContainer = document.getElementById('licenses-container');
+            const noResults = document.getElementById('no-results');
+            const exportPdfButton = document.getElementById('exportPdf');
 
-        function showToast(message, type = 'success') {
-            const toast = document.getElementById('toast');
-            const toastMessage = document.getElementById('toast-message');
-            const successIcon = document.getElementById('toast-icon-success');
-            const errorIcon = document.getElementById('toast-icon-error');
+            // Function to filter licenses
+            function filterLicenses() {
+                const searchTerm = searchInput.value.toLowerCase();
+                const filterValue = filterSelect.value;
+                let visibleCount = 0;
 
-            toastMessage.textContent = message;
+                licenseCards.forEach(card => {
+                    const status = card.dataset.status;
+                    const productName = card.dataset.product.toLowerCase();
+                    const date = card.dataset.date.toLowerCase();
+                    const licenseKey = card.dataset.key.toLowerCase();
 
-            if (type === 'success') {
-                successIcon.classList.remove('hidden');
-                errorIcon.classList.add('hidden');
-            } else {
-                successIcon.classList.add('hidden');
-                errorIcon.classList.remove('hidden');
+                    // Check if card matches search term and filter
+                    const matchesSearch = productName.includes(searchTerm) ||
+                        date.includes(searchTerm) ||
+                        licenseKey.includes(searchTerm);
+
+                    const matchesFilter = filterValue === 'all' || status === filterValue;
+
+                    // Show or hide based on filters
+                    if (matchesSearch && matchesFilter) {
+                        card.classList.remove('hidden');
+                        visibleCount++;
+                    } else {
+                        card.classList.add('hidden');
+                    }
+                });
+
+                // Toggle empty state message
+                if (visibleCount === 0) {
+                    licensesContainer.classList.add('hidden');
+                    noResults.classList.remove('hidden');
+                } else {
+                    licensesContainer.classList.remove('hidden');
+                    noResults.classList.add('hidden');
+                }
             }
 
-            // Show toast
-            const toastElement = toast.firstElementChild;
-            toastElement.classList.remove('opacity-0', 'translate-y-12');
+            // Add event listeners
+            if (searchInput) {
+                searchInput.addEventListener('input', filterLicenses);
+            }
 
-            // Hide after 3 seconds
-            setTimeout(hideToast, 3000);
+            if (filterSelect) {
+                filterSelect.addEventListener('change', filterLicenses);
+            }
+
+            if (resetButton) {
+                resetButton.addEventListener('click', function() {
+                    searchInput.value = '';
+                    filterSelect.value = 'all';
+                    filterLicenses();
+                });
+            }
+
+            // PDF Export functionality
+            if (exportPdfButton) {
+                exportPdfButton.addEventListener('click', function() {
+                    // Prepare the licenses data based on current filters
+                    const visibleLicenses = Array.from(licenseCards)
+                        .filter(card => !card.classList.contains('hidden'))
+                        .map(card => {
+                            return {
+                                product: card.dataset.product,
+                                status: card.dataset.status,
+                                date: card.dataset.date,
+                                key: card.dataset.key
+                            };
+                        });
+
+                    if (visibleLicenses.length === 0) {
+                        showToast('Tidak ada lisensi untuk diekspor', 'error');
+                        return;
+                    }
+
+                    // Create form data to send to server
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '{{ route('licenses.export') }}';
+                    form.target = '_blank';
+
+                    // Add CSRF token
+                    const csrfToken = document.createElement('input');
+                    csrfToken.type = 'hidden';
+                    csrfToken.name = '_token';
+                    csrfToken.value = document.querySelector('meta[name="csrf-token"]').getAttribute(
+                        'content');
+                    form.appendChild(csrfToken);
+
+                    // Add licenses data
+                    const licensesData = document.createElement('input');
+                    licensesData.type = 'hidden';
+                    licensesData.name = 'licenses';
+                    licensesData.value = JSON.stringify(visibleLicenses);
+                    form.appendChild(licensesData);
+
+                    document.body.appendChild(form);
+                    form.submit();
+                    document.body.removeChild(form);
+
+                    showToast('Mengunduh PDF...', 'success');
+                });
+            }
+
+            // Function to copy license key to clipboard
+            window.copyToClipboard = function(text) {
+                navigator.clipboard.writeText(text).then(function() {
+                    showToast('Kunci lisensi berhasil disalin!', 'success');
+                }, function() {
+                    showToast('Gagal menyalin kunci lisensi.', 'error');
+                });
+            }
+        });
+
+        // Toast notification function
+        function showToast(message, type = 'success') {
+            // Use SweetAlert2 for toast notifications to match the site's existing notification system
+            Swal.fire({
+                icon: type,
+                title: type === 'success' ? 'Berhasil!' : 'Gagal!',
+                text: message,
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true
+            });
         }
 
         function hideToast() {

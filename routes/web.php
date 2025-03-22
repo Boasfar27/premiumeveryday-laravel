@@ -338,11 +338,14 @@ Route::prefix('debug')->name('debug.')->middleware(['auth'])->group(function () 
 });
 
 // License routes
-Route::prefix('licenses')->group(function () {
+Route::prefix('licenses')->middleware(['auth'])->group(function () {
     Route::get('/', [LicenseController::class, 'index'])->name('licenses.index');
     Route::get('/{license}', [LicenseController::class, 'show'])->name('licenses.show');
     Route::get('/{license}/activate', [LicenseController::class, 'activate'])->name('licenses.activate');
     Route::post('/{license}/activate', [LicenseController::class, 'processActivation'])->name('licenses.process-activation');
     Route::get('/{license}/success-activation', [LicenseController::class, 'showSuccessActivation'])->name('licenses.success-activation');
+    
+    // Add PDF export route
+    Route::post('/export', [LicenseController::class, 'exportPdf'])->name('licenses.export');
 });
     
