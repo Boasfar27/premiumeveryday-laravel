@@ -14,85 +14,52 @@ class TimelineSeeder extends Seeder
     {
         $timelines = [
             [
-                'type' => 'general',
-                'title' => 'Peluncuran Premium Everyday',
-                'description' => 'Premium Everyday resmi diluncurkan sebagai platform berlangganan premium terpercaya.',
-                'date' => now()->subMonths(12),
-                'icon' => 'rocket',
-                'color' => 'blue',
-                'is_active' => true,
+                'title' => 'Mulai Bisnis',
+                'description' => 'Kami memulai perjalanan dengan tekad untuk membuat layanan premium digital lebih terjangkau bagi masyarakat Indonesia.',
+                'date' => '2020-01-15',
                 'order' => 1,
+                'type' => 'general',
+                'is_active' => true,
             ],
             [
-                'type' => 'product',
-                'title' => 'Tambahan Kategori Streaming Video',
-                'description' => 'Kami menambahkan kategori Streaming Video dengan berbagai layanan premium populer.',
-                'date' => now()->subMonths(10),
-                'icon' => 'film',
-                'color' => 'red',
-                'is_active' => true,
+                'title' => 'Ekspansi Layanan',
+                'description' => 'Kami memperluas katalog layanan dengan menambahkan lebih banyak platform streaming dan alat produktivitas premium.',
+                'date' => '2021-05-20',
                 'order' => 2,
-            ],
-            [
-                'type' => 'feature',
-                'title' => 'Metode Pembayaran Baru',
-                'description' => 'Menambahkan dukungan untuk berbagai e-wallet dan virtual account untuk kemudahan pembayaran.',
-                'date' => now()->subMonths(8),
-                'icon' => 'credit-card',
-                'color' => 'green',
-                'is_active' => true,
-                'order' => 3,
-            ],
-            [
-                'type' => 'update',
-                'title' => 'Peningkatan Sistem Keamanan',
-                'description' => 'Meningkatkan keamanan sistem untuk melindungi data pelanggan dan akun premium.',
-                'date' => now()->subMonths(6),
-                'icon' => 'shield-check',
-                'color' => 'purple',
-                'is_active' => true,
-                'order' => 4,
-            ],
-            [
                 'type' => 'product',
-                'title' => 'Peluncuran Kategori Productivity Tools',
-                'description' => 'Menambahkan layanan Microsoft Office 365, Adobe Creative Cloud, dan berbagai software produktivitas lainnya.',
-                'date' => now()->subMonths(4),
-                'icon' => 'desktop-computer',
-                'color' => 'indigo',
                 'is_active' => true,
-                'order' => 5,
             ],
             [
-                'type' => 'promotion',
-                'title' => 'Promo Akhir Tahun',
-                'description' => 'Diskon besar-besaran untuk semua layanan premium. Segera berlangganan sebelum promo berakhir!',
-                'date' => now()->subMonths(2),
-                'icon' => 'gift',
-                'color' => 'yellow',
+                'title' => 'Peluncuran Platform Baru',
+                'description' => 'Meresmikan platform online baru yang memudahkan pelanggan untuk menelusuri dan membeli berbagai layanan digital premium.',
+                'date' => '2022-08-10',
+                'order' => 3,
+                'type' => 'feature',
                 'is_active' => true,
-                'order' => 6,
             ],
             [
+                'title' => 'Pencapaian 10,000 Pelanggan',
+                'description' => 'Kami mencapai 10,000 pelanggan aktif, menandai kepercayaan masyarakat terhadap layanan kami.',
+                'date' => '2023-02-25',
+                'order' => 4,
                 'type' => 'event',
-                'title' => 'Peluncuran Website Baru',
-                'description' => 'Website baru dengan tampilan yang lebih modern dan fitur yang lebih lengkap untuk kenyamanan Anda.',
-                'date' => now()->subWeeks(2),
-                'icon' => 'globe',
-                'color' => 'pink',
                 'is_active' => true,
-                'order' => 7,
+            ],
+            [
+                'title' => 'Pengenalan Layanan AI',
+                'description' => 'Mulai menawarkan akses ke alat-alat AI premium seperti ChatGPT dan Gemini AI untuk mendukung era digital yang baru.',
+                'date' => '2023-11-15',
+                'order' => 5,
+                'type' => 'product',
+                'is_active' => true,
             ],
         ];
 
-        foreach ($timelines as $timeline) {
+        foreach ($timelines as $timelineData) {
             Timeline::updateOrCreate(
-                [
-                    'title' => $timeline['title'],
-                    'date' => $timeline['date'],
-                ],
-                $timeline
+                ['title' => $timelineData['title'], 'date' => $timelineData['date']],
+                $timelineData
             );
         }
     }
-}
+} 

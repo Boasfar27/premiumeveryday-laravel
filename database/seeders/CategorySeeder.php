@@ -17,42 +17,46 @@ class CategorySeeder extends Seeder
             [
                 'name' => 'Streaming Video',
                 'slug' => 'streaming-video',
-                'description' => '<p>Layanan streaming video premium dengan akses ke ribuan film dan serial TV terbaru. Nikmati konten berkualitas tinggi tanpa iklan dan batasan regional.</p>',
-                'is_active' => true,
+                'description' => 'Premium streaming video services including Netflix, Disney+, HBO Max, and more.',
                 'sort_order' => 1,
-                'image' => 'categories/streaming-video.webp'
             ],
             [
                 'name' => 'Streaming Music',
                 'slug' => 'streaming-music',
-                'description' => '<p>Akses ke jutaan lagu dan podcast dari seluruh dunia. Dengarkan musik premium tanpa iklan dengan kualitas audio yang superior.</p>',
-                'is_active' => true,
+                'description' => 'Premium music streaming services including Spotify, Apple Music, and more.',
                 'sort_order' => 2,
-                'image' => 'categories/streaming-music.webp'
+            ],
+            [
+                'name' => 'AI Tools',
+                'slug' => 'ai-tools',
+                'description' => 'Premium AI tools and services including ChatGPT, Gemini AI, and more.',
+                'sort_order' => 3,
             ],
             [
                 'name' => 'Productivity Tools',
                 'slug' => 'productivity-tools',
-                'description' => '<p>Koleksi software dan tools premium untuk meningkatkan produktivitas kerja dan belajar. Dari aplikasi office hingga design tools.</p>',
-                'is_active' => true,
-                'sort_order' => 3,
-                'image' => 'categories/productivity-tools.webp'
+                'description' => 'Premium productivity software including Microsoft 365, Canva Pro, and more.',
+                'sort_order' => 4,
             ],
             [
-                'name' => 'Premium Software',
-                'slug' => 'premium-software',
-                'description' => '<p>Software berlisensi original dengan harga terjangkau. Termasuk aplikasi desain, editing, dan software profesional lainnya.</p>',
-                'is_active' => true,
-                'sort_order' => 4,
-                'image' => 'categories/premium-software.webp'
+                'name' => 'Creative Software',
+                'slug' => 'creative-software',
+                'description' => 'Premium creative software including Capcut Pro, Picsart, and more.',
+                'sort_order' => 5,
+            ],
+            [
+                'name' => 'Sports Streaming',
+                'slug' => 'sports-streaming',
+                'description' => 'Premium sports streaming services including Vision+ Sport, RCTI+ Sport, and more.',
+                'sort_order' => 6,
             ],
         ];
 
         foreach ($categories as $category) {
             Category::updateOrCreate(
                 ['slug' => $category['slug']],
-                $category
+                array_merge($category, ['is_active' => true])
             );
         }
     }
-}
+} 
