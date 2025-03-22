@@ -102,8 +102,11 @@ class MidtransController extends Controller
             // If total from items doesn't match order total, use the calculated total
             $gross_amount = $total > 0 ? $total : max((int) $order->total, 10000);
             
+            // Generate a unique order_id by appending current timestamp to avoid duplicates
+            $unique_order_id = $order->order_number . '-' . time();
+            
             $transaction_details = [
-                'order_id' => $order->order_number,
+                'order_id' => $unique_order_id,
                 'gross_amount' => $gross_amount,
             ];
             
@@ -139,6 +142,16 @@ class MidtransController extends Controller
                 'midtrans_token' => $snapToken
             ]);
             
+            // Store the unique order_id for future reference
+            MidtransTransaction::updateOrCreate(
+                ['order_id' => $order->id],
+                [
+                    'midtrans_order_id' => $unique_order_id,
+                    'transaction_status' => 'pending',
+                    'gross_amount' => $gross_amount
+                ]
+            );
+            
             // Log successful token generation
             Log::info('Midtrans token generated successfully', [
                 'order_id' => $order->id,
@@ -171,39 +184,105 @@ class MidtransController extends Controller
     public function handleNotification(Request $request)
     {
         try {
+            // Log the raw request for debugging
+            Log::info('Midtrans notification received', [
+                'raw_request' => $request->all()
+            ]);
+            
             $notification = new Notification();
+            
+            // Log notification data
+            Log::info('Midtrans notification data', [
+                'order_id' => $notification->order_id,
+                'transaction_status' => $notification->transaction_status,
+                'transaction_id' => $notification->transaction_id
+            ]);
             
             $orderNumber = $notification->order_id;
             $status = $notification->transaction_status;
             $fraudStatus = $notification->fraud_status;
             $transactionId = $notification->transaction_id;
             
-            $order = Order::where('order_number', $orderNumber)->firstOrFail();
+            // First, try to find the transaction by the midtrans_order_id
+            $transaction = MidtransTransaction::where('midtrans_order_id', $orderNumber)->first();
+            
+            if ($transaction) {
+                $order = Order::find($transaction->order_id);
+                Log::info('Order found via transaction record', [
+                    'order_id' => $order ? $order->id : 'not found',
+                    'order_number' => $order ? $order->order_number : 'not found'
+                ]);
+            } else {
+                // Extract the original order number before the timestamp if it contains a hyphen
+                if (strpos($orderNumber, '-') !== false) {
+                    $originalOrderNumber = explode('-', $orderNumber)[0];
+                    $order = Order::where('order_number', $originalOrderNumber)->first();
+                } else {
+                    $order = Order::where('order_number', $orderNumber)->first();
+                }
+                
+                if (!$order) {
+                    Log::error('Order not found for notification', [
+                        'order_id' => $orderNumber
+                    ]);
+                    return response()->json(['status' => 'error', 'message' => 'Order not found'], 404);
+                }
+                
+                Log::info('Order found via order number', [
+                    'order_id' => $order->id,
+                    'order_number' => $order->order_number
+                ]);
+            }
             
             // Handle transaction status
             if ($status == 'capture') {
                 if ($fraudStatus == 'challenge') {
-                    $order->payment_status = 'challenged';
+                    // Transaction is challenged due to fraud detection
+                    $order->update([
+                        'payment_status' => 'pending',
+                        'status' => 'pending'
+                    ]);
                 } else if ($fraudStatus == 'accept') {
-                    $order->payment_status = 'paid';
-                    $order->status = 'processing';
+                    // Transaction is accepted
+                    $order->update([
+                        'payment_status' => 'paid',
+                        'status' => 'approved',
+                        'paid_at' => now()
+                    ]);
                 }
             } else if ($status == 'settlement') {
-                $order->payment_status = 'paid';
-                $order->status = 'processing';
-            } else if ($status == 'cancel' || $status == 'deny' || $status == 'expire') {
-                $order->payment_status = 'failed';
+                // Payment completed
+                $order->update([
+                    'payment_status' => 'paid',
+                    'status' => 'approved',
+                    'paid_at' => now()
+                ]);
+                
+                // Log the update
+                Log::info('Order marked as paid after settlement', [
+                    'order_id' => $order->id,
+                    'order_number' => $order->order_number
+                ]);
             } else if ($status == 'pending') {
-                $order->payment_status = 'pending';
+                // Payment pending
+                $order->update([
+                    'payment_status' => 'pending',
+                    'status' => 'pending'
+                ]);
+            } else if (in_array($status, ['deny', 'expire', 'cancel'])) {
+                // Payment failed
+                $order->update([
+                    'payment_status' => 'failed',
+                    'status' => 'failed'
+                ]);
             }
-            
-            $order->save();
             
             // Update Midtrans transaction
             MidtransTransaction::updateOrCreate(
                 ['order_id' => $order->id],
                 [
                     'transaction_id' => $transactionId,
+                    'midtrans_order_id' => $orderNumber,
                     'payment_type' => $notification->payment_type,
                     'transaction_time' => $notification->transaction_time,
                     'transaction_status' => $status,
@@ -215,6 +294,17 @@ class MidtransController extends Controller
                     'pdf_url' => $notification->pdf_url ?? null,
                 ]
             );
+            
+            // Refresh the order from database to get the latest status
+            $order = $order->fresh();
+            
+            // Log final status
+            Log::info('Final order status after notification processing', [
+                'order_id' => $order->id,
+                'order_number' => $order->order_number,
+                'payment_status' => $order->payment_status,
+                'status' => $order->status
+            ]);
             
             return response()->json(['status' => 'success']);
         } catch (\Exception $e) {
@@ -232,8 +322,8 @@ class MidtransController extends Controller
      */
     public function paymentPage(Order $order)
     {
-        // If order doesn't have a Midtrans token yet, create one
-        if (empty($order->midtrans_token)) {
+        // Always create a new token if payment status is pending or expired
+        if (empty($order->midtrans_token) || $order->payment_status == 'pending' || $order->payment_status == 'failed') {
             try {
                 // Get fresh Snap token
                 $response = $this->getSnapToken($order);
@@ -307,85 +397,130 @@ class MidtransController extends Controller
             // Log debugging information
             Log::info('Checking Midtrans payment status', [
                 'order_id' => $order->id,
-                'order_number' => $order->order_number
+                'order_number' => $order->order_number,
+                'current_payment_status' => $order->payment_status
             ]);
             
-            // Get status from Midtrans API
-            $status = Transaction::status($order->order_number);
-            
-            // Log the response
-            Log::info('Midtrans status response', [
-                'response' => $status,
-                'transaction_status' => $status->transaction_status ?? 'not_available'
-            ]);
-            
-            // Process the status
-            if (isset($status->transaction_status)) {
-                // Update the order status based on transaction status
-                switch ($status->transaction_status) {
-                    case 'settlement':
-                    case 'capture':
-                        $order->update([
-                            'payment_status' => 'paid',
-                            'status' => 'approved',
-                            'paid_at' => now()
-                        ]);
-                        $message = 'Payment has been confirmed. Thank you for your purchase!';
-                        $alertType = 'success';
-                        break;
-                        
-                    case 'pending':
-                        $order->update([
-                            'payment_status' => 'pending'
-                        ]);
-                        $message = 'Payment is still pending. Please complete your payment to proceed.';
-                        $alertType = 'info';
-                        break;
-                        
-                    case 'deny':
-                    case 'cancel':
-                    case 'expire':
-                    case 'failure':
-                        $order->update([
-                            'payment_status' => 'failed'
-                        ]);
-                        $message = 'Payment has been ' . $status->transaction_status . '. Please try again or contact support.';
-                        $alertType = 'error';
-                        break;
-                        
-                    default:
-                        $message = 'Payment status: ' . $status->transaction_status;
-                        $alertType = 'info';
-                        break;
-                }
+            // Get the most recent Midtrans transaction for this order
+            $midtransTransaction = MidtransTransaction::where('order_id', $order->id)
+                ->latest()
+                ->first();
                 
-                // Update or create Midtrans transaction record
-                MidtransTransaction::updateOrCreate(
-                    ['order_id' => $order->id],
-                    [
-                        'transaction_id' => $status->transaction_id ?? null,
-                        'payment_type' => $status->payment_type ?? null,
-                        'transaction_time' => $status->transaction_time ?? null,
-                        'transaction_status' => $status->transaction_status,
-                        'status_code' => $status->status_code ?? null,
-                        'status_message' => $status->status_message ?? null,
-                    ]
-                );
+            if (!$midtransTransaction || !$midtransTransaction->midtrans_order_id) {
+                Log::warning('No Midtrans transaction found', [
+                    'order_id' => $order->id,
+                    'order_number' => $order->order_number
+                ]);
                 
                 return redirect()->route('user.payments.detail', $order)
-                    ->with($alertType, $message);
+                    ->with('error', 'No Midtrans transaction found for this order.');
             }
             
-            // If no transaction status available
-            return redirect()->route('user.payments.detail', $order)
-                ->with('info', 'Unable to retrieve payment status. Please contact support if you have completed payment.');
+            try {
+                // Get status from Midtrans API using the stored midtrans_order_id
+                $status = Transaction::status($midtransTransaction->midtrans_order_id);
+                
+                // Log the response
+                Log::info('Midtrans status response', [
+                    'order_id' => $order->id,
+                    'order_number' => $order->order_number,
+                    'transaction_status' => $status->transaction_status ?? 'not_available'
+                ]);
+                
+                // Process the status
+                if (isset($status->transaction_status)) {
+                    // Update the order status based on transaction status
+                    switch ($status->transaction_status) {
+                        case 'settlement':
+                        case 'capture':
+                            $order->update([
+                                'payment_status' => 'paid',
+                                'status' => 'approved',
+                                'paid_at' => now()
+                            ]);
+                            $message = 'Payment has been confirmed. Thank you for your purchase!';
+                            $alertType = 'success';
+                            break;
+                            
+                        case 'pending':
+                            $order->update([
+                                'payment_status' => 'pending',
+                                'status' => 'pending'
+                            ]);
+                            $message = 'Payment is still pending. Please complete your payment to proceed.';
+                            $alertType = 'info';
+                            break;
+                            
+                        case 'deny':
+                        case 'cancel':
+                        case 'expire':
+                        case 'failure':
+                            $order->update([
+                                'payment_status' => 'failed',
+                                'status' => 'failed'
+                            ]);
+                            $message = 'Payment has been ' . $status->transaction_status . '. Please try again or contact support.';
+                            $alertType = 'error';
+                            break;
+                            
+                        default:
+                            $message = 'Payment status: ' . $status->transaction_status;
+                            $alertType = 'info';
+                            break;
+                    }
+                    
+                    // Update or create Midtrans transaction record
+                    MidtransTransaction::updateOrCreate(
+                        ['order_id' => $order->id],
+                        [
+                            'transaction_id' => $status->transaction_id ?? null,
+                            'payment_type' => $status->payment_type ?? null,
+                            'transaction_time' => $status->transaction_time ?? null,
+                            'transaction_status' => $status->transaction_status,
+                            'status_code' => $status->status_code ?? null,
+                            'status_message' => $status->status_message ?? null,
+                        ]
+                    );
+                    
+                    // Log the update
+                    Log::info('Order status updated after check', [
+                        'order_id' => $order->id,
+                        'order_number' => $order->order_number,
+                        'new_payment_status' => $order->payment_status,
+                        'new_status' => $order->status
+                    ]);
+                    
+                    return redirect()->route('user.payments.detail', $order)
+                        ->with($alertType, $message);
+                }
+                
+                // If no transaction status available
+                Log::warning('No transaction status in response', [
+                    'order_id' => $order->id,
+                    'order_number' => $order->order_number
+                ]);
+                
+                return redirect()->route('user.payments.detail', $order)
+                    ->with('info', 'Unable to retrieve payment status. Please contact support if you have completed payment.');
+            } catch (\Exception $apiError) {
+                // Log the API error
+                Log::error('Midtrans API error', [
+                    'order_id' => $order->id,
+                    'order_number' => $order->order_number,
+                    'error' => $apiError->getMessage()
+                ]);
+                
+                return redirect()->route('user.payments.detail', $order)
+                    ->with('error', 'Error checking payment status: ' . $apiError->getMessage());
+            }
                 
         } catch (\Exception $e) {
-            // Log the error
+            // Log the general error
             Log::error('Error checking Midtrans status', [
                 'order_id' => $order->id,
                 'order_number' => $order->order_number,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
             ]);
             
             return redirect()->route('user.payments.detail', $order)
@@ -439,6 +574,48 @@ class MidtransController extends Controller
             
             return redirect()->route('user.payments.detail', $order)
                 ->with('error', 'Failed to connect to payment gateway: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Handle successful payment finish redirect from Midtrans
+     */
+    public function finish(Request $request)
+    {
+        try {
+            // Log the raw request for debugging
+            Log::info('Midtrans finish redirect received', [
+                'raw_request' => $request->all()
+            ]);
+            
+            // Extract order number from the order_id parameter
+            $orderNumber = $request->input('order_id');
+            if ($orderNumber) {
+                // Find the order by order_number
+                $order = Order::where('order_number', $orderNumber)->first();
+                if ($order) {
+                    // Update order status based on transaction_status
+                    if ($request->input('transaction_status') === 'settlement') {
+                        $order->update([
+                            'payment_status' => 'paid',
+                            'status' => 'approved',
+                            'paid_at' => now()
+                        ]);
+                        return redirect()->route('user.payments.detail', $order)
+                            ->with('success', 'Payment completed successfully! Thank you for your purchase.');
+                    }
+                }
+            }
+            
+            return redirect()->route('user.payments.history')
+                ->with('success', 'Payment completed. Thank you!');
+        } catch (\Exception $e) {
+            Log::error('Error in Midtrans finish method', [
+                'error' => $e->getMessage()
+            ]);
+            
+            return redirect()->route('user.payments.history')
+                ->with('error', 'There was an issue processing your payment. Please check your order status.');
         }
     }
 }

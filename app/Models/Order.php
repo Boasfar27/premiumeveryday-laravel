@@ -90,7 +90,7 @@ class Order extends Model
     }
 
     /**
-     * Get the Midtrans transaction for the order.
+     * Get the Midtrans transaction for this order
      */
     public function midtransTransaction()
     {

@@ -46,7 +46,7 @@
                                                         <div>
                                                             <div class="flex flex-col">
                                                                 <a href="{{ route('products.show', $item['product']->slug) }}"
-                                                                    class="text-lg font-semibold text-gray-800 hover:text-blue-600">{{ $item['product']->name }}</a>
+                                                                    class="text-lg font-semibold text-gray-800 hover:text-pink-600">{{ $item['product']->name }}</a>
                                                                 <div class="text-sm text-gray-500">
                                                                     <span
                                                                         class="capitalize">{{ $item['subscription_type'] }}</span>
@@ -65,12 +65,12 @@
                                                                     <p class="text-sm text-gray-500 line-through">
                                                                         Rp {{ number_format($item['price'], 0, ',', '.') }}
                                                                     </p>
-                                                                    <p class="text-lg font-semibold text-primary">
+                                                                    <p class="text-lg font-semibold text-pink-600">
                                                                         Rp
                                                                         {{ number_format($item['discounted_price'], 0, ',', '.') }}
                                                                     </p>
                                                                 @else
-                                                                    <p class="text-lg font-semibold text-primary">
+                                                                    <p class="text-lg font-semibold text-pink-600">
                                                                         Rp {{ number_format($item['price'], 0, ',', '.') }}
                                                                     </p>
                                                                 @endif
@@ -91,7 +91,7 @@
                                                                     <input type="hidden" name="quantity"
                                                                         value="{{ $item['quantity'] }}">
                                                                     <button type="submit"
-                                                                        class="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 text-gray-600 hover:bg-gray-50 cart-btn">
+                                                                        class="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 text-gray-600 hover:bg-pink-50 hover:border-pink-300 hover:text-pink-600 cart-btn">
                                                                         <svg class="w-4 h-4" fill="none"
                                                                             stroke="currentColor" viewBox="0 0 24 24">
                                                                             <path stroke-linecap="round"
@@ -115,7 +115,7 @@
                                                                     <input type="hidden" name="quantity"
                                                                         value="{{ $item['quantity'] }}">
                                                                     <button type="submit"
-                                                                        class="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 text-gray-600 hover:bg-gray-50 cart-btn">
+                                                                        class="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 text-gray-600 hover:bg-pink-50 hover:border-pink-300 hover:text-pink-600 cart-btn">
                                                                         <svg class="w-4 h-4" fill="none"
                                                                             stroke="currentColor" viewBox="0 0 24 24">
                                                                             <path stroke-linecap="round"
@@ -150,7 +150,7 @@
                                                     <!-- Item Total -->
                                                     <div class="mt-4 text-right">
                                                         <p class="text-sm text-gray-600">
-                                                            Total: <span class="font-semibold text-gray-900">Rp
+                                                            Total: <span class="font-semibold text-pink-600">Rp
                                                                 {{ number_format($item['price'] * $item['quantity'], 0, ',', '.') }}</span>
                                                         </p>
                                                     </div>
@@ -163,7 +163,7 @@
                                 <!-- Continue Shopping -->
                                 <div class="mt-8 pt-6 border-t border-gray-200">
                                     <a href="{{ route('products.index') }}"
-                                        class="inline-flex items-center text-primary hover:text-primary-dark">
+                                        class="inline-flex items-center text-pink-600 hover:text-pink-700">
                                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
@@ -190,9 +190,9 @@
                                         </label>
                                         <div class="flex gap-2">
                                             <input type="text" id="coupon" name="coupon" placeholder="Enter code"
-                                                class="flex-1 rounded-lg border-gray-300 shadow-sm focus:border-primary focus:ring-primary text-sm">
+                                                class="flex-1 rounded-lg border-gray-300 shadow-sm focus:border-pink-500 focus:ring-pink-500 text-sm">
                                             <button type="submit"
-                                                class="bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium px-4 rounded-lg text-sm transition-colors cart-btn">
+                                                class="bg-gray-100 hover:bg-pink-50 text-gray-800 hover:text-pink-600 font-medium px-4 rounded-lg text-sm transition-colors cart-btn">
                                                 Apply
                                             </button>
                                         </div>
@@ -240,7 +240,7 @@
                                     <div class="pt-4 border-t border-gray-200">
                                         <div class="flex justify-between items-center">
                                             <span class="text-base font-semibold text-gray-900">Total</span>
-                                            <span class="text-xl font-bold text-primary">Rp
+                                            <span class="text-xl font-bold text-pink-600">Rp
                                                 {{ number_format($total, 0, ',', '.') }}</span>
                                         </div>
                                     </div>
@@ -249,7 +249,7 @@
                                     <div class="mt-6">
                                         <form method="GET" action="{{ route('checkout') }}">
                                             <button type="submit"
-                                                class="w-full bg-primary hover:bg-primary-dark text-white py-3 rounded-lg text-base font-semibold transition-colors cart-btn">
+                                                class="w-full bg-pink-600 hover:bg-pink-700 text-white py-3 rounded-lg text-base font-semibold transition-colors cart-btn">
                                                 Proceed to Checkout
                                             </button>
                                         </form>
@@ -313,11 +313,11 @@
                                                     <p class="text-sm text-gray-500 line-through">
                                                         Rp {{ number_format($product->price, 0, ',', '.') }}
                                                     </p>
-                                                    <p class="text-lg font-bold text-primary">
+                                                    <p class="text-lg font-bold text-pink-600">
                                                         Rp {{ number_format($product->sale_price, 0, ',', '.') }}
                                                     </p>
                                                 @else
-                                                    <p class="text-lg font-bold text-primary">
+                                                    <p class="text-lg font-bold text-pink-600">
                                                         Rp {{ number_format($product->price, 0, ',', '.') }}
                                                     </p>
                                                 @endif
@@ -325,7 +325,7 @@
 
                                             <div class="mt-4">
                                                 <a href="{{ route('products.show', $product) }}"
-                                                    class="block text-center bg-primary hover:bg-primary-dark text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors">
+                                                    class="block text-center bg-pink-600 hover:bg-pink-700 text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors">
                                                     View Details
                                                 </a>
                                             </div>
@@ -340,8 +340,8 @@
                 <!-- Empty Cart -->
                 <div class="flex flex-col items-center justify-center py-12">
                     <div class="w-full max-w-md text-center">
-                        <div class="mx-auto w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center mb-6">
-                            <svg class="w-12 h-12 text-primary" fill="none" stroke="currentColor"
+                        <div class="mx-auto w-24 h-24 rounded-full bg-pink-100 flex items-center justify-center mb-6">
+                            <svg class="w-12 h-12 text-pink-600" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z">
@@ -351,7 +351,7 @@
                         <h3 class="text-xl font-semibold text-gray-900 mb-2">Your cart is empty</h3>
                         <p class="text-gray-500 mb-8">Start exploring our premium products to add to your cart</p>
                         <a href="{{ route('products.index') }}"
-                            class="inline-flex items-center px-6 py-3 bg-primary hover:bg-primary-dark text-white font-medium rounded-lg transition-colors">
+                            class="inline-flex items-center px-6 py-3 bg-pink-600 hover:bg-pink-700 text-white font-medium rounded-lg transition-colors">
                             Browse Products
                         </a>
                     </div>
@@ -404,7 +404,7 @@
                             text: "Are you sure you want to remove this item from your cart?",
                             icon: 'question',
                             showCancelButton: true,
-                            confirmButtonColor: '#3085d6',
+                            confirmButtonColor: '#ec4899',
                             cancelButtonColor: '#d33',
                             confirmButtonText: 'Yes, remove it!',
                             cancelButtonText: 'No, keep it'

@@ -73,7 +73,7 @@
         <div class="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 shadow-lg z-10">
             <div class="space-y-2">
                 <a href="{{ route('payment.midtrans.redirect', $order) }}" id="pay-button"
-                    class="block w-full bg-primary hover:bg-primary-dark text-white py-3 rounded-lg text-base font-semibold transition-colors text-center">
+                    class="block w-full bg-pink-600 hover:bg-pink-700 text-white py-3 rounded-lg text-base font-semibold transition-colors text-center">
                     Pay Now
                 </a>
                 <p class="text-xs text-center text-gray-500 italic">

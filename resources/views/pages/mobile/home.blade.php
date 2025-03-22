@@ -2,6 +2,25 @@
 
 @section('title', 'Premium Everyday - Layanan Streaming Premium Terpercaya')
 
+@push('styles')
+    <style>
+        .testimonial-carousel .carousel-inner {
+            display: flex;
+            transition: transform 0.5s ease;
+        }
+
+        .carousel-page {
+            flex: 0 0 100%;
+            width: 100%;
+        }
+
+        .mobile-carousel-indicator.bg-pink-500 {
+            width: 3px;
+            height: 3px;
+        }
+    </style>
+@endpush
+
 @section('content')
     <!-- Hero Section -->
     <section id="home"
@@ -338,47 +357,67 @@
                 <p class="mt-2 text-sm text-gray-600">Testimoni dari pelanggan yang puas dengan layanan kami</p>
             </div>
 
-            <div class="grid grid-cols-1 gap-6">
-                @if (is_object($testimonials) && count($testimonials) > 0)
-                    @foreach ($testimonials->take(3) as $testimonial)
-                        <div
-                            class="bg-white p-5 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1">
-                            <div class="flex items-center mb-3">
-                                <div
-                                    class="h-10 w-10 rounded-full bg-pink-100 flex items-center justify-center text-pink-600 font-bold text-lg">
-                                    {{ substr($testimonial->name, 0, 1) }}
+            @if (is_object($testimonials) && count($testimonials) > 0)
+                <div class="testimonial-carousel relative">
+                    <div class="overflow-hidden">
+                        <div class="carousel-inner flex transition-transform duration-500">
+                            @foreach (collect($testimonials)->chunk(1) as $chunk)
+                                <div class="carousel-page flex-shrink-0 w-full grid grid-cols-1 gap-6">
+                                    @foreach ($chunk as $testimonial)
+                                        <div
+                                            class="bg-white p-5 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1">
+                                            <div class="flex items-center mb-3">
+                                                <div
+                                                    class="h-10 w-10 rounded-full bg-pink-100 flex items-center justify-center text-pink-600 font-bold text-lg">
+                                                    {{ substr($testimonial->name, 0, 1) }}
+                                                </div>
+                                                <div class="ml-3">
+                                                    <h4 class="text-base font-bold text-gray-900">{{ $testimonial->name }}
+                                                    </h4>
+                                                    <div class="flex items-center mt-1">
+                                                        @for ($i = 1; $i <= 5; $i++)
+                                                            @if ($i <= $testimonial->rating)
+                                                                <svg class="w-3 h-3 text-yellow-400 fill-current"
+                                                                    viewBox="0 0 24 24">
+                                                                    <path
+                                                                        d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z">
+                                                                    </path>
+                                                                </svg>
+                                                            @else
+                                                                <svg class="w-3 h-3 text-gray-300 fill-current"
+                                                                    viewBox="0 0 24 24">
+                                                                    <path
+                                                                        d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z">
+                                                                    </path>
+                                                                </svg>
+                                                            @endif
+                                                        @endfor
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <p class="text-gray-600 text-sm italic">"{{ $testimonial->content }}"</p>
+                                            <p class="text-gray-400 text-xs mt-2">
+                                                {{ $testimonial->created_at->format('M d, Y') }}</p>
+                                        </div>
+                                    @endforeach
                                 </div>
-                                <div class="ml-3">
-                                    <h4 class="text-base font-bold text-gray-900">{{ $testimonial->name }}</h4>
-                                    <div class="flex items-center mt-1">
-                                        @for ($i = 1; $i <= 5; $i++)
-                                            @if ($i <= $testimonial->rating)
-                                                <svg class="w-3 h-3 text-yellow-400 fill-current" viewBox="0 0 24 24">
-                                                    <path
-                                                        d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z">
-                                                    </path>
-                                                </svg>
-                                            @else
-                                                <svg class="w-3 h-3 text-gray-300 fill-current" viewBox="0 0 24 24">
-                                                    <path
-                                                        d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z">
-                                                    </path>
-                                                </svg>
-                                            @endif
-                                        @endfor
-                                    </div>
-                                </div>
-                            </div>
-                            <p class="text-gray-600 text-sm italic">"{{ $testimonial->content }}"</p>
-                            <p class="text-gray-400 text-xs mt-2">{{ $testimonial->created_at->format('M d, Y') }}</p>
+                            @endforeach
                         </div>
-                    @endforeach
-                @else
-                    <div class="text-center py-8">
-                        <p class="text-gray-500">No testimonials yet.</p>
                     </div>
-                @endif
-            </div>
+
+                    <!-- Carousel Indicators -->
+                    <div class="flex justify-center mt-4">
+                        @foreach (collect($testimonials)->chunk(1) as $index => $chunk)
+                            <button type="button" data-mobile-carousel-target="{{ $index }}"
+                                class="mobile-carousel-indicator mx-1 w-2 h-2 rounded-full bg-gray-300 hover:bg-pink-500 focus:outline-none"></button>
+                        @endforeach
+                    </div>
+                </div>
+            @else
+                <div class="text-center py-8">
+                    <p class="text-gray-500">No testimonials yet.</p>
+                </div>
+            @endif
         </div>
     </section>
 
@@ -559,6 +598,61 @@
             }
 
             window.addEventListener('scroll', onScroll);
+
+            // Mobile Testimonial Carousel
+            const carousel = document.querySelector('.testimonial-carousel .carousel-inner');
+            if (carousel) {
+                const pages = document.querySelectorAll('.carousel-page');
+                const indicators = document.querySelectorAll('.mobile-carousel-indicator');
+
+                let currentPage = 0;
+                let pageCount = pages.length;
+
+                // Initialize
+                updateCarousel();
+
+                // Set first indicator as active
+                if (indicators.length > 0) {
+                    indicators[0].classList.add('bg-pink-500');
+                }
+
+                // Set up auto scroll every 3 seconds
+                let intervalId = setInterval(() => {
+                    currentPage = (currentPage + 1) % pageCount;
+                    updateCarousel();
+                }, 3000);
+
+                // Indicator click handling
+                indicators.forEach((indicator, index) => {
+                    indicator.addEventListener('click', () => {
+                        currentPage = index;
+                        updateCarousel();
+
+                        // Reset the interval
+                        clearInterval(intervalId);
+                        intervalId = setInterval(() => {
+                            currentPage = (currentPage + 1) % pageCount;
+                            updateCarousel();
+                        }, 3000);
+                    });
+                });
+
+                function updateCarousel() {
+                    // Move carousel
+                    carousel.style.transform = `translateX(-${currentPage * 100}%)`;
+
+                    // Update indicators
+                    indicators.forEach((indicator, index) => {
+                        if (index === currentPage) {
+                            indicator.classList.add('bg-pink-500');
+                            indicator.classList.remove('bg-gray-300');
+                        } else {
+                            indicator.classList.remove('bg-pink-500');
+                            indicator.classList.add('bg-gray-300');
+                        }
+                    });
+                }
+            }
         });
     </script>
 @endpush

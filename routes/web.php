@@ -90,8 +90,12 @@ Route::get('/', function () {
         ->orderBy('order')
         ->get();
         
-    // Get testimonials/feedback
-    $testimonials = []; // Removed feedback query
+    // Get testimonials/reviews 
+    $testimonials = \App\Models\Review::where('is_active', true)
+        ->where('rating', '>=', 4)
+        ->latest()
+        ->take(12)
+        ->get();
     
     return view(
         $agent->isMobile() ? 'pages.mobile.home' : 'pages.desktop.home',
@@ -244,31 +248,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 // Main routes file with updated Midtrans callback paths
 
 // Add these routes OUTSIDE the payment prefix for direct access
-Route::get('/payment/midtrans/finish', function(Request $request) {
-    // Extract order number from the order_id parameter (format: ORD-123456789-1)
-    $orderNumber = $request->input('order_id');
-    if ($orderNumber) {
-        // Find the order by order_number
-        $order = \App\Models\Order::where('order_number', $orderNumber)->first();
-        if ($order) {
-            // Update order status based on transaction_status
-            if ($request->input('transaction_status') === 'settlement') {
-                $order->update([
-                    'payment_status' => 'paid',
-                    'status' => 'approved',
-                    'paid_at' => now()
-                ]);
-                // Redirect to order details page with success message
-                return redirect()->route('user.payments.detail', $order)
-                    ->with('success', 'Payment completed successfully! Thank you for your purchase.');
-            }
-        }
-    }
-    
-    // Default fallback if order not found or status not settlement
-    return redirect()->route('user.payments.history')
-        ->with('success', 'Payment completed. Thank you!');
-})->name('payment.midtrans.finish');
+Route::get('/payment/midtrans/finish', [MidtransController::class, 'finish'])->name('payment.midtrans.finish');
 
 Route::get('/payment/midtrans/unfinish', function(Request $request) {
     // Extract order number from the order_id parameter (format: ORD-123456789-1)
@@ -334,4 +314,19 @@ Route::get('/debug-images', function () {
 Route::get('/test-images', function () {
     return view('test-images');
 });
+
+// Midtrans payment routes
+Route::prefix('payment/midtrans')->name('payment.midtrans.')->group(function () {
+    Route::get('/page/{order}', [MidtransController::class, 'paymentPage'])->name('page');
+    Route::get('/check-status/{order}', [MidtransController::class, 'checkStatus'])->name('check_status');
+    Route::get('/finish', [MidtransController::class, 'finish'])->name('finish');
+    Route::get('/unfinish', [MidtransController::class, 'unfinish'])->name('unfinish');
+    Route::get('/error', [MidtransController::class, 'error'])->name('error');
+    Route::get('/redirect/{order}', [MidtransController::class, 'redirectToVTWeb'])->name('redirect');
+});
+
+// Midtrans notification webhook - Make sure this URL matches what's configured in Midtrans dashboard
+Route::post('/payment/midtrans/notification', [MidtransController::class, 'handleNotification'])->name('payment.midtrans.notification');
+// Add a GET fallback for testing
+Route::get('/payment/midtrans/notification', [MidtransController::class, 'handleNotification'])->name('payment.midtrans.notification.get');
     

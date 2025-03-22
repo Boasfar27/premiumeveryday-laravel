@@ -20,6 +20,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Set default timezone for the application
+        date_default_timezone_set('Asia/Jakarta');
+        
         // Set Midtrans configuration globally
         if (config('midtrans.server_key')) {
             Config::$serverKey = config('midtrans.server_key');

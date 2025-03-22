@@ -38,12 +38,18 @@ class PaymentHistoryController extends Controller
 
         // Load review for this order
         $review = $order->reviews()->where('user_id', auth()->id())->first();
+        
+        // Determine if payment can be retried (for any payment method with pending status)
+        $canRetryPayment = $order->payment_status == 'pending';
+        
+        // Determine if the user can leave a review
+        $canLeaveReview = $order->payment_status == 'paid';
 
         $agent = new Agent();
         return view($agent->isMobile() ? 
             'pages.mobile.payments.detail' : 
             'pages.desktop.payments.detail',
-            compact('order', 'review')
+            compact('order', 'review', 'canRetryPayment', 'canLeaveReview')
         );
     }
 

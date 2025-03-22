@@ -89,45 +89,42 @@
             <!-- Payment Methods -->
             <div class="bg-white rounded-lg shadow-sm overflow-hidden mb-6">
                 <div class="p-4">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-3">Pembayaran</h2>
+                    <h2 class="text-lg font-semibold text-gray-900 mb-3">Payment Methods</h2>
 
-                    <form action="{{ route('process.payment') }}" method="POST" id="payment-form">
+                    <p class="text-gray-600 mb-3 text-sm">
+                        By clicking "Place Order", you will be redirected to Midtrans secure payment gateway. There, you
+                        can select your preferred payment method.
+                    </p>
+
+                    <p class="text-xs text-gray-500 mb-4">
+                        Available payment options: GoPay, QRIS, various bank transfers, and e-wallets.
+                    </p>
+
+                    <!-- Terms and Conditions -->
+                    <form action="{{ route('process.payment') }}" method="POST" class="space-y-4" id="payment-form">
                         @csrf
-                        <div class="space-y-4">
-                            <!-- Payment Information -->
-                            <div class="p-3 bg-blue-50 rounded-md">
-                                <div class="flex">
-                                    <div class="flex-shrink-0">
-                                        <svg class="h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg"
-                                            viewBox="0 0 20 20" fill="currentColor">
-                                            <path fill-rule="evenodd"
-                                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                                                clip-rule="evenodd" />
-                                        </svg>
-                                    </div>
-                                    <div class="ml-3 flex-1">
-                                        <h3 class="text-xs font-medium text-blue-800">Informasi Pembayaran</h3>
-                                        <div class="mt-1 text-xs text-blue-700">
-                                            <p class="mb-1">Setelah mengklik "Bayar Sekarang", Anda akan diarahkan ke
-                                                halaman pembayaran Midtrans yang aman.</p>
-                                            <p>Di halaman Midtrans, Anda dapat memilih metode pembayaran yang Anda inginkan
-                                                seperti Virtual Account, QRIS, GoPay, dan lainnya.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="flex items-center">
+                        <div class="flex items-start">
+                            <div class="flex items-center h-5">
                                 <input id="terms" name="terms" type="checkbox"
-                                    class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded" required>
-                                <label for="terms" class="ml-2 block text-xs text-gray-900">
-                                    I agree to the <a href="{{ route('legal.terms') }}"
-                                        class="text-primary hover:text-primary-dark">Terms of Service</a> and <a
-                                        href="{{ route('legal.privacy') }}"
-                                        class="text-primary hover:text-primary-dark">Privacy Policy</a>
-                                </label>
+                                    class="h-4 w-4 rounded border-gray-300 text-pink-600 focus:ring-pink-500">
+                            </div>
+                            <div class="ml-3 text-sm">
+                                <label for="terms" class="font-medium text-gray-700">I agree to the</label>
+                                <a href="{{ route('legal.terms') }}" class="text-pink-600 hover:text-pink-700"
+                                    target="_blank">Terms and Conditions</a>
+                                <p class="text-xs text-gray-500">By placing your order, you agree to our terms and
+                                    conditions.</p>
                             </div>
                         </div>
+
+                        @error('terms')
+                            <div class="text-red-500 text-xs">You must agree to the terms and conditions to proceed.</div>
+                        @enderror
+
+                        <button type="submit"
+                            class="w-full bg-pink-600 hover:bg-pink-700 text-white py-3 px-4 rounded-md shadow-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500">
+                            Place Order
+                        </button>
                     </form>
                 </div>
             </div>
@@ -137,32 +134,31 @@
                 <div class="p-4">
                     <h2 class="text-lg font-semibold text-gray-900 mb-3">Order Summary</h2>
 
-                    <div class="space-y-3">
-                        <div class="flex justify-between">
-                            <span class="text-sm text-gray-600">Subtotal</span>
-                            <span class="text-sm text-gray-900 font-medium">Rp
-                                {{ number_format($subtotal, 0, ',', '.') }}</span>
+                    <!-- Price Summary -->
+                    <div class="space-y-3 border-b border-gray-200 pb-4 mb-4">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">Subtotal</span>
+                            <span class="font-medium">Rp {{ number_format($subtotal, 0, ',', '.') }}</span>
                         </div>
 
                         @if ($discount > 0)
-                            <div class="flex justify-between">
-                                <span class="text-sm text-gray-600">Discount</span>
-                                <span class="text-sm text-green-600 font-medium">-Rp
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">Discount</span>
+                                <span class="font-medium text-green-600">- Rp
                                     {{ number_format($discount, 0, ',', '.') }}</span>
                             </div>
                         @endif
 
-                        <div class="flex justify-between">
-                            <span class="text-sm text-gray-600">Tax (11%)</span>
-                            <span class="text-sm text-gray-900 font-medium">Rp
-                                {{ number_format($tax, 0, ',', '.') }}</span>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">Tax (11%)</span>
+                            <span class="font-medium">Rp {{ number_format($tax, 0, ',', '.') }}</span>
                         </div>
+                    </div>
 
-                        <div class="border-t border-gray-200 pt-3 flex justify-between">
-                            <span class="text-base font-semibold text-gray-900">Total</span>
-                            <span class="text-lg font-bold text-primary">Rp
-                                {{ number_format($total, 0, ',', '.') }}</span>
-                        </div>
+                    <!-- Total -->
+                    <div class="flex justify-between">
+                        <span class="text-base font-medium text-gray-900">Total</span>
+                        <span class="text-lg font-bold text-pink-600">Rp {{ number_format($total, 0, ',', '.') }}</span>
                     </div>
                 </div>
             </div>
@@ -171,8 +167,8 @@
         <!-- Pay Now Button (Fixed at bottom) -->
         <div class="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 shadow-lg z-10">
             <button form="payment-form" type="submit"
-                class="w-full bg-primary hover:bg-primary-dark text-white py-3 rounded-lg text-base font-semibold transition-colors">
-                Bayar Sekarang
+                class="w-full bg-pink-600 hover:bg-pink-700 text-white py-3 rounded-lg text-base font-semibold transition-colors">
+                Place Order
             </button>
         </div>
     </div>

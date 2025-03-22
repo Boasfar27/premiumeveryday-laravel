@@ -90,10 +90,12 @@
                                 class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
                                 Cancel
                             </a>
-                            <button type="submit"
-                                class="ml-3 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                                {{ $existingReview ? 'Update Review' : 'Submit Review' }}
-                            </button>
+                            <div class="mt-6">
+                                <button type="submit"
+                                    class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500">
+                                    Submit Review
+                                </button>
+                            </div>
                         </div>
                     </form>
                 </div>

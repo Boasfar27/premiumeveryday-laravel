@@ -178,7 +178,7 @@
                                     <dt class="text-sm font-medium text-gray-500 mb-2">Instruksi Pembayaran</dt>
                                     <dd>
                                         <a href="{{ $order->midtransTransaction->pdf_url }}" target="_blank"
-                                            class="inline-flex items-center justify-center w-full px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                            class="inline-flex items-center justify-center w-full px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500">
                                             <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor"
                                                 viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -193,18 +193,59 @@
 
                             @if ($order->payment_status == 'pending')
                                 <div class="col-span-2 mt-3 pt-3 border-t border-gray-200">
-                                    <a href="{{ route('payment.midtrans.check', $order->id) }}"
-                                        class="inline-flex items-center justify-center w-full px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-                                        <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                        </svg>
-                                        Cek Status Pembayaran
-                                    </a>
+                                    <p class="text-sm text-gray-600 mb-3">Anda dapat melanjutkan pembayaran kapan saja,
+                                        bahkan jika sebelumnya telah menutup halaman pembayaran Midtrans.</p>
+                                    <div class="grid grid-cols-1 gap-3">
+                                        <a href="{{ route('payment.midtrans.page', $order) }}"
+                                            class="inline-flex items-center justify-center w-full px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500">
+                                            <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z">
+                                                </path>
+                                            </svg>
+                                            Bayar Sekarang
+                                        </a>
+
+                                        <a href="{{ route('payment.midtrans.check_status', $order) }}"
+                                            class="inline-flex items-center justify-center w-full px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                                            <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+                                                </path>
+                                            </svg>
+                                            Cek Status Pembayaran
+                                        </a>
+                                    </div>
                                 </div>
                             @endif
                         </dl>
+                    </div>
+                </div>
+            @endif
+
+            <!-- For non-Midtrans payment methods -->
+            @if ($canRetryPayment && $order->payment_method != 'midtrans')
+                <div class="bg-white rounded-lg shadow mb-5">
+                    <div class="p-4 border-b border-gray-200">
+                        <h2 class="text-lg font-medium text-gray-900">Tindakan Pembayaran</h2>
+                    </div>
+                    <div class="p-4">
+                        <p class="text-sm text-gray-600 mb-3">Anda dapat melanjutkan pembayaran kapan saja untuk
+                            menyelesaikan pesanan ini.</p>
+                        <div class="grid grid-cols-1 gap-3">
+                            <a href="{{ route('payment.midtrans.page', $order) }}"
+                                class="inline-flex items-center justify-center w-full px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500">
+                                <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z">
+                                    </path>
+                                </svg>
+                                Bayar Sekarang
+                            </a>
+                        </div>
                     </div>
                 </div>
             @endif
@@ -328,7 +369,7 @@
                 </div>
 
                 <div class="p-4">
-                    @if (in_array($order->status, ['completed', 'active']))
+                    @if (in_array($order->status, ['completed', 'active', 'approved']) || $canLeaveReview)
                         @if ($review)
                             <div class="bg-gray-50 p-4 rounded border border-gray-200">
                                 <div class="flex items-center mb-2">
@@ -359,7 +400,7 @@
 
                                 <div class="mt-4">
                                     <a href="{{ route('user.payments.review.edit', ['order' => $order->id, 'review' => $review->id]) }}"
-                                        class="inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 w-full">
+                                        class="inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 w-full">
                                         <svg class="mr-2 h-4 w-4 text-gray-500" fill="none" stroke="currentColor"
                                             viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -380,18 +421,20 @@
                                 </svg>
                                 <h3 class="mt-2 text-sm font-medium text-gray-900">Belum ada review</h3>
                                 <p class="mt-1 text-sm text-gray-500">Bagikan pengalaman Anda tentang pesanan ini.</p>
-                                <div class="mt-6">
-                                    <a href="{{ route('user.payments.review.create', $order) }}"
-                                        class="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                        <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z">
-                                            </path>
-                                        </svg>
-                                        Berikan Review
-                                    </a>
-                                </div>
+                                @if ($canLeaveReview)
+                                    <div class="mt-6">
+                                        <a href="{{ route('user.payments.review.create', $order) }}"
+                                            class="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500">
+                                            <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z">
+                                                </path>
+                                            </svg>
+                                            Berikan Review
+                                        </a>
+                                    </div>
+                                @endif
                             </div>
                         @endif
                     @else

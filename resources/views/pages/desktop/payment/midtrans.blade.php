@@ -51,14 +51,13 @@
                             </div>
                         </div>
 
-                        <!-- Midtrans Button -->
-                        <div class="mt-6 space-y-3">
+                        <!-- Payment Button -->
+                        <div class="mt-6">
                             <a href="{{ route('payment.midtrans.redirect', $order) }}" id="pay-button"
-                                class="block w-full bg-primary hover:bg-primary-dark text-white font-bold py-3 px-4 rounded-md transition-colors text-center">
+                                class="block w-full bg-pink-600 hover:bg-pink-700 text-white py-3 px-4 rounded-lg text-base font-semibold transition-colors text-center">
                                 Pay Now
                             </a>
-
-                            <p class="text-center text-sm text-gray-500 italic">
+                            <p class="mt-2 text-sm text-center text-gray-500 italic">
                                 You will be redirected to Midtrans payment page
                             </p>
                         </div>

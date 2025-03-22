@@ -18,6 +18,7 @@ class MidtransTransaction extends Model
     protected $fillable = [
         'order_id',
         'transaction_id',
+        'midtrans_order_id',
         'payment_type',
         'gross_amount',
         'transaction_time',

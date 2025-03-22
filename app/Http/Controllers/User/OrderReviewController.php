@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\Review;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Jenssegers\Agent\Agent;
 
 class OrderReviewController extends Controller
 {
@@ -26,7 +27,8 @@ class OrderReviewController extends Controller
             return redirect()->route('user.payments.review.edit', ['order' => $order->id, 'review' => $existingReview->id]);
         }
 
-        return view('pages.' . getDevice() . '.reviews.create', [
+        $agent = new Agent();
+        return view('pages.' . ($agent->isMobile() ? 'mobile' : 'desktop') . '.reviews.create', [
             'order' => $order,
             'existingReview' => null
         ]);
@@ -76,7 +78,8 @@ class OrderReviewController extends Controller
             abort(403);
         }
 
-        return view('pages.' . getDevice() . '.reviews.edit', [
+        $agent = new Agent();
+        return view('pages.' . ($agent->isMobile() ? 'mobile' : 'desktop') . '.reviews.edit', [
             'order' => $order,
             'review' => $review
         ]);

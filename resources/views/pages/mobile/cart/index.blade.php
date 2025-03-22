@@ -323,17 +323,17 @@
             <!-- Empty Cart -->
             <div class="flex flex-col items-center justify-center px-4 py-12">
                 <div class="w-full max-w-sm text-center">
-                    <div class="mx-auto w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-6">
-                        <svg class="w-10 h-10 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="mx-auto w-20 h-20 rounded-full bg-pink-100 flex items-center justify-center mb-6">
+                        <svg class="w-10 h-10 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z">
                             </path>
                         </svg>
                     </div>
                     <h3 class="text-lg font-semibold text-gray-900 mb-2">Your cart is empty</h3>
-                    <p class="text-gray-500 mb-6">Start exploring our products and add items to your cart</p>
+                    <p class="text-gray-500 mb-6">Start exploring our premium products to add to your cart</p>
                     <a href="{{ route('products.index') }}"
-                        class="inline-flex items-center px-6 py-3 bg-primary hover:bg-primary-dark text-white font-medium rounded-lg transition-colors">
+                        class="inline-flex items-center px-6 py-3 bg-pink-600 hover:bg-pink-700 text-white font-medium rounded-lg transition-colors">
                         Browse Products
                     </a>
                 </div>
@@ -400,7 +400,7 @@
                         text: "Are you sure you want to remove this item from your cart?",
                         icon: 'question',
                         showCancelButton: true,
-                        confirmButtonColor: '#3085d6',
+                        confirmButtonColor: '#ec4899',
                         cancelButtonColor: '#d33',
                         confirmButtonText: 'Yes, remove it!',
                         cancelButtonText: 'No, keep it'
