@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use App\Models\Setting;
 
 class SubscriptionPlan extends Model
 {
@@ -152,5 +153,75 @@ class SubscriptionPlan extends Model
     public function scopeSharing($query)
     {
         return $query->where('type', 'sharing');
+    }
+
+    /**
+     * Get the included features for the subscription plan.
+     */
+    public function includedFeatures()
+    {
+        return $this->features()->where('is_included', true)->orderBy('sort_order');
+    }
+
+    /**
+     * Get the excluded features for the subscription plan.
+     */
+    public function excludedFeatures()
+    {
+        return $this->features()->where('is_included', false)->orderBy('sort_order');
+    }
+
+    /**
+     * Get the display name with duration.
+     */
+    public function getDisplayNameAttribute()
+    {
+        $durations = Setting::get('subscription_durations', []);
+        $durationLabel = isset($durations[$this->billing_cycle]) ? $durations[$this->billing_cycle]['label'] : ucfirst($this->billing_cycle);
+        
+        return "{$this->name} - {$durationLabel}";
+    }
+
+    /**
+     * Get the formatted price with currency.
+     */
+    public function getFormattedPriceWithCurrencyAttribute()
+    {
+        $currency = Setting::get('currency_symbol', 'Rp');
+        return "{$currency} " . number_format($this->price, 0, ',', '.');
+    }
+
+    /**
+     * Get the formatted discount price with currency.
+     */
+    public function getFormattedDiscountPriceAttribute()
+    {
+        if ($this->sale_price <= 0) {
+            return null;
+        }
+        
+        $currency = Setting::get('currency_symbol', 'Rp');
+        return "{$currency} " . number_format($this->sale_price, 0, ',', '.');
+    }
+
+    /**
+     * Get the discount percentage.
+     */
+    public function getDiscountPercentageAttribute()
+    {
+        if ($this->sale_price > 0 && $this->price > 0) {
+            return round((($this->price - $this->sale_price) / $this->price) * 100);
+        }
+        
+        return 0;
+    }
+
+    /**
+     * Get the duration in human-readable format.
+     */
+    public function getDurationLabelAttribute()
+    {
+        $durations = Setting::get('subscription_durations', []);
+        return isset($durations[$this->billing_cycle]) ? $durations[$this->billing_cycle]['label'] : ucfirst($this->billing_cycle);
     }
 }

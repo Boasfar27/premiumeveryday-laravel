@@ -73,20 +73,41 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->navigationGroups([
                 NavigationGroup::make()
-                    ->label('Product Management')
-                    ->icon('heroicon-o-shopping-bag'),
+                    ->label('Products')
+                    ->icon('heroicon-o-shopping-bag')
+                    ->items([
+                        // Items added automatically for resources with this navigation group
+                    ]),
                 NavigationGroup::make()
-                    ->label('User Management')
-                    ->icon('heroicon-o-users'),
+                    ->label('Subscriptions')
+                    ->icon('heroicon-o-credit-card')
+                    ->items([
+                        // Items added automatically for resources with this navigation group
+                    ]),
                 NavigationGroup::make()
-                    ->label('Order Management')
-                    ->icon('heroicon-o-shopping-cart'),
+                    ->label('Users')
+                    ->icon('heroicon-o-users')
+                    ->items([
+                        // Items added automatically for resources with this navigation group
+                    ]),
                 NavigationGroup::make()
-                    ->label('Content Management')
-                    ->icon('heroicon-o-document-text'),
+                    ->label('Orders')
+                    ->icon('heroicon-o-shopping-cart')
+                    ->items([
+                        // Items added automatically for resources with this navigation group
+                    ]),
+                NavigationGroup::make()
+                    ->label('Content')
+                    ->icon('heroicon-o-document-text')
+                    ->items([
+                        // Items added automatically for resources with this navigation group
+                    ]),
                 NavigationGroup::make()
                     ->label('Settings')
-                    ->icon('heroicon-o-cog-6-tooth'),
+                    ->icon('heroicon-o-cog')
+                    ->items([
+                        // Items added automatically for resources with this navigation group
+                    ]),
             ])
             ->databaseNotifications()
             ->globalSearch();

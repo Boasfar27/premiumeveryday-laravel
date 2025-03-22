@@ -214,101 +214,130 @@
                                     d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
                                 </path>
                             </svg>
-                            Showing <span
+                            Menampilkan <span
                                 class="font-medium">{{ $products->firstItem() ?? 0 }}-{{ $products->lastItem() ?? 0 }}</span>
-                            of <span class="font-medium">{{ $products->total() }}</span> products
+                            dari <span class="font-medium">{{ $products->total() }}</span> produk
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+                    <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4 md:gap-6">
                         @forelse ($products as $product)
                             <div
                                 class="bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden flex flex-col border border-gray-100 group transform hover:-translate-y-1">
                                 <a href="{{ route('products.show', $product) }}"
                                     class="relative bg-gray-200 overflow-hidden">
-                                    <div class="aspect-w-1 aspect-h-1 w-full">
+                                    <div class="aspect-w-4 aspect-h-3 w-full">
                                         <img src="{{ $product->thumbnail_url }}" alt="{{ $product->name }}"
                                             class="h-full w-full object-cover object-center transform group-hover:scale-105 transition-transform duration-500"
-                                            onerror="this.onerror=null; this.src='{{ asset('images/placeholder.webp') }}';">
+                                            onerror="this.onerror=null; this.src='{{ asset('images/placeholder.webp') }}'; console.log('Loading placeholder for ' + '{{ $product->name }}' + ' (ID: {{ $product->id }})');">
+
+                                        @if (config('app.debug'))
+                                            <div
+                                                class="absolute top-0 right-0 bg-black bg-opacity-75 text-white text-xs px-1 py-1">
+                                                {{ $product->thumbnail ? '✓' : '✗' }}
+                                            </div>
+                                        @endif
 
                                         <!-- Product badges -->
-                                        <div class="absolute top-2 left-2 flex flex-col gap-1">
+                                        <div class="absolute top-0 right-0">
                                             @if ($product->is_on_sale)
                                                 <span
-                                                    class="inline-flex items-center rounded-full bg-pink-100 px-2 py-0.5 text-xs font-semibold text-pink-700 shadow-sm">
-                                                    -{{ $product->discount_percentage }}%
-                                                </span>
-                                            @endif
-                                            @if ($product->isNew())
-                                                <span
-                                                    class="inline-flex items-center rounded-full bg-pink-100 px-2 py-0.5 text-xs font-semibold text-pink-700 shadow-sm">
-                                                    New
+                                                    class="inline-flex items-center bg-gradient-to-l from-pink-500 to-red-600 px-3 py-1 text-xs font-medium text-white shadow-sm">
+                                                    Hemat {{ $product->discount_percentage }}%
                                                 </span>
                                             @endif
                                         </div>
+
+                                        <!-- Category badge -->
+                                        @if ($product->category)
+                                            <div
+                                                class="absolute bottom-0 left-0 bg-gray-900 bg-opacity-75 text-white text-xs font-medium px-3 py-1">
+                                                {{ $product->category->name }}
+                                            </div>
+                                        @endif
+
+                                        <!-- New badge -->
+                                        @if ($product->isNew())
+                                            <div
+                                                class="absolute top-0 left-0 bg-blue-600 text-white text-xs font-medium px-3 py-1">
+                                                Baru
+                                            </div>
+                                        @endif
                                     </div>
                                 </a>
 
-                                <div class="p-4 flex-1 flex flex-col">
-                                    <a href="{{ route('products.show', $product) }}"
-                                        class="block group-hover:text-pink-600 transition-colors duration-200">
-                                        <h3 class="text-sm font-medium text-gray-900 mb-1 line-clamp-2">
-                                            {{ $product->name }}</h3>
-                                    </a>
+                                <div class="p-4 flex-grow flex flex-col">
+                                    <!-- Product info -->
+                                    <div class="flex justify-between items-start mb-2">
+                                        <h3
+                                            class="text-sm md:text-base font-medium text-gray-900 group-hover:text-pink-600 transition-colors duration-200">
+                                            <a href="{{ route('products.show', $product) }}" class="hover:underline">
+                                                {{ $product->name }}
+                                            </a>
+                                        </h3>
 
-                                    <div class="text-xs text-gray-500 line-clamp-2 mb-3">
-                                        {{ strip_tags(substr($product->description, 0, 100)) }}...
+                                        @if ($product->average_rating)
+                                            <div class="flex items-center">
+                                                <span class="text-amber-500">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4"
+                                                        viewBox="0 0 20 20" fill="currentColor">
+                                                        <path
+                                                            d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                                    </svg>
+                                                </span>
+                                                <span
+                                                    class="text-xs text-gray-600 ml-1">{{ number_format($product->average_rating, 1) }}</span>
+                                            </div>
+                                        @endif
                                     </div>
 
-                                    <div class="mt-auto flex items-center justify-between">
-                                        <div>
-                                            @if ($product->is_on_sale)
-                                                <span class="line-through text-gray-400 text-xs">Rp
-                                                    {{ number_format($product->price, 0, ',', '.') }}</span>
-                                                <div class="text-pink-700 font-bold text-sm">Rp
-                                                    {{ number_format($product->getDiscountedPrice(), 0, ',', '.') }}</div>
-                                            @else
-                                                <div class="text-pink-700 font-bold text-sm">Rp
-                                                    {{ number_format($product->price, 0, ',', '.') }}</div>
-                                            @endif
-                                        </div>
+                                    <!-- Short description -->
+                                    <p class="text-xs text-gray-500 mb-3 line-clamp-2 flex-grow">
+                                        {{ Str::limit(strip_tags($product->short_description ?? $product->description), 80) }}
+                                    </p>
 
-                                        <a href="{{ route('products.show', $product) }}"
-                                            class="inline-flex items-center justify-center rounded-lg px-2.5 py-1.5 bg-pink-50 text-pink-600 hover:bg-pink-600 hover:text-white transition-all duration-200 text-sm font-medium shadow-sm">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none"
-                                                viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                            </svg>
-                                            Detail
-                                        </a>
+                                    <!-- Price and action -->
+                                    <div class="mt-auto">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center">
+                                                @if ($product->is_on_sale)
+                                                    <span
+                                                        class="text-lg font-bold text-pink-600">{{ format_currency($product->sale_price) }}</span>
+                                                    <span
+                                                        class="text-sm text-gray-500 line-through ml-2">{{ format_currency($product->price) }}</span>
+                                                @else
+                                                    <span
+                                                        class="text-lg font-bold text-pink-600">{{ format_currency($product->price) }}</span>
+                                                @endif
+                                            </div>
+
+                                            <a href="{{ route('products.show', $product) }}"
+                                                class="ml-2 inline-flex items-center rounded-full p-1.5 text-pink-600 hover:bg-pink-50 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
+                                                    viewBox="0 0 20 20" fill="currentColor">
+                                                    <path fill-rule="evenodd"
+                                                        d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
+                                                        clip-rule="evenodd" />
+                                                </svg>
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         @empty
-                            <div
-                                class="col-span-full bg-white rounded-lg shadow-sm p-8 text-center border border-gray-100 relative overflow-hidden">
-                                <div class="absolute inset-0 bg-gray-50 opacity-50 pattern-dots"></div>
-                                <div class="relative">
-                                    <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none"
-                                        stroke="currentColor" viewBox="0 0 24 24">
+                            <div class="col-span-full">
+                                <div class="bg-white p-6 rounded-lg shadow-sm text-center">
+                                    <svg class="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" viewBox="0 0 24 24"
+                                        stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
                                         </path>
                                     </svg>
-                                    <h3 class="text-xl font-semibold text-gray-900 mb-2">No products found</h3>
-                                    <p class="text-gray-500 mb-6 max-w-md mx-auto">We couldn't find any products matching
-                                        your criteria. Try adjusting your search or browse all products.</p>
+                                    <h3 class="text-lg font-medium text-gray-900 mb-2">Tidak ada produk</h3>
+                                    <p class="text-gray-500 mb-4">Belum ada produk yang tersedia dalam kategori ini.</p>
                                     <a href="{{ route('products.index') }}"
-                                        class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 transition-colors duration-200">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none"
-                                            viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M7 16l-4-4m0 0l4-4m-4 4h18" />
-                                        </svg>
-                                        View all products
+                                        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500">
+                                        Lihat semua produk
                                     </a>
                                 </div>
                             </div>

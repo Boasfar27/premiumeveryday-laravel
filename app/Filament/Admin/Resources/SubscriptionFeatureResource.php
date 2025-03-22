@@ -102,6 +102,6 @@ class SubscriptionFeatureResource extends Resource
     
     public static function getNavigationGroup(): ?string
     {
-        return 'Product Management';
+        return 'Subscriptions';
     }
 }

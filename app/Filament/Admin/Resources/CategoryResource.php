@@ -19,7 +19,7 @@ class CategoryResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-tag';
     
-    protected static ?string $navigationLabel = 'Categories';
+    protected static ?string $navigationLabel = 'Kategori';
     
     protected static ?int $navigationSort = 2;
 
@@ -153,6 +153,6 @@ class CategoryResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Product Management';
+        return 'Products';
     }
 }

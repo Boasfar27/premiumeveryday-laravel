@@ -1,0 +1,21 @@
+/* Debug styles for image placeholders */
+img[src*="placeholder.webp"] {
+    border: 2px solid red !important;
+    background-color: #e0e7ff !important;
+    /* Light indigo background for placeholders */
+}
+
+.bg-gray-200 {
+    position: relative;
+}
+
+.debug-image-info {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    font-size: 10px;
+    padding: 2px 5px;
+    z-index: 10;
+}

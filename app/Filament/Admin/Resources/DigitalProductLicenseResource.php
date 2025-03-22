@@ -19,7 +19,7 @@ class DigitalProductLicenseResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-key';
     
-    protected static ?string $navigationLabel = 'Licenses';
+    protected static ?string $navigationLabel = 'Lisensi';
     
     protected static ?int $navigationSort = 3;
 
@@ -156,6 +156,6 @@ class DigitalProductLicenseResource extends Resource
     
     public static function getNavigationGroup(): ?string
     {
-        return 'Product Management';
+        return 'Products';
     }
 }

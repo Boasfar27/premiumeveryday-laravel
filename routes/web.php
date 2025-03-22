@@ -329,4 +329,10 @@ Route::prefix('payment/midtrans')->name('payment.midtrans.')->group(function () 
 Route::post('/payment/midtrans/notification', [MidtransController::class, 'handleNotification'])->name('payment.midtrans.notification');
 // Add a GET fallback for testing
 Route::get('/payment/midtrans/notification', [MidtransController::class, 'handleNotification'])->name('payment.midtrans.notification.get');
+
+// Debug routes
+Route::prefix('debug')->name('debug.')->middleware(['auth'])->group(function () {
+    Route::get('/images', [App\Http\Controllers\DebugController::class, 'images'])->name('images');
+    Route::post('/fix-images', [App\Http\Controllers\DebugController::class, 'fixImages'])->name('fix-images');
+});
     
