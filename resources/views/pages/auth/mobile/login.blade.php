@@ -4,14 +4,6 @@
 
 @section('content')
     <div class="min-h-screen bg-white">
-        <!-- Header -->
-        <div class="py-6 px-4 bg-primary">
-            <div class="flex items-center justify-between">
-                <a href="{{ route('home') }}" class="flex items-center">
-                    <img class="h-8 w-auto" src="{{ asset('images/logo.webp') }}" alt="Premium Everyday">
-                </a>
-            </div>
-        </div>
 
         <!-- Login Form -->
         <div class="px-4 py-8">
@@ -19,7 +11,7 @@
                 <h2 class="text-2xl font-bold text-gray-900 mb-2">Masuk</h2>
                 <p class="text-gray-600">
                     Belum punya akun?
-                    <a href="{{ route('register') }}" class="text-primary hover:text-primary-dark font-medium">
+                    <a href="{{ route('register') }}" class="text-pink-600 hover:text-pink-700 font-medium">
                         Daftar disini
                     </a>
                 </p>
@@ -51,7 +43,7 @@
                         Alamat Email
                     </label>
                     <input id="email" name="email" type="email" autocomplete="email" required
-                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-pink-500 focus:border-pink-500 sm:text-sm"
                         value="{{ old('email') }}">
                 </div>
 
@@ -60,20 +52,20 @@
                         Kata Sandi
                     </label>
                     <input id="password" name="password" type="password" autocomplete="current-password" required
-                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-pink-500 focus:border-pink-500 sm:text-sm">
                 </div>
 
                 <div class="flex items-center justify-between">
                     <div class="flex items-center">
                         <input id="remember_me" name="remember" type="checkbox"
-                            class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded">
+                            class="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded">
                         <label for="remember_me" class="ml-2 block text-sm text-gray-900">
                             Ingat Saya
                         </label>
                     </div>
 
                     <div class="text-sm">
-                        <a href="{{ route('password.request') }}" class="font-medium text-primary hover:text-primary-dark">
+                        <a href="{{ route('password.request') }}" class="font-medium text-pink-600 hover:text-pink-700">
                             Lupa kata sandi?
                         </a>
                     </div>
@@ -81,7 +73,7 @@
 
                 <div>
                     <button type="submit"
-                        class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                        class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500">
                         Masuk
                     </button>
                 </div>

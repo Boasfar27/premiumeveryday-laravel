@@ -4,13 +4,6 @@
 
 @section('styles')
     <style>
-        :root {
-            --primary-dark: #3D0301;
-            --primary: #B03052;
-            --secondary: #D76C82;
-            --accent: #3D0301;
-        }
-
         .auth-container {
             min-height: calc(100vh - 200px);
             display: flex;
@@ -31,7 +24,7 @@
         }
 
         .auth-header {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            background: linear-gradient(135deg, #EC4899 0%, #F472B6 100%);
             color: white;
             padding: 2rem;
             text-align: center;
@@ -42,8 +35,8 @@
         }
 
         .form-control:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 0.2rem rgba(176, 48, 82, 0.25);
+            border-color: #EC4899;
+            box-shadow: 0 0 0 0.2rem rgba(236, 72, 153, 0.25);
         }
 
         .btn-google {
@@ -90,8 +83,8 @@
     <div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 pt-24 md:pt-20">
         <div class="flex w-full max-w-6xl mx-auto shadow-lg rounded-lg overflow-hidden">
             <!-- Left Side - Image/Banner -->
-            <div class="hidden lg:block w-1/2 bg-primary relative">
-                <div class="absolute inset-0 bg-gradient-to-r from-primary to-secondary opacity-90"></div>
+            <div class="hidden lg:block w-1/2 bg-pink-600 relative">
+                <div class="absolute inset-0 bg-gradient-to-r from-pink-600 to-pink-500 opacity-90"></div>
                 <div class="relative z-10 p-12 text-white">
                     <h2 class="text-4xl font-bold mb-6">Selamat Datang Kembali</h2>
                     <p class="text-lg mb-8">Masuk ke akun Anda untuk menikmati layanan premium kami.</p>
@@ -131,7 +124,7 @@
                         <h2 class="text-3xl font-bold text-gray-900 mb-2">Masuk</h2>
                         <p class="text-gray-600">
                             Belum punya akun?
-                            <a href="{{ route('register') }}" class="text-primary hover:text-primary-dark font-medium">
+                            <a href="{{ route('register') }}" class="text-pink-600 hover:text-pink-700 font-medium">
                                 Daftar disini
                             </a>
                         </p>
@@ -163,7 +156,7 @@
                                 Alamat Email
                             </label>
                             <input id="email" name="email" type="email" autocomplete="email" required
-                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
+                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-pink-500 focus:border-pink-500 sm:text-sm"
                                 value="{{ old('email') }}">
                         </div>
 
@@ -172,13 +165,13 @@
                                 Kata Sandi
                             </label>
                             <input id="password" name="password" type="password" autocomplete="current-password" required
-                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
+                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-pink-500 focus:border-pink-500 sm:text-sm">
                         </div>
 
                         <div class="flex items-center justify-between">
                             <div class="flex items-center">
                                 <input id="remember_me" name="remember" type="checkbox"
-                                    class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded">
+                                    class="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded">
                                 <label for="remember_me" class="ml-2 block text-sm text-gray-900">
                                     Ingat Saya
                                 </label>
@@ -186,7 +179,7 @@
 
                             <div class="text-sm">
                                 <a href="{{ route('password.request') }}"
-                                    class="font-medium text-primary hover:text-primary-dark">
+                                    class="font-medium text-pink-600 hover:text-pink-700">
                                     Lupa kata sandi?
                                 </a>
                             </div>
@@ -194,7 +187,7 @@
 
                         <div>
                             <button type="submit"
-                                class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                                class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500">
                                 Masuk
                             </button>
                         </div>
