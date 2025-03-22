@@ -62,9 +62,15 @@
                     <label for="phone" class="block text-sm font-medium text-gray-700">
                         Nomor Telepon
                     </label>
-                    <input id="phone" name="phone" type="tel" autocomplete="tel"
-                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-pink-500 focus:border-pink-500 sm:text-sm"
-                        value="{{ old('phone') }}" placeholder="Contoh: 08XXXXXXXXXX">
+                    <div class="mt-1 flex rounded-md shadow-sm">
+                        <span
+                            class="inline-flex items-center px-3 py-2 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 sm:text-sm">
+                            08
+                        </span>
+                        <input id="phone" name="phone" type="tel" autocomplete="tel"
+                            class="flex-1 block w-full px-3 py-2 rounded-none rounded-r-md border border-gray-300 shadow-sm placeholder-gray-400 focus:outline-none focus:ring-pink-500 focus:border-pink-500 sm:text-sm"
+                            value="{{ old('phone') ? substr(old('phone'), 2) : '' }}" placeholder="XXXXXXXXXX">
+                    </div>
                 </div>
 
                 <div>

@@ -93,7 +93,7 @@ class AuthController extends BaseController
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'phone' => $request->phone,
+            'phone' => '08' . $request->phone,
             'role' => 0,
             'is_active' => true,
             'verification_code' => sprintf("%06d", mt_rand(1, 999999))
