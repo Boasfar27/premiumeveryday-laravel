@@ -33,7 +33,7 @@
         }
 
         .faq-card:hover {
-            border-left: 3px solid #4F46E5;
+            border-left: 3px solid #EC4899;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
@@ -42,12 +42,12 @@
         }
 
         .category-tab.active {
-            background-color: #4F46E5;
+            background-color: #EC4899;
             color: white;
         }
 
         .search-highlight {
-            background-color: rgba(79, 70, 229, 0.2);
+            background-color: rgba(236, 72, 153, 0.2);
             padding: 0 2px;
             border-radius: 2px;
         }
@@ -77,7 +77,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(90deg, rgba(79, 70, 229, 0.9) 0%, rgba(124, 58, 237, 0.8) 100%);
+            background: linear-gradient(90deg, rgba(236, 72, 153, 0.9) 0%, rgba(219, 39, 119, 0.8) 100%);
             border-radius: 0.75rem;
         }
 
@@ -90,7 +90,7 @@
         }
 
         .popular-question {
-            border-left: 3px solid #4F46E5;
+            border-left: 3px solid #EC4899;
             background-color: #F9FAFB;
         }
     </style>
@@ -106,19 +106,19 @@
         </div>
 
         <!-- Header -->
-        <div class="faq-header bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl p-8 mb-10 relative overflow-hidden">
+        <div class="faq-header bg-gradient-to-r from-pink-600 to-pink-500 rounded-xl p-8 mb-10 relative overflow-hidden">
             <div class="max-w-3xl mx-auto text-center relative z-10">
                 <h1 class="text-3xl font-bold text-white mb-4">How can we help you?</h1>
-                <p class="text-indigo-100 mb-6">Find answers to frequently asked questions about our products and services
+                <p class="text-pink-100 mb-6">Find answers to frequently asked questions about our products and services
                 </p>
 
                 <!-- Search Bar -->
                 <div class="relative max-w-xl mx-auto">
                     <input type="text" id="faq-search" placeholder="Search for answers..."
-                        class="w-full px-4 py-3 rounded-full border-0 focus:ring-2 focus:ring-indigo-300 text-gray-900 shadow-lg"
+                        class="w-full px-4 py-3 rounded-full border-0 focus:ring-2 focus:ring-pink-300 text-gray-900 shadow-lg"
                         autocomplete="off">
                     <div class="absolute inset-y-0 right-0 flex items-center pr-4">
-                        <button class="text-primary hover:text-primary-dark focus:outline-none">
+                        <button class="text-pink-600 hover:text-pink-700 focus:outline-none">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -135,7 +135,7 @@
                 <a href="#product-faqs"
                     class="help-card bg-white p-6 rounded-lg shadow-sm border border-gray-100 text-center">
                     <div
-                        class="text-primary bg-primary-50 w-12 h-12 mx-auto rounded-full flex items-center justify-center mb-4">
+                        class="text-pink-600 bg-pink-50 w-12 h-12 mx-auto rounded-full flex items-center justify-center mb-4">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
                             stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -149,7 +149,7 @@
                 <a href="#payment-faqs"
                     class="help-card bg-white p-6 rounded-lg shadow-sm border border-gray-100 text-center">
                     <div
-                        class="text-green-600 bg-green-50 w-12 h-12 mx-auto rounded-full flex items-center justify-center mb-4">
+                        class="text-pink-600 bg-pink-50 w-12 h-12 mx-auto rounded-full flex items-center justify-center mb-4">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
                             stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -163,7 +163,7 @@
                 <a href="#account-faqs"
                     class="help-card bg-white p-6 rounded-lg shadow-sm border border-gray-100 text-center">
                     <div
-                        class="text-blue-600 bg-blue-50 w-12 h-12 mx-auto rounded-full flex items-center justify-center mb-4">
+                        class="text-pink-600 bg-pink-50 w-12 h-12 mx-auto rounded-full flex items-center justify-center mb-4">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
                             stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -171,7 +171,7 @@
                         </svg>
                     </div>
                     <h3 class="font-semibold text-gray-900 mb-2">Account</h3>
-                    <p class="text-gray-500 text-sm">Managing your account and profile settings</p>
+                    <p class="text-gray-500 text-sm">Account settings, profiles, and credentials</p>
                 </a>
             </div>
 
@@ -184,7 +184,7 @@
                             <h3 class="font-medium text-gray-900 mb-1">{{ $popularFaq->question }}</h3>
                             <p class="text-gray-500 text-sm line-clamp-2">{{ strip_tags($popularFaq->answer) }}</p>
                             <a href="#faq-{{ $popularFaq->id }}"
-                                class="text-primary text-sm font-medium mt-2 inline-block hover:underline">Read more</a>
+                                class="text-pink-600 text-sm font-medium mt-2 inline-block hover:underline">Read more</a>
                         </div>
                     @endforeach
                 </div>
@@ -210,9 +210,9 @@
                     <div x-data="{ open: false }" class="bg-white rounded-lg faq-card" data-category="{{ $faq->category }}"
                         id="faq-{{ $faq->id }}">
                         <button @click="open = !open"
-                            class="w-full flex justify-between items-center p-5 focus:outline-none">
-                            <span class="text-lg font-medium text-gray-900 text-left">{{ $faq->question }}</span>
-                            <svg class="w-5 h-5 text-primary flex-shrink-0 ml-2" :class="{ 'transform rotate-180': open }"
+                            class="w-full flex justify-between items-center p-4 focus:outline-none">
+                            <span class="text-base font-medium text-gray-900">{{ $faq->question }}</span>
+                            <svg class="w-5 h-5 text-pink-600 flex-shrink-0 ml-2" :class="{ 'transform rotate-180': open }"
                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                             </svg>
