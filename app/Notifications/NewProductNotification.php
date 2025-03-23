@@ -60,9 +60,7 @@ class NewProductNotification extends Notification implements ShouldQueue
      */
     public static function sendToAllUsers(Product $product): void
     {
-        User::whereDoesntHave('roles', function($query) {
-            $query->where('name', 'admin');
-        })->chunk(100, function($users) use ($product) {
+        User::where('role', 0)->chunk(100, function($users) use ($product) {
             foreach ($users as $user) {
                 $user->notify(new NewProductNotification($product));
             }
@@ -84,8 +82,6 @@ class NewProductNotification extends Notification implements ShouldQueue
                     ->label('Lihat')
                     ->url('/admin/resources/products/' . $product->id . '/edit'),
             ])
-            ->sendToDatabase(User::whereHas('roles', function($query) {
-                $query->where('name', 'admin');
-            })->get());
+            ->sendToDatabase(User::where('role', 1)->get());
     }
 } 

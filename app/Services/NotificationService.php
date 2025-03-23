@@ -2,12 +2,14 @@
 
 namespace App\Services;
 
+use App\Models\Coupon;
 use App\Models\License;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\Promotion;
 use App\Models\User;
 use App\Notifications\LicenseDeliveredNotification;
+use App\Notifications\NewCouponNotification;
 use App\Notifications\NewOrderNotification;
 use App\Notifications\NewProductNotification;
 use App\Notifications\NewPromotionNotification;
@@ -105,13 +107,27 @@ class NotificationService
     }
 
     /**
+     * Send notification to all users about new coupon
+     */
+    public function notifyUsersAboutNewCoupon(Coupon $coupon): void
+    {
+        NewCouponNotification::sendToAllUsers($coupon);
+    }
+
+    /**
+     * Notify admin when new coupon is created
+     */
+    public function notifyAdminAboutNewCoupon(Coupon $coupon): void
+    {
+        NewCouponNotification::notifyAdmin($coupon);
+    }
+
+    /**
      * Send notification to admin users about unread notifications
      */
     public function sendUnreadNotificationsReminder(): void
     {
-        $admins = User::whereHas('roles', function($query) {
-            $query->where('name', 'admin');
-        })->get();
+        $admins = User::where('role', 1)->get();
 
         foreach ($admins as $admin) {
             $unreadCount = $admin->unreadNotifications->count();

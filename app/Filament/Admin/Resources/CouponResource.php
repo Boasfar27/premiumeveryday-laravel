@@ -5,6 +5,7 @@ namespace App\Filament\Admin\Resources;
 use App\Filament\Admin\Resources\CouponResource\Pages;
 use App\Filament\Admin\Resources\CouponResource\RelationManagers;
 use App\Models\Coupon;
+use App\Services\NotificationService;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -37,6 +38,16 @@ class CouponResource extends Resource
                         'fixed' => 'Fixed Amount',
                     ])
                     ->required(),
+                Forms\Components\TextInput::make('min_purchase')
+                    ->numeric()
+                    ->default(0)
+                    ->step(0.01)
+                    ->required(),
+                Forms\Components\TextInput::make('max_discount')
+                    ->numeric()
+                    ->default(0)
+                    ->step(0.01)
+                    ->required(),
                 Forms\Components\TextInput::make('max_uses')
                     ->numeric()
                     ->minValue(1)
@@ -49,6 +60,10 @@ class CouponResource extends Resource
                     ->dehydrated(),
                 Forms\Components\DateTimePicker::make('expires_at')
                     ->placeholder('Never Expires'),
+                Forms\Components\DateTimePicker::make('start_date')
+                    ->label('Start Date')
+                    ->default(now())
+                    ->required(),
                 Forms\Components\Toggle::make('is_active')
                     ->required()
                     ->default(true),

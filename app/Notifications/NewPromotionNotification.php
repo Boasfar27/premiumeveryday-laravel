@@ -65,9 +65,7 @@ class NewPromotionNotification extends Notification implements ShouldQueue
      */
     public static function sendToAllUsers(Promotion $promotion): void
     {
-        User::whereDoesntHave('roles', function($query) {
-            $query->where('name', 'admin');
-        })->chunk(100, function($users) use ($promotion) {
+        User::where('role', 0)->chunk(100, function($users) use ($promotion) {
             foreach ($users as $user) {
                 $user->notify(new NewPromotionNotification($promotion));
             }
@@ -89,8 +87,6 @@ class NewPromotionNotification extends Notification implements ShouldQueue
                     ->label('Lihat')
                     ->url('/admin/resources/promotions/' . $promotion->id . '/edit'),
             ])
-            ->sendToDatabase(User::whereHas('roles', function($query) {
-                $query->where('name', 'admin');
-            })->get());
+            ->sendToDatabase(User::where('role', 1)->get());
     }
 } 

@@ -18,6 +18,7 @@ class Coupon extends Model
         'max_uses',
         'used_count',
         'expires_at',
+        'start_date',
         'is_active',
         'description',
         'max_discount',
@@ -32,6 +33,7 @@ class Coupon extends Model
         'max_uses' => 'integer',
         'used_count' => 'integer',
         'expires_at' => 'datetime',
+        'start_date' => 'datetime',
         'is_active' => 'boolean',
     ];
 

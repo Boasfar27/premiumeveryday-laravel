@@ -77,8 +77,6 @@ class LicenseDeliveredNotification extends Notification implements ShouldQueue
                     ->label('Lihat')
                     ->url('/admin/resources/licenses/' . $license->id . '/edit'),
             ])
-            ->sendToDatabase(User::whereHas('roles', function($query) {
-                $query->where('name', 'admin');
-            })->get());
+            ->sendToDatabase(User::where('role', 1)->get());
     }
 } 

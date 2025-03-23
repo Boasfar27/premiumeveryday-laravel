@@ -211,7 +211,7 @@ class SubscriptionSettings extends Page implements HasForms
         );
         
         // Clear cache
-        Setting::clearAllCache();
+        Setting::clearCache();
         
         Notification::make()
             ->title('Pengaturan langganan berhasil disimpan')

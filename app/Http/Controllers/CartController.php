@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\DigitalProduct;
 use App\Models\Coupon;
 use App\Models\Product;
+use App\Models\User;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Log;
@@ -640,6 +642,9 @@ class CartController extends Controller
                 'account_type' => $item['account_type'] ?? 'sharing'
             ]);
         }
+        
+        // Send notification to admin about new order
+        app(NotificationService::class)->notifyAdminAboutNewOrder($order);
         
         // Clear cart and checkout session
         Session::forget(['cart', 'checkout', 'discount', 'applied_coupon']);

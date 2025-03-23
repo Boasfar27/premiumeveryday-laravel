@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\MidtransTransaction;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Midtrans\Snap;
@@ -98,9 +99,9 @@ class MidtransController extends Controller
                 ]
             ];
             
-            // Format transaction details - ensure gross_amount matches sum of items
-            // If total from items doesn't match order total, use the calculated total
-            $gross_amount = $total > 0 ? $total : max((int) $order->total, 10000);
+            // Format transaction details - ensure gross_amount includes tax
+            // Always use the order total which should include all components (subtotal, discount, tax)
+            $gross_amount = max((int) $order->total, 10000);
             
             // Generate a unique order_id by appending current timestamp to avoid duplicates
             $unique_order_id = $order->order_number . '-' . time();
@@ -131,7 +132,9 @@ class MidtransController extends Controller
             Log::info('Midtrans createToken params', [
                 'transaction_details' => $transaction_details,
                 'item_count' => count($items),
-                'items_total' => $total
+                'items_total' => $total,
+                'order_total' => (int) $order->total,
+                'difference' => (int) $order->total - $total
             ]);
             
             // Create token using Midtrans Snap
@@ -249,6 +252,11 @@ class MidtransController extends Controller
                         'status' => 'approved',
                         'paid_at' => now()
                     ]);
+                    
+                    // Send notifications
+                    $notificationService = app(NotificationService::class);
+                    $notificationService->notifyUserAboutPaymentConfirmation($order);
+                    $notificationService->notifyAdminAboutPaymentConfirmation($order);
                 }
             } else if ($status == 'settlement') {
                 // Payment completed
@@ -257,6 +265,11 @@ class MidtransController extends Controller
                     'status' => 'approved',
                     'paid_at' => now()
                 ]);
+                
+                // Send notifications
+                $notificationService = app(NotificationService::class);
+                $notificationService->notifyUserAboutPaymentConfirmation($order);
+                $notificationService->notifyAdminAboutPaymentConfirmation($order);
                 
                 // Log the update
                 Log::info('Order marked as paid after settlement', [
