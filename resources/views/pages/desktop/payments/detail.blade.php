@@ -188,7 +188,7 @@
                         @if ($canRetry)
                             <div class="mt-4">
                                 <div class="-mx-2 -my-1.5 flex">
-                                    <a href="{{ route('checkout.payment', $order) }}"
+                                    <a href="{{ route('payment.midtrans.page', $order) }}"
                                         class="px-3 py-1.5 bg-yellow-100 text-yellow-800 hover:bg-yellow-200 rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500">
                                         Bayar Sekarang
                                     </a>

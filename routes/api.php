@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Order;
+use App\Http\Controllers\MidtransController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,4 +31,7 @@ Route::get('/check-order/{order}', function($order) {
     // Pengguna tidak perlu login untuk memeriksa keberadaan order
     // tapi kami tetap membatasi informasi yang dikembalikan
     return response()->json(['exists' => true]);
-}); 
+});
+
+// Midtrans payment notification webhook - no CSRF protection
+Route::post('/midtrans/callback', [MidtransController::class, 'handleNotification']); 
