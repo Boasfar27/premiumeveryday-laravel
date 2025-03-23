@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Resources\DigitalProductResource\Pages;
 
 use App\Filament\Admin\Resources\DigitalProductResource;
+use App\Services\NotificationService;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 use Filament\Notifications\Notification;
@@ -28,5 +29,16 @@ class CreateDigitalProduct extends CreateRecord
                     ->url($this->getResource()::getUrl('edit', ['record' => $this->record]))
                     ->button(),
             ]);
+    }
+
+    protected function afterCreate(): void
+    {
+        // Kirim notifikasi ke user tentang produk baru
+        if ($this->record->is_active) {
+            app(NotificationService::class)->notifyUsersAboutNewProduct($this->record);
+        }
+        
+        // Notifikasi ke admin lain
+        app(NotificationService::class)->notifyAdminAboutNewProduct($this->record);
     }
 }

@@ -10,6 +10,7 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Filament\Notifications\Actions\Action;
 use Filament\Notifications\Notification as FilamentNotification;
+use Illuminate\Support\Facades\Log;
 
 class NewCouponNotification extends Notification implements ShouldQueue
 {
@@ -52,8 +53,17 @@ class NewCouponNotification extends Notification implements ShouldQueue
             $email->line('Deskripsi: ' . $this->coupon->description);
         }
         
-        return $email->action('Gunakan Sekarang', url('/products'))
-            ->line('Jangan lewatkan kesempatan ini!');
+        // Gunakan route untuk cart
+        try {
+            $cartUrl = route('cart.index', ['coupon' => $this->coupon->code]);
+        } catch (\Exception $e) {
+            // Fallback URL
+            $cartUrl = url('/cart?coupon=' . $this->coupon->code);
+        }
+        
+        $email->action('Gunakan Kupon', $cartUrl);
+        
+        return $email->line('Terima kasih telah berbelanja di Premium Everyday!');
     }
 
     /**
@@ -61,16 +71,24 @@ class NewCouponNotification extends Notification implements ShouldQueue
      */
     public function toArray(object $notifiable): array
     {
-        $message = $this->coupon->type === 'percentage' 
-            ? 'Diskon ' . $this->coupon->discount . '%' 
-            : 'Diskon Rp ' . number_format($this->coupon->discount, 0, ',', '.');
-            
+        // Gunakan route cart.index dengan parameter
+        try {
+            $link = route('cart.index', ['coupon' => $this->coupon->code]);
+        } catch (\Exception $e) {
+            // Fallback jika route tidak ditemukan
+            $link = url('/cart?coupon=' . $this->coupon->code);
+        }
+        
         return [
             'coupon_id' => $this->coupon->id,
-            'code' => $this->coupon->code,
-            'discount' => $this->coupon->discount,
-            'message' => 'Kode Kupon Baru: ' . $this->coupon->code . ' - ' . $message,
-            'link' => '/products'
+            'coupon_code' => $this->coupon->code,
+            'discount_type' => $this->coupon->type,
+            'discount_value' => $this->coupon->discount,
+            'message' => 'Kode kupon baru: ' . $this->coupon->code,
+            'link' => $link,
+            'route_name' => 'cart.index',
+            'route_params' => ['coupon' => $this->coupon->code],
+            'notif_type' => 'new_coupon'
         ];
     }
 
@@ -91,6 +109,15 @@ class NewCouponNotification extends Notification implements ShouldQueue
      */
     public static function notifyAdmin(Coupon $coupon): void
     {
+        // Gunakan route untuk URL admin
+        try {
+            $adminUrl = route('filament.admin.resources.coupons.edit', ['record' => $coupon->id]);
+        } catch (\Exception $e) {
+            // Fallback jika route tidak ditemukan
+            Log::error('Admin coupon URL error: ' . $e->getMessage());
+            $adminUrl = '/admin/coupons/' . $coupon->id . '/edit';
+        }
+        
         FilamentNotification::make()
             ->title('Kupon Baru Dibuat')
             ->icon('heroicon-o-ticket')
@@ -99,7 +126,7 @@ class NewCouponNotification extends Notification implements ShouldQueue
             ->actions([
                 Action::make('view')
                     ->label('Lihat')
-                    ->url('/admin/resources/coupons/' . $coupon->id . '/edit'),
+                    ->url($adminUrl),
             ])
             ->sendToDatabase(User::where('role', 1)->get());
     }

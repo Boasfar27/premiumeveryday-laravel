@@ -52,13 +52,18 @@ class MidtransController extends Controller
                 'clientKey' => !empty(Config::$clientKey) ? 'Set ('.substr(Config::$clientKey, 0, 5).'...)' : 'Empty', 
                 'isProduction' => Config::$isProduction,
                 'order_number' => $order->order_number,
-                'total' => $order->total
+                'total' => $order->total,
+                'subtotal' => $order->subtotal,
+                'tax' => $order->tax,
+                'discount' => $order->discount_amount
             ]);
             
             $items = [];
             
             // Add order items to the transaction
             foreach ($order->items as $item) {
+                // Hitung tax proporsional untuk setiap item berdasarkan persentase tax_rate
+                $itemTotal = $item->price * $item->quantity;
                 $items[] = [
                     'id' => $item->id,
                     'price' => (int) ($item->price ?? $item->unit_price ?? 0),
@@ -84,6 +89,26 @@ class MidtransController extends Controller
                     $item['price'] = 1000; // Default price if missing
                 }
                 $total += $item['price'] * $item['quantity'];
+            }
+            
+            // Tambahkan komponen pajak sebagai item tersendiri untuk transparansi
+            if ($order->tax > 0) {
+                $items[] = [
+                    'id' => 'tax-' . $order->id,
+                    'price' => (int) $order->tax,
+                    'quantity' => 1,
+                    'name' => 'Pajak (PPN)',
+                ];
+            }
+            
+            // Tambahkan diskon jika ada (dengan nilai negatif)
+            if ($order->discount_amount > 0) {
+                $items[] = [
+                    'id' => 'discount-' . $order->id,
+                    'price' => -(int) $order->discount_amount,
+                    'quantity' => 1,
+                    'name' => 'Diskon',
+                ];
             }
             
             // Format customer details

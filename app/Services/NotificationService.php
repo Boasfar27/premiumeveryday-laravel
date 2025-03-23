@@ -92,16 +92,20 @@ class NotificationService
 
     /**
      * Send notification to all users about new product
+     * 
+     * @param Product|DigitalProduct $product
      */
-    public function notifyUsersAboutNewProduct(Product $product): void
+    public function notifyUsersAboutNewProduct($product): void
     {
         NewProductNotification::sendToAllUsers($product);
     }
 
     /**
      * Notify admin when new product is created
+     * 
+     * @param Product|DigitalProduct $product
      */
-    public function notifyAdminAboutNewProduct(Product $product): void
+    public function notifyAdminAboutNewProduct($product): void
     {
         NewProductNotification::notifyAdmin($product);
     }
@@ -136,5 +140,17 @@ class NotificationService
                 $admin->notify(new \App\Notifications\UnreadNotificationsReminder($unreadCount));
             }
         }
+    }
+
+    /**
+     * Send notification to user about order status change
+     */
+    public function notifyOrderStatusChange(Order $order, string $oldStatus, string $newStatus): void
+    {
+        // Kirim notifikasi ke user
+        \App\Notifications\OrderStatusChangedNotification::sendToUser($order, $oldStatus, $newStatus);
+        
+        // Kirim notifikasi ke admin
+        \App\Notifications\OrderStatusChangedNotification::notifyAdmin($order, $oldStatus, $newStatus);
     }
 } 
