@@ -63,34 +63,7 @@
 
         @auth
             <!-- Notifications -->
-            <div class="relative" x-data="{ showNotifications: false }">
-                <button @click="showNotifications = !showNotifications"
-                    class="flex items-center w-full px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md">
-                    <span class="flex-grow">Notifications</span>
-                    @if ($unreadCount > 0)
-                        <span
-                            class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                            {{ $unreadCount }}
-                        </span>
-                    @endif
-                </button>
-
-                <div x-show="showNotifications" @click.away="showNotifications = false" class="mt-2 px-3"
-                    style="display: none;">
-                    @forelse($notifications as $notification)
-                        <div class="py-2 border-b border-gray-200 last:border-0">
-                            <p class="text-sm font-medium text-gray-900">
-                                {{ $notification->data['message'] ?? 'Notification' }}
-                            </p>
-                            <p class="text-xs text-gray-500">
-                                {{ $notification->created_at->diffForHumans() }}
-                            </p>
-                        </div>
-                    @empty
-                        <p class="py-2 text-sm text-gray-500">No notifications</p>
-                    @endforelse
-                </div>
-            </div>
+            <x-notification-list-mobile :notifications="auth()->user()->notifications()->latest()->take(5)->get()" :unreadCount="auth()->user()->unreadNotifications->count()" />
 
             <!-- User Menu -->
             <div class="border-t border-gray-200 pt-4 pb-3">
