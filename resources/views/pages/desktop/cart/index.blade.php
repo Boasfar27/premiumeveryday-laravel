@@ -185,19 +185,20 @@
                                 <div class="mb-6 pb-6 border-b border-gray-200">
                                     <form method="POST" action="{{ route('cart.apply-coupon') }}" class="coupon-form">
                                         @csrf
-                                        <label for="coupon" class="block text-sm font-medium text-gray-700 mb-2">
+                                        <label for="coupon_code" class="block text-sm font-medium text-gray-700 mb-2">
                                             Coupon Code
                                         </label>
                                         <div class="flex gap-2">
-                                            <input type="text" id="coupon" name="coupon" placeholder="Enter code"
+                                            <input type="text" id="coupon_code" name="coupon_code"
+                                                placeholder="Enter code"
                                                 class="flex-1 rounded-lg border-gray-300 shadow-sm focus:border-pink-500 focus:ring-pink-500 text-sm">
                                             <button type="submit"
                                                 class="bg-gray-100 hover:bg-pink-50 text-gray-800 hover:text-pink-600 font-medium px-4 rounded-lg text-sm transition-colors cart-btn">
                                                 Apply
                                             </button>
                                         </div>
-                                        @if (session('coupon_error'))
-                                            <p class="mt-2 text-xs text-red-600">{{ session('coupon_error') }}</p>
+                                        @if (session('error'))
+                                            <p class="mt-2 text-xs text-red-600">{{ session('error') }}</p>
                                         @endif
                                     </form>
                                 </div>
@@ -209,10 +210,10 @@
                                         <span class="font-medium">Rp {{ number_format($subtotal, 0, ',', '.') }}</span>
                                     </div>
 
-                                    @if (session('applied_coupon'))
+                                    @if (session('coupon'))
                                         <div class="flex justify-between">
                                             <span class="text-gray-600 flex items-center">
-                                                Discount ({{ session('applied_coupon')['code'] }})
+                                                Discount ({{ session('coupon')['code'] }})
                                                 <form action="{{ route('cart.remove-coupon') }}" method="POST"
                                                     class="inline">
                                                     @csrf
@@ -228,7 +229,7 @@
                                                 </form>
                                             </span>
                                             <span class="font-medium text-green-600">- Rp
-                                                {{ number_format($discount, 0, ',', '.') }}</span>
+                                                {{ number_format(session('coupon')['discount'], 0, ',', '.') }}</span>
                                         </div>
                                     @endif
 

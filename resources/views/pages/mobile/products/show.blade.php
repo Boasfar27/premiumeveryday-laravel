@@ -209,29 +209,51 @@
                         </div>
                     @endif
 
-                    <!-- Purchase Options -->
-                    <div class="mt-6">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-2">Purchase Options</h3>
-
-                        <!-- Tab Navigation -->
+                    <!-- Purchase Type Tabs -->
+                    <div class="mb-6">
                         <div class="flex border-b border-gray-200 mb-4">
-                            <button id="tab-sharing-mobile" onclick="showTabMobile('sharing')"
-                                class="tab-button-mobile active py-2 px-4 text-sm font-medium border-b-2 border-pink-600 text-pink-600">
+                            <button id="tab-sharing" onclick="showTab('sharing')"
+                                class="tab-button active py-2 px-4 flex-1 text-center font-medium border-b-2 border-pink-600 text-pink-600">
                                 Sharing Account
                             </button>
-                            <button id="tab-private-mobile" onclick="showTabMobile('private')"
-                                class="tab-button-mobile py-2 px-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700">
+                            <button id="tab-private" onclick="showTab('private')"
+                                class="tab-button py-2 px-4 flex-1 text-center font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700">
                                 Private Account
                             </button>
                         </div>
 
-                        <!-- Sharing Account Options -->
-                        <div id="content-sharing-mobile" class="tab-content-mobile">
-                            <p class="text-sm text-gray-600 mb-4">
+                        <!-- Informasi jenis akun dan perbedaannya -->
+                        <div class="bg-gray-50 p-3 rounded-lg mb-4 text-sm">
+                            <h4 class="font-medium text-gray-800 mb-2">Perbedaan Jenis Akun</h4>
+                            <div class="space-y-3">
+                                <div>
+                                    <h5 class="font-medium text-pink-600">Sharing Account</h5>
+                                    <ul class="list-disc pl-5 text-xs text-gray-600 mt-1">
+                                        <li>Berbagi akun dengan pengguna lain</li>
+                                        <li>Harga lebih terjangkau</li>
+                                        <li>Mungkin ada batasan region</li>
+                                        <li>Cocok untuk penggunaan ringan</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h5 class="font-medium text-pink-600">Private Account</h5>
+                                    <ul class="list-disc pl-5 text-xs text-gray-600 mt-1">
+                                        <li>Akun pribadi eksklusif</li>
+                                        <li>Tidak berbagi dengan pengguna lain</li>
+                                        <li>Bebas batasan region</li>
+                                        <li>Cocok untuk penggunaan intensif</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Purchase Options -->
+                        <div id="content-sharing" class="tab-content">
+                            <p class="text-xs text-gray-600 mb-4">
                                 {{ $product->sharing_description ?? 'Share your account with multiple users. Lower price but limited to specific regions.' }}
                             </p>
 
-                            <div class="space-y-4">
+                            <div class="space-y-3">
                                 <!-- 1 Month Plan -->
                                 <div class="border border-gray-200 rounded-lg p-4 hover:border-pink-500 transition">
                                     <div class="flex items-center justify-between">
@@ -360,12 +382,12 @@
                         </div>
 
                         <!-- Private Account Options -->
-                        <div id="content-private-mobile" class="tab-content-mobile hidden">
-                            <p class="text-sm text-gray-600 mb-4">
+                        <div id="content-private" class="tab-content hidden">
+                            <p class="text-xs text-gray-600 mb-4">
                                 {{ $product->private_description ?? 'Get your own private account. Higher price but available in all regions and fully private.' }}
                             </p>
 
-                            <div class="space-y-4">
+                            <div class="space-y-3">
                                 <!-- 1 Month Plan -->
                                 <div class="border border-gray-200 rounded-lg p-4 hover:border-pink-500 transition">
                                     <div class="flex items-center justify-between">
@@ -568,9 +590,9 @@
     </div>
 
     <script>
-        function showTabMobile(tabName) {
-            const tabs = document.querySelectorAll('.tab-button-mobile');
-            const contents = document.querySelectorAll('.tab-content-mobile');
+        function showTab(tabName) {
+            const tabs = document.querySelectorAll('.tab-button');
+            const contents = document.querySelectorAll('.tab-content');
 
             // Hide all contents
             contents.forEach(content => {
@@ -587,14 +609,14 @@
             });
 
             // Show selected content
-            document.getElementById('content-' + tabName + '-mobile').classList.remove('hidden');
+            document.getElementById('content-' + tabName).classList.remove('hidden');
 
             // Add active class to selected tab
-            document.getElementById('tab-' + tabName + '-mobile').classList.add('active');
-            document.getElementById('tab-' + tabName + '-mobile').classList.add('border-pink-600');
-            document.getElementById('tab-' + tabName + '-mobile').classList.add('text-pink-600');
-            document.getElementById('tab-' + tabName + '-mobile').classList.remove('border-transparent');
-            document.getElementById('tab-' + tabName + '-mobile').classList.remove('text-gray-500');
+            document.getElementById('tab-' + tabName).classList.add('active');
+            document.getElementById('tab-' + tabName).classList.add('border-pink-600');
+            document.getElementById('tab-' + tabName).classList.add('text-pink-600');
+            document.getElementById('tab-' + tabName).classList.remove('border-transparent');
+            document.getElementById('tab-' + tabName).classList.remove('text-gray-500');
         }
     </script>
 @endsection

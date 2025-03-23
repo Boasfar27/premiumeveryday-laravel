@@ -47,24 +47,16 @@ class CartController extends Controller
             }
         }
 
-        // Apply coupon discount if exists
-        if (session()->has('applied_coupon')) {
-            $coupon = Coupon::where('code', session('applied_coupon.code'))->first();
-            if ($coupon && $subtotal >= $coupon->min_purchase) {
-                if ($coupon->type === 'percentage') {
-                    $discount = min(($subtotal * $coupon->value / 100), $coupon->max_discount);
-                } else {
-                    $discount = min($coupon->value, $coupon->max_discount);
-                }
-
-                // Update product prices with discount
+        // Get discount from coupon if exists
+        if (session()->has('coupon')) {
+            $couponData = session('coupon');
+            $discount = $couponData['discount'] ?? 0;
+            
+            // Apply discount to individual products if needed
+            if ($discount > 0 && count($products) > 0) {
                 foreach ($products as &$item) {
-                    if ($coupon->type === 'percentage') {
-                        $itemDiscount = min(($item['price'] * $coupon->value / 100), $coupon->max_discount / count($products));
-                    } else {
-                        $itemDiscount = min($coupon->value / count($products), $coupon->max_discount / count($products));
-                    }
-                    $item['discounted_price'] = $item['price'] - $itemDiscount;
+                    $itemDiscount = $discount / count($products);
+                    $item['discounted_price'] = max(0, $item['price'] - $itemDiscount);
                 }
             }
         }
@@ -394,102 +386,70 @@ class CartController extends Controller
      */
     public function applyCoupon(Request $request)
     {
-        $request->validate([
-            'coupon' => 'required|string|max:50',
-        ]);
+        try {
+            $code = $request->input('coupon_code');
 
-        $code = strtoupper($request->coupon);
-        $cart = session()->get('cart', []);
-        
-        if (empty($cart)) {
-            if ($request->ajax()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Your cart is empty. Please add products before applying a coupon.'
-                ]);
+            // Cari kupon berdasarkan kode
+            $coupon = Coupon::where('code', $code)
+                ->where('is_active', true)
+                ->first();
+
+            if (!$coupon) {
+                return redirect()->back()->with('error', 'Coupon code is not valid!');
             }
-            return back()->with('coupon_error', 'Your cart is empty. Please add products before applying a coupon.');
-        }
 
-        $coupon = Coupon::where('code', $code)->where('is_active', true)->first();
-
-        if (!$coupon) {
-            if ($request->ajax()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Invalid coupon code. Please try another one.'
-                ]);
+            // Verifikasi tanggal berlaku kupon
+            $now = now();
+            if ($coupon->start_date && $now < $coupon->start_date) {
+                return redirect()->back()->with('error', 'Coupon is not active yet!');
             }
-            return back()->with('coupon_error', 'Invalid coupon code. Please try another one.');
-        }
 
-        // Check if coupon is still valid
-        if ($coupon->isExpired()) {
-            if ($request->ajax()) {
-                return response()->json([
-                    'success' => false, 
-                    'message' => 'This coupon has expired.'
-                ]);
+            if ($coupon->end_date && $now > $coupon->end_date) {
+                return redirect()->back()->with('error', 'Coupon has expired!');
             }
-            return back()->with('coupon_error', 'This coupon has expired.');
-        }
 
-        // Check if coupon has reached its usage limit
-        if ($coupon->hasReachedUsageLimit()) {
-            if ($request->ajax()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'This coupon has reached its usage limit.'
-                ]);
+            // Verifikasi batas penggunaan kupon
+            if ($coupon->max_uses && $coupon->used_count >= $coupon->max_uses) {
+                return redirect()->back()->with('error', 'Coupon has reached its usage limit!');
             }
-            return back()->with('coupon_error', 'This coupon has reached its usage limit.');
-        }
 
-        // Calculate cart subtotal
-        $subtotal = 0;
-        foreach ($cart as $item) {
-            $subtotal += ($item['price'] ?? 0) * ($item['quantity'] ?? 1);
-        }
+            // Mendapatkan subtotal dari keranjang
+            $cart = Session::get('cart', []);
+            $subtotal = 0;
 
-        // Check minimum purchase
-        if ($subtotal < $coupon->min_purchase) {
-            $minAmount = number_format($coupon->min_purchase, 0, ',', '.');
-            if ($request->ajax()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => "Minimum purchase of Rp {$minAmount} required for this coupon."
-                ]);
+            foreach ($cart as $item) {
+                $subtotal += $item['price'] * $item['quantity'];
             }
-            return back()->with('coupon_error', "Minimum purchase of Rp {$minAmount} required for this coupon.");
-        }
 
-        // Calculate discount
-        $discount = 0;
-        if ($coupon->type === 'percentage') {
-            $discount = min(($subtotal * $coupon->value / 100), $coupon->max_discount);
-        } else {
-            $discount = min($coupon->value, $coupon->max_discount);
-        }
+            // Periksa pembelian minimum jika ada
+            if ($coupon->min_purchase && $subtotal < $coupon->min_purchase) {
+                return redirect()->back()->with('error', 'Minimum purchase requirement not met!');
+            }
 
-        // Save the coupon and discount to session
-        Session::put('applied_coupon', [
-            'code' => $coupon->code,
-            'value' => $coupon->value,
-            'type' => $coupon->type
-        ]);
-        
-        Session::put('discount', $discount);
+            // Hitung diskon berdasarkan tipe kupon
+            $discount = $coupon->calculateDiscount($subtotal);
 
-        if ($request->ajax()) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Coupon applied successfully!',
+            // Tambahkan kupon ke sesi
+            Session::put('coupon', [
+                'code' => $coupon->code,
                 'discount' => $discount,
-                'formatted_discount' => 'Rp ' . number_format($discount, 0, ',', '.')
+                'coupon_id' => $coupon->id
             ]);
-        }
 
-        return back()->with('success', 'Coupon applied successfully!');
+            // Log untuk debugging
+            \Log::info('Coupon applied', [
+                'code' => $coupon->code,
+                'discount_value' => $coupon->getDiscountValue(),
+                'type' => $coupon->type,
+                'subtotal' => $subtotal,
+                'calculated_discount' => $discount
+            ]);
+
+            return redirect()->back()->with('success', 'Coupon applied successfully!');
+        } catch (\Exception $e) {
+            \Log::error('Error applying coupon: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error applying coupon!');
+        }
     }
 
     /**
@@ -497,7 +457,7 @@ class CartController extends Controller
      */
     public function removeCoupon()
     {
-        Session::forget(['applied_coupon', 'discount']);
+        Session::forget(['coupon']);
         
         if (request()->ajax() || request()->expectsJson()) {
             return response()->json([
@@ -544,15 +504,11 @@ class CartController extends Controller
         
         // Calculate discount only if coupon exists
         $discount = 0;
-        if (Session::has('applied_coupon')) {
-            $coupon = Coupon::where('code', Session::get('applied_coupon.code'))->first();
-            if ($coupon && $subtotal >= $coupon->min_purchase) {
-                if ($coupon->type === 'percentage') {
-                    $discount = min(($subtotal * $coupon->value / 100), $coupon->max_discount);
-                } else {
-                    $discount = min($coupon->value, $coupon->max_discount);
-                }
-            }
+        $couponCode = null;
+        if (Session::has('coupon')) {
+            $couponData = Session::get('coupon');
+            $discount = $couponData['discount'] ?? 0;
+            $couponCode = $couponData['code'] ?? null;
         }
         
         // Calculate tax and total
@@ -571,6 +527,7 @@ class CartController extends Controller
             'tax' => $tax,
             'total' => $total,
             'products' => $products,
+            'coupon_code' => $couponCode,
             'created_at' => now()->format('Y-m-d H:i:s')
         ]);
         
@@ -619,6 +576,7 @@ class CartController extends Controller
             'subscription_type' => count($checkout['products']) > 0 ? $checkout['products'][0]['duration'] : 'monthly',
             'amount' => $checkout['subtotal'],
             'final_amount' => $checkout['total'],
+            'coupon_code' => $checkout['coupon_code'] ?? null,
             'created_at' => now(),
             'updated_at' => now(),
         ]);

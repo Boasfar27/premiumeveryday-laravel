@@ -15,6 +15,7 @@ use App\Notifications\NewProductNotification;
 use App\Notifications\NewPromotionNotification;
 use App\Notifications\PaymentConfirmationNotification;
 use App\Notifications\UnpaidOrderNotification;
+use Illuminate\Support\Facades\Log;
 
 class NotificationService
 {
@@ -152,5 +153,125 @@ class NotificationService
         
         // Kirim notifikasi ke admin
         \App\Notifications\OrderStatusChangedNotification::notifyAdmin($order, $oldStatus, $newStatus);
+    }
+
+    /**
+     * Kirim informasi akun dan kredensial ke pengguna
+     *
+     * @param Order $order
+     * @param array $accountCredentials
+     * @return void
+     */
+    public function sendAccountCredentials(Order $order, array $accountCredentials)
+    {
+        // Kirim notifikasi ke pengguna
+        $order->user->notify(new \App\Notifications\AccountCredentialNotification($order, $accountCredentials));
+        
+        // Log aktivitas
+        Log::info('Account credentials sent to user', [
+            'user_id' => $order->user->id,
+            'order_id' => $order->id,
+            'order_number' => $order->order_number,
+            'credentials_count' => count($accountCredentials),
+        ]);
+    }
+    
+    /**
+     * Update status pesanan dan beri tahu pengguna
+     *
+     * @param Order $order
+     * @param string $newStatus
+     * @return void 
+     */
+    public function updateOrderStatus(Order $order, string $newStatus)
+    {
+        $oldStatus = $order->status;
+        
+        // Jangan proses jika tidak ada perubahan status
+        if ($oldStatus === $newStatus) {
+            return;
+        }
+        
+        // Update status pesanan
+        $order->status = $newStatus;
+        $order->save();
+        
+        // Kirim notifikasi ke user
+        \App\Notifications\OrderStatusChangedNotification::sendToUser($order, $oldStatus, $newStatus);
+        
+        // Kirim notifikasi ke admin
+        \App\Notifications\OrderStatusChangedNotification::notifyAdmin($order, $oldStatus, $newStatus);
+        
+        // Kirim informasi akun jika status menjadi 'delivered'
+        if ($newStatus === 'delivered') {
+            // Kirim email informasi akun (harus dibuat dulu)
+            // Contoh data akun (akan diisi dengan data sebenarnya oleh admin)
+            $accountCredentials = [
+                'username' => 'username_akun',
+                'password' => 'password_akun',
+                'type' => $order->items->first()->subscription_type ?? 'monthly',
+                'duration' => $order->items->first()->duration ?? 1,
+                'expired_at' => now()->addMonths($order->items->first()->duration ?? 1)->format('d M Y'),
+                'instructions' => 'Langkah-langkah penggunaan akun'
+            ];
+            
+            $this->sendAccountCredentials($order, $accountCredentials);
+        }
+    }
+
+    /**
+     * Kirim notifikasi kepada pengguna bahwa produk telah dikirim
+     *
+     * @param Order $order
+     * @return void
+     */
+    public function notifyUserAboutProductDelivery(Order $order): void
+    {
+        // Jika produk adalah produk digital
+        if ($order->items->count() > 0) {
+            // Kirim notifikasi ke user
+            $order->user->notify(new \App\Notifications\ProductDeliveredNotification($order));
+            
+            // Kirim kredensial akun jika ada
+            $items = $order->items;
+            $accountCredentials = [];
+            
+            foreach ($items as $item) {
+                if (method_exists($item->orderable, 'getCredentials')) {
+                    $credentials = $item->orderable->getCredentials();
+                    if (!empty($credentials)) {
+                        $accountCredentials[] = array_merge(
+                            $credentials,
+                            [
+                                'product_name' => $item->orderable->name,
+                                'type' => $item->subscription_type ?? 'standard',
+                                'duration' => $item->duration ?? 1,
+                                'expired_at' => now()->addMonths($item->duration ?? 1)->format('d M Y'),
+                            ]
+                        );
+                    }
+                }
+            }
+            
+            // Jika ada kredensial, kirim ke pengguna
+            if (!empty($accountCredentials)) {
+                $this->sendAccountCredentials($order, $accountCredentials);
+            }
+        }
+        
+        // Update status pesanan menjadi completed
+        $oldStatus = $order->status;
+        $order->status = 'completed';
+        $order->save();
+        
+        // Kirim notifikasi perubahan status
+        $this->notifyOrderStatusChange($order, $oldStatus, 'completed');
+        
+        // Log aktivitas
+        \Illuminate\Support\Facades\Log::info('Product delivered notification sent', [
+            'order_id' => $order->id,
+            'order_number' => $order->order_number,
+            'user_id' => $order->user_id,
+        ]);
     }
 } 

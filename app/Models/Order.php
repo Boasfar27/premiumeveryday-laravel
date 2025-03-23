@@ -98,16 +98,63 @@ class Order extends Model
     }
 
     /**
-     * Get the status color for the order.
+     * Get formatted payment status attribute for display
+     */
+    public function getFormattedStatusAttribute()
+    {
+        // Status yang ditampilkan berdasarkan prioritas
+        if ($this->payment_status == 'paid') {
+            return '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Pembayaran Selesai</span>';
+        } else if ($this->payment_status == 'pending') {
+            return '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Menunggu Pembayaran</span>';
+        } else if ($this->payment_status == 'failed') {
+            return '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Pembayaran Gagal</span>';
+        } else if ($this->payment_status == 'expired') {
+            return '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Pembayaran Kadaluarsa</span>';
+        } else {
+            // Fallback status berdasarkan status order
+            return match($this->status) {
+                'approved' => '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Disetujui</span>',
+                'pending' => '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Menunggu</span>',
+                'processing' => '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Diproses</span>',
+                'shipped' => '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-indigo-100 text-indigo-800">Dikirim</span>',
+                'delivered' => '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Terkirim</span>',
+                'cancelled' => '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Dibatalkan</span>',
+                'failed' => '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Gagal</span>',
+                default => '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">'.ucfirst($this->status).'</span>',
+            };
+        }
+    }
+
+    /**
+     * Get the status color attribute based on payment_status and order status.
      */
     public function getStatusColorAttribute()
     {
+        // Prioritaskan warna berdasarkan payment_status jika ada kondisi khusus
+        if (in_array($this->payment_status, ['failed', 'expired', 'refunded'])) {
+            return match($this->payment_status) {
+                'failed' => 'red',
+                'expired' => 'gray',
+                'refunded' => 'purple',
+                default => 'gray',
+            };
+        }
+        
+        // Jika pembayaran pending, warna kuning
+        if ($this->payment_status === 'pending') {
+            return 'yellow';
+        }
+        
+        // Jika pembayaran berhasil (paid), warna berdasarkan status order
         return match($this->status) {
-            'pending' => 'warning',
-            'processing' => 'info',
-            'active' => 'success',
+            'pending' => 'blue',
+            'processing' => 'indigo',
+            'active' => 'green',
             'completed' => 'primary',
-            'cancelled' => 'danger',
+            'cancelled' => 'red',
+            'approved' => 'green',
+            'failed' => 'red',
             default => 'secondary',
         };
     }
@@ -118,22 +165,6 @@ class Order extends Model
     public function getFormattedTotalAttribute()
     {
         return 'Rp ' . number_format($this->total, 0, ',', '.');
-    }
-
-    /**
-     * Get the formatted status for the order.
-     */
-    public function getFormattedStatusAttribute()
-    {
-        return match($this->status) {
-            'pending' => 'Menunggu Pembayaran',
-            'processing' => 'Diproses',
-            'active' => 'Aktif',
-            'completed' => 'Selesai',
-            'cancelled' => 'Dibatalkan',
-            'approved' => 'Disetujui',
-            default => ucfirst($this->status ?? 'Menunggu'),
-        };
     }
 
     /**

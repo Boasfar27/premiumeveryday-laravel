@@ -230,6 +230,31 @@
                                     </button>
                                 </div>
 
+                                <!-- Informasi jenis akun dan perbedaannya -->
+                                <div class="bg-gray-50 p-4 rounded-lg mb-4">
+                                    <h4 class="font-medium text-gray-800 mb-2">Perbedaan Jenis Akun</h4>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <h5 class="font-medium text-pink-600">Sharing Account</h5>
+                                            <ul class="list-disc pl-5 text-sm text-gray-600 mt-1">
+                                                <li>Berbagi akun dengan pengguna lain</li>
+                                                <li>Harga lebih terjangkau</li>
+                                                <li>Mungkin ada batasan region</li>
+                                                <li>Cocok untuk penggunaan ringan</li>
+                                            </ul>
+                                        </div>
+                                        <div>
+                                            <h5 class="font-medium text-pink-600">Private Account</h5>
+                                            <ul class="list-disc pl-5 text-sm text-gray-600 mt-1">
+                                                <li>Akun pribadi eksklusif</li>
+                                                <li>Tidak berbagi dengan pengguna lain</li>
+                                                <li>Bebas batasan region</li>
+                                                <li>Cocok untuk penggunaan intensif</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <!-- Sharing Account Options -->
                                 <div id="content-sharing" class="tab-content">
                                     <p class="text-sm text-gray-600 mb-4">
@@ -264,12 +289,12 @@
                                                 @auth
                                                     <button type="submit"
                                                         class="w-full bg-pink-600 hover:bg-pink-700 text-white font-medium py-2 px-4 rounded transition">
-                                                        Add to Cart
+                                                        Tambah ke Keranjang
                                                     </button>
                                                 @else
                                                     <a href="{{ route('login') }}?redirect={{ route('products.show', $product) }}"
                                                         class="block text-center w-full bg-pink-600 hover:bg-pink-700 text-white font-medium py-2 px-4 rounded transition">
-                                                        Login to Purchase
+                                                        Login untuk Membeli
                                                     </a>
                                                 @endauth
                                             </form>
@@ -307,12 +332,12 @@
                                                 @auth
                                                     <button type="submit"
                                                         class="w-full bg-pink-600 hover:bg-pink-700 text-white font-medium py-2 px-4 rounded transition">
-                                                        Add to Cart
+                                                        Tambah ke Keranjang
                                                     </button>
                                                 @else
                                                     <a href="{{ route('login') }}?redirect={{ route('products.show', $product) }}"
                                                         class="block text-center w-full bg-pink-600 hover:bg-pink-700 text-white font-medium py-2 px-4 rounded transition">
-                                                        Login to Purchase
+                                                        Login untuk Membeli
                                                     </a>
                                                 @endauth
                                             </form>
@@ -352,12 +377,12 @@
                                                 @auth
                                                     <button type="submit"
                                                         class="w-full bg-pink-600 hover:bg-pink-700 text-white font-medium py-2 px-4 rounded transition">
-                                                        Add to Cart
+                                                        Tambah ke Keranjang
                                                     </button>
                                                 @else
                                                     <a href="{{ route('login') }}?redirect={{ route('products.show', $product) }}"
                                                         class="block text-center w-full bg-pink-600 hover:bg-pink-700 text-white font-medium py-2 px-4 rounded transition">
-                                                        Login to Purchase
+                                                        Login untuk Membeli
                                                     </a>
                                                 @endauth
                                             </form>
@@ -404,12 +429,12 @@
                                                 @auth
                                                     <button type="submit"
                                                         class="w-full bg-pink-600 hover:bg-pink-700 text-white font-medium py-2 px-4 rounded transition">
-                                                        Add to Cart
+                                                        Tambah ke Keranjang
                                                     </button>
                                                 @else
                                                     <a href="{{ route('login') }}?redirect={{ route('products.show', $product) }}"
                                                         class="block text-center w-full bg-pink-600 hover:bg-pink-700 text-white font-medium py-2 px-4 rounded transition">
-                                                        Login to Purchase
+                                                        Login untuk Membeli
                                                     </a>
                                                 @endauth
                                             </form>
@@ -445,12 +470,12 @@
                                                 @auth
                                                     <button type="submit"
                                                         class="w-full bg-pink-600 hover:bg-pink-700 text-white font-medium py-2 px-4 rounded transition">
-                                                        Add to Cart
+                                                        Tambah ke Keranjang
                                                     </button>
                                                 @else
                                                     <a href="{{ route('login') }}?redirect={{ route('products.show', $product) }}"
                                                         class="block text-center w-full bg-pink-600 hover:bg-pink-700 text-white font-medium py-2 px-4 rounded transition">
-                                                        Login to Purchase
+                                                        Login untuk Membeli
                                                     </a>
                                                 @endauth
                                             </form>
@@ -490,12 +515,12 @@
                                                 @auth
                                                     <button type="submit"
                                                         class="w-full bg-pink-600 hover:bg-pink-700 text-white font-medium py-2 px-4 rounded transition">
-                                                        Add to Cart
+                                                        Tambah ke Keranjang
                                                     </button>
                                                 @else
                                                     <a href="{{ route('login') }}?redirect={{ route('products.show', $product) }}"
                                                         class="block text-center w-full bg-pink-600 hover:bg-pink-700 text-white font-medium py-2 px-4 rounded transition">
-                                                        Login to Purchase
+                                                        Login untuk Membeli
                                                     </a>
                                                 @endauth
                                             </form>

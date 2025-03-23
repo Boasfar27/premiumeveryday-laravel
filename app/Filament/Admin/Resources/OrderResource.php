@@ -18,43 +18,100 @@ class OrderResource extends Resource
     protected static ?string $model = Order::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
+    
+    protected static ?string $navigationLabel = 'Pesanan';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('product_id')
-                    ->numeric(),
-                Forms\Components\TextInput::make('user_id')
-                    ->numeric(),
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(100),
-                Forms\Components\TextInput::make('email')
-                    ->email()
-                    ->required()
-                    ->maxLength(100),
-                Forms\Components\TextInput::make('whatsapp')
-                    ->required()
-                    ->maxLength(20),
-                Forms\Components\TextInput::make('product_name')
-                    ->required()
-                    ->maxLength(100),
-                Forms\Components\TextInput::make('subscription_type')
-                    ->required(),
-                Forms\Components\TextInput::make('amount')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('payment_proof'),
-                Forms\Components\TextInput::make('status')
-                    ->required(),
-                Forms\Components\TextInput::make('coupon_code')
-                    ->maxLength(50),
-                Forms\Components\TextInput::make('discount_amount')
-                    ->numeric(),
-                Forms\Components\TextInput::make('final_amount')
-                    ->required()
-                    ->numeric(),
+                Forms\Components\Section::make('Informasi Pelanggan')
+                    ->schema([
+                        Forms\Components\TextInput::make('order_number')
+                            ->label('Nomor Pesanan')
+                            ->disabled(),
+                        Forms\Components\Select::make('user_id')
+                            ->label('Pelanggan')
+                            ->relationship('user', 'name')
+                            ->searchable()
+                            ->preload()
+                            ->disabled(),
+                        Forms\Components\TextInput::make('name')
+                            ->label('Nama')
+                            ->required()
+                            ->maxLength(100),
+                        Forms\Components\TextInput::make('email')
+                            ->label('Email')
+                            ->email()
+                            ->required()
+                            ->maxLength(100),
+                        Forms\Components\TextInput::make('whatsapp')
+                            ->label('WhatsApp')
+                            ->tel()
+                            ->required()
+                            ->maxLength(20),
+                    ])->columns(2),
+                    
+                Forms\Components\Section::make('Detail Pembayaran')
+                    ->schema([
+                        Forms\Components\TextInput::make('subtotal')
+                            ->label('Subtotal')
+                            ->prefix('Rp')
+                            ->disabled(),
+                        Forms\Components\TextInput::make('tax')
+                            ->label('Pajak')
+                            ->prefix('Rp')
+                            ->disabled(),
+                        Forms\Components\TextInput::make('discount_amount')
+                            ->label('Diskon')
+                            ->prefix('Rp')
+                            ->disabled(),
+                        Forms\Components\TextInput::make('total')
+                            ->label('Total')
+                            ->prefix('Rp')
+                            ->disabled(),
+                        Forms\Components\Select::make('payment_method')
+                            ->label('Metode Pembayaran')
+                            ->options([
+                                'midtrans' => 'Midtrans',
+                                'bank_transfer' => 'Transfer Bank',
+                                'manual' => 'Manual',
+                            ])
+                            ->required(),
+                        Forms\Components\Select::make('payment_status')
+                            ->label('Status Pembayaran')
+                            ->options([
+                                'pending' => 'Menunggu Pembayaran',
+                                'paid' => 'Lunas',
+                                'failed' => 'Gagal',
+                                'expired' => 'Kadaluarsa',
+                                'refunded' => 'Dikembalikan',
+                            ])
+                            ->required(),
+                        Forms\Components\Select::make('status')
+                            ->label('Status Pesanan')
+                            ->options([
+                                'pending' => 'Menunggu',
+                                'approved' => 'Disetujui',
+                                'processing' => 'Diproses',
+                                'completed' => 'Selesai',
+                                'cancelled' => 'Dibatalkan',
+                                'failed' => 'Gagal',
+                            ])
+                            ->required(),
+                        Forms\Components\DateTimePicker::make('paid_at')
+                            ->label('Tanggal Pembayaran'),
+                    ])->columns(2),
+                    
+                Forms\Components\Section::make('Catatan')
+                    ->schema([
+                        Forms\Components\Textarea::make('customer_notes')
+                            ->label('Catatan Pelanggan')
+                            ->maxLength(500),
+                        Forms\Components\Textarea::make('admin_notes')
+                            ->label('Catatan Admin')
+                            ->maxLength(500),
+                    ]),
             ]);
     }
 
@@ -62,52 +119,189 @@ class OrderResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('product_id')
-                    ->numeric()
+                Tables\Columns\TextColumn::make('order_number')
+                    ->label('Nomor Pesanan')
+                    ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('user_id')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('name')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('email')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('whatsapp')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('product_name')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('subscription_type'),
-                Tables\Columns\TextColumn::make('amount')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('payment_proof'),
-                Tables\Columns\TextColumn::make('status'),
-                Tables\Columns\TextColumn::make('coupon_code')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('discount_amount')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('final_amount')
-                    ->numeric()
+                Tables\Columns\TextColumn::make('user.name')
+                    ->label('Pelanggan')
+                    ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->label('Tanggal Pesanan')
+                    ->dateTime('d M Y H:i')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('total')
+                    ->label('Total')
+                    ->money('IDR')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('payment_status')
+                    ->label('Status Pembayaran')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'paid' => 'success',
+                        'pending' => 'warning',
+                        'failed' => 'danger',
+                        'expired' => 'danger',
+                        'refunded' => 'info',
+                        default => 'secondary',
+                    })
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'paid' => 'Lunas',
+                        'pending' => 'Menunggu',
+                        'failed' => 'Gagal',
+                        'expired' => 'Kadaluarsa',
+                        'refunded' => 'Dikembalikan',
+                        default => ucfirst($state),
+                    }),
+                Tables\Columns\TextColumn::make('status')
+                    ->label('Status Pesanan')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'approved' => 'success',
+                        'pending' => 'warning',
+                        'processing' => 'info',
+                        'completed' => 'success',
+                        'cancelled' => 'danger',
+                        'failed' => 'danger',
+                        default => 'secondary',
+                    })
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'approved' => 'Disetujui',
+                        'pending' => 'Menunggu',
+                        'processing' => 'Diproses',
+                        'completed' => 'Selesai',
+                        'cancelled' => 'Dibatalkan',
+                        'failed' => 'Gagal',
+                        default => ucfirst($state),
+                    }),
             ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('payment_status')
+                    ->label('Status Pembayaran')
+                    ->options([
+                        'paid' => 'Lunas',
+                        'pending' => 'Menunggu',
+                        'failed' => 'Gagal',
+                        'expired' => 'Kadaluarsa',
+                        'refunded' => 'Dikembalikan',
+                    ]),
+                Tables\Filters\SelectFilter::make('status')
+                    ->label('Status Pesanan')
+                    ->options([
+                        'approved' => 'Disetujui',
+                        'pending' => 'Menunggu',
+                        'processing' => 'Diproses',
+                        'completed' => 'Selesai',
+                        'cancelled' => 'Dibatalkan',
+                        'failed' => 'Gagal',
+                    ]),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('processPayment')
+                    ->label('Proses Pembayaran')
+                    ->icon('heroicon-o-check-circle')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->modalHeading('Konfirmasi Pembayaran')
+                    ->modalDescription('Apakah Anda yakin ingin memproses pembayaran ini sebagai LUNAS?')
+                    ->modalSubmitActionLabel('Ya, Proses Pembayaran')
+                    ->visible(fn (Order $record) => $record->payment_status === 'pending')
+                    ->action(function (Order $record) {
+                        // Proses pembayaran
+                        $record->update([
+                            'payment_status' => 'paid',
+                            'status' => 'approved',
+                            'paid_at' => now(),
+                        ]);
+                        
+                        // Log aktivitas
+                        \Illuminate\Support\Facades\Log::info('Admin processed payment', [
+                            'order_id' => $record->id,
+                            'order_number' => $record->order_number,
+                            'user_id' => auth()->id(),
+                        ]);
+                        
+                        // Notifikasi ke user
+                        $notificationService = app(\App\Services\NotificationService::class);
+                        $notificationService->notifyUserAboutPaymentConfirmation($record);
+                        
+                        // Tampilkan notifikasi sukses
+                        \Filament\Notifications\Notification::make()
+                            ->title('Pembayaran Berhasil Diproses')
+                            ->success()
+                            ->send();
+                    }),
+                    
+                Tables\Actions\Action::make('sendProduct')
+                    ->label('Kirim Produk')
+                    ->icon('heroicon-o-paper-airplane')
+                    ->color('primary')
+                    ->requiresConfirmation()
+                    ->modalHeading('Konfirmasi Pengiriman Produk')
+                    ->modalDescription('Apakah Anda yakin ingin menandai pesanan ini sebagai TERKIRIM?')
+                    ->modalSubmitActionLabel('Ya, Kirim Produk')
+                    ->visible(fn (Order $record) => $record->payment_status === 'paid' && $record->status === 'approved')
+                    ->action(function (Order $record) {
+                        // Perbarui status pesanan
+                        $record->update([
+                            'status' => 'completed',
+                        ]);
+                        
+                        // Log aktivitas
+                        \Illuminate\Support\Facades\Log::info('Admin sent product', [
+                            'order_id' => $record->id,
+                            'order_number' => $record->order_number,
+                            'user_id' => auth()->id(),
+                        ]);
+                        
+                        // Notifikasi ke user
+                        $notificationService = app(\App\Services\NotificationService::class);
+                        $notificationService->notifyUserAboutProductDelivery($record);
+                        
+                        // Tampilkan notifikasi sukses
+                        \Filament\Notifications\Notification::make()
+                            ->title('Produk Berhasil Dikirim')
+                            ->success()
+                            ->send();
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\BulkAction::make('processPaymentsBulk')
+                        ->label('Proses Pembayaran (Massal)')
+                        ->icon('heroicon-o-check-circle')
+                        ->color('success')
+                        ->requiresConfirmation()
+                        ->modalHeading('Konfirmasi Pembayaran Massal')
+                        ->modalDescription('Apakah Anda yakin ingin memproses semua pembayaran yang dipilih sebagai LUNAS?')
+                        ->modalSubmitActionLabel('Ya, Proses Pembayaran')
+                        ->action(function (\Illuminate\Database\Eloquent\Collection $records) {
+                            $processed = 0;
+                            $records->each(function (Order $record) use (&$processed) {
+                                if ($record->payment_status === 'pending') {
+                                    $record->update([
+                                        'payment_status' => 'paid',
+                                        'status' => 'approved',
+                                        'paid_at' => now(),
+                                    ]);
+                                    
+                                    // Notifikasi ke user
+                                    $notificationService = app(\App\Services\NotificationService::class);
+                                    $notificationService->notifyUserAboutPaymentConfirmation($record);
+                                    
+                                    $processed++;
+                                }
+                            });
+                            
+                            // Tampilkan notifikasi sukses
+                            \Filament\Notifications\Notification::make()
+                                ->title($processed . ' Pembayaran Berhasil Diproses')
+                                ->success()
+                                ->send();
+                        }),
                 ]),
             ]);
     }

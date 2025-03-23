@@ -15,24 +15,24 @@ class PaymentHistoryController extends Controller
      */
     public function show(Order $order)
     {
-        // Check if this is the current user's order
-        if ($order->user_id !== auth()->id()) {
-            abort(403, 'Unauthorized action.');
+        // Check if order belongs to current user
+        if ($order->user_id != auth()->id()) {
+            abort(403, 'You are not authorized to view this order.');
         }
         
-        // Check if the payment is pending and should be rechecked
+        // Check payment status if still pending
+        $canRetry = false;
+        $canReview = false;
+        
         if ($order->payment_status == 'pending' && $order->payment_method == 'midtrans') {
-            try {
-                // First check if there's a Midtrans transaction
-                $midtransTransaction = MidtransTransaction::where('order_id', $order->id)
-                    ->latest()
-                    ->first();
+            $midtransTransaction = $order->midtransTransaction;
+            
+            if ($midtransTransaction && $midtransTransaction->midtrans_order_id) {
+                // Configure Midtrans API
+                Config::$serverKey = config('midtrans.server_key');
+                Config::$isProduction = config('midtrans.is_production');
                 
-                if ($midtransTransaction && $midtransTransaction->midtrans_order_id) {
-                    // Configure Midtrans API
-                    Config::$serverKey = config('midtrans.server_key');
-                    Config::$isProduction = config('midtrans.is_production');
-                    
+                try {
                     // Get status from Midtrans API
                     $status = Transaction::status($midtransTransaction->midtrans_order_id);
                     
@@ -51,39 +51,40 @@ class PaymentHistoryController extends Controller
                             ]);
                         }
                         
-                        // Update transaction record
+                        // Update transaction record with payment type and status
                         $midtransTransaction->update([
                             'transaction_status' => $status->transaction_status,
                             'status_code' => $status->status_code ?? null,
                             'status_message' => $status->status_message ?? null,
+                            'payment_type' => $status->payment_type ?? $midtransTransaction->payment_type,
                         ]);
                         
                         // Refresh the order
                         $order = $order->fresh();
                     }
+                } catch (\Exception $e) {
+                    // Log the error but continue
+                    \Log::error('Error checking Midtrans status: ' . $e->getMessage());
                 }
-            } catch (\Exception $e) {
-                // Just log the error, but continue showing the page
-                \Log::error('Error checking Midtrans status in payment details', [
-                    'order_id' => $order->id,
-                    'error' => $e->getMessage()
-                ]);
             }
         }
         
-        // Determine if the user can retry payment
-        $canRetryPayment = in_array($order->payment_status, ['pending', 'failed']);
+        // Can retry payment if status is pending, failed, or expired and not too old
+        $canRetry = in_array($order->payment_status, ['pending', 'failed', 'expired']) && 
+                   $order->created_at->diffInDays(now()) < 7;
         
-        // Determine if the user can leave a review
-        $canLeaveReview = $order->payment_status == 'paid';
+        // Can review if the order is completed and has products
+        $canReview = $order->payment_status == 'paid' && $order->items->count() > 0;
         
-        $agent = new Agent();
-        $view = $agent->isMobile() ? 'pages.mobile.payments.detail' : 'pages.desktop.payments.detail';
+        // Check if user has already left a review
+        $hasReviewed = $order->reviews()->where('user_id', auth()->id())->exists();
         
-        return view($view, [
-            'order' => $order,
-            'canRetryPayment' => $canRetryPayment,
-            'canLeaveReview' => $canLeaveReview
-        ]);
+        // Get the proper view based on user agent
+        $agent = new \Jenssegers\Agent\Agent();
+        $view = $agent->isMobile() 
+            ? 'pages.mobile.payments.detail' 
+            : 'pages.desktop.payments.detail';
+            
+        return view($view, compact('order', 'canRetry', 'canReview', 'hasReviewed'));
     }
 } 

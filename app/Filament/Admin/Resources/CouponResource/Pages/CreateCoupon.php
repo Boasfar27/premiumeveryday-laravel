@@ -22,4 +22,14 @@ class CreateCoupon extends CreateRecord
             $notificationService->notifyUsersAboutNewCoupon($this->record);
         }
     }
+    
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
+    }
+
+    protected function getCreatedNotificationTitle(): ?string
+    {
+        return 'Kupon berhasil dibuat';
+    }
 }

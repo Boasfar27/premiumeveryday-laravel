@@ -6,7 +6,7 @@
         <div class="bg-white shadow">
             <div class="px-4 py-5">
                 <h1 class="text-xl font-semibold text-gray-900">Riwayat Pembayaran</h1>
-                <p class="mt-1 text-sm text-gray-600">Daftar semua pembayaran Anda</p>
+                <p class="mt-1 text-sm text-gray-600">Daftar pesanan Anda</p>
             </div>
         </div>
 
@@ -24,18 +24,22 @@
             @endif
 
             @if (count($orders) > 0)
+                <div class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 mb-4 rounded" role="alert">
+                    <p class="font-bold">Informasi Pesanan</p>
+                    <p class="text-sm">Setelah melakukan pembayaran, admin akan memproses pesanan Anda dan mengirimkan
+                        produk ke akun Anda. Setelah menerima produk, Anda dapat memberikan ulasan.</p>
+                </div>
                 <div class="space-y-4">
                     @foreach ($orders as $order)
                         <div class="bg-white rounded-lg shadow overflow-hidden">
                             <div class="p-4 border-b border-gray-200 flex justify-between items-center">
                                 <div>
-                                    <p class="text-xs text-gray-500">No. Pembayaran</p>
+                                    <p class="text-xs text-gray-500">No. Pesanan</p>
                                     <p class="text-sm font-medium">{{ $order->order_number }}</p>
                                 </div>
-                                <span
-                                    class="px-2 py-1 text-xs font-semibold rounded-full bg-{{ $order->status_color }}-100 text-{{ $order->status_color }}-800">
-                                    {{ $order->getFormattedStatusAttribute() }}
-                                </span>
+                                <div>
+                                    {!! $order->getFormattedStatusAttribute() !!}
+                                </div>
                             </div>
                             <div class="p-4">
                                 <div class="grid grid-cols-2 gap-2 mb-3">
@@ -49,10 +53,12 @@
                                         <p class="text-sm font-medium">{{ $order->getFormattedTotalAttribute() }}</p>
                                     </div>
                                 </div>
-                                <a href="{{ route('user.payments.detail', $order->id) }}"
-                                    class="mt-2 w-full inline-flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500">
-                                    Lihat Detail
-                                </a>
+                                <div class="mt-3">
+                                    <a href="{{ route('user.payments.detail', $order) }}"
+                                        class="w-full inline-flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500">
+                                        Lihat Detail
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     @endforeach
@@ -69,9 +75,9 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
-                        <h3 class="mt-2 text-sm font-medium text-gray-900">Tidak ada riwayat pembayaran</h3>
+                        <h3 class="mt-2 text-sm font-medium text-gray-900">Belum Ada Pesanan</h3>
                         <p class="mt-1 text-sm text-gray-500">
-                            Anda belum memiliki catatan pembayaran.</p>
+                            Anda belum memiliki pesanan apapun.</p>
                         <div class="mt-6">
                             <a href="{{ route('home') }}"
                                 class="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500">

@@ -17,13 +17,18 @@
         @endif
 
         @if (count($orders) > 0)
+            <div class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 mb-4" role="alert">
+                <p class="font-bold">Informasi Pembayaran</p>
+                <p>Setelah melakukan pembayaran, admin akan memproses pesanan Anda dan mengirimkan produk ke akun Anda.
+                    Setelah menerima produk, Anda dapat memberikan ulasan pada produk yang Anda beli.</p>
+            </div>
             <div class="bg-white shadow overflow-hidden sm:rounded-lg">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
                             <th scope="col"
                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                No. Pembayaran
+                                No. Pesanan
                             </th>
                             <th scope="col"
                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -38,7 +43,7 @@
                                 Status
                             </th>
                             <th scope="col"
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Aksi
                             </th>
                         </tr>
@@ -56,10 +61,7 @@
                                     {{ $order->getFormattedTotalAttribute() }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <span
-                                        class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-{{ $order->status_color }}-100 text-{{ $order->status_color }}-800">
-                                        {{ $order->getFormattedStatusAttribute() }}
-                                    </span>
+                                    {!! $order->getFormattedStatusAttribute() !!}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                     <a href="{{ route('user.payments.detail', $order->id) }}"
@@ -85,9 +87,9 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
-                        <h3 class="mt-2 text-sm font-medium text-gray-900">Tidak ada riwayat pembayaran</h3>
+                        <h3 class="mt-2 text-sm font-medium text-gray-900">Belum Ada Pesanan</h3>
                         <p class="mt-1 text-sm text-gray-500">
-                            Anda belum memiliki catatan pembayaran.</p>
+                            Anda belum memiliki pesanan apapun.</p>
                         <div class="mt-6">
                             <a href="{{ route('home') }}"
                                 class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500">

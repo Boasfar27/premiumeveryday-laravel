@@ -65,7 +65,7 @@ class OrderReviewController extends Controller
         $review->is_active = true;
         $review->save();
 
-        return redirect()->route('user.payments.detail', $order->id)->with('success', 'Review berhasil dikirim!');
+        return redirect()->route('user.payments.detail', $order->id)->with('success', 'Ulasan berhasil dikirim!');
     }
 
     /**
@@ -105,7 +105,7 @@ class OrderReviewController extends Controller
         $review->content = $request->content;
         $review->save();
 
-        return redirect()->route('user.payments.detail', $order->id)->with('success', 'Review berhasil diperbarui!');
+        return redirect()->route('user.payments.detail', $order->id)->with('success', 'Ulasan berhasil diperbarui!');
     }
 
     /**

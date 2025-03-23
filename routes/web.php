@@ -348,4 +348,46 @@ Route::prefix('licenses')->middleware(['auth'])->group(function () {
     // Add PDF export route
     Route::post('/export', [LicenseController::class, 'exportPdf'])->name('licenses.export');
 });
+
+// Midtrans Payment Routes
+Route::prefix('payment/midtrans')->group(function () {
+    Route::get('page/{order}', [MidtransController::class, 'paymentPage'])->name('payment.midtrans.page');
+    Route::get('finish', [MidtransController::class, 'finish'])->name('payment.midtrans.finish');
+    Route::get('unfinish', function () {
+        return redirect()->route('user.payments.history')->with('info', 'Payment is pending. Please complete your payment.');
+    })->name('payment.midtrans.unfinish');
+    Route::get('error', function () {
+        return redirect()->route('user.payments.history')->with('error', 'Payment failed. Please try again or contact support.');
+    })->name('payment.midtrans.error');
+    Route::post('notification', [MidtransController::class, 'handleNotification'])->name('payment.midtrans.notification');
+    
+    // Tambahkan route untuk force update status
+    Route::get('force-update/{order}', function (App\Models\Order $order) {
+        // Log aktivitas ini
+        \Illuminate\Support\Facades\Log::info('Force update status for order', [
+            'order_id' => $order->id,
+            'order_number' => $order->order_number,
+            'current_status' => $order->payment_status
+        ]);
+        
+        // Update order status
+        $order->update([
+            'payment_status' => 'paid',
+            'status' => 'approved',
+            'paid_at' => now()
+        ]);
+        
+        // Update MidtransTransaction jika ada
+        $midtransTransaction = App\Models\MidtransTransaction::where('order_id', $order->id)->first();
+        if ($midtransTransaction) {
+            $midtransTransaction->update([
+                'transaction_status' => 'settlement',
+                'status_message' => 'Transaction has been manually updated'
+            ]);
+        }
+        
+        return redirect()->route('user.payments.detail', $order)
+            ->with('success', 'Status pembayaran berhasil diperbarui menjadi PAID');
+    })->name('payment.midtrans.force-update')->middleware(['auth']);
+});
     

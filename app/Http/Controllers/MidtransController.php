@@ -262,7 +262,22 @@ class MidtransController extends Controller
                 ]);
             }
             
+            // Pastikan order ditemukan
+            if (!$order) {
+                Log::error('Order not found for notification', [
+                    'order_id' => $orderNumber
+                ]);
+                return response()->json(['status' => 'error', 'message' => 'Order not found'], 404);
+            }
+            
             // Handle transaction status
+            Log::info('Memproses status transaksi Midtrans', [
+                'order_id' => $order->id,
+                'order_number' => $order->order_number,
+                'transaction_status' => $status,
+                'fraud_status' => $fraudStatus
+            ]);
+            
             if ($status == 'capture') {
                 if ($fraudStatus == 'challenge') {
                     // Transaction is challenged due to fraud detection
@@ -270,12 +285,21 @@ class MidtransController extends Controller
                         'payment_status' => 'pending',
                         'status' => 'pending'
                     ]);
+                    Log::info('Order ditandai sebagai pending (challenge fraud)', [
+                        'order_id' => $order->id,
+                        'order_number' => $order->order_number
+                    ]);
                 } else if ($fraudStatus == 'accept') {
                     // Transaction is accepted
                     $order->update([
                         'payment_status' => 'paid',
                         'status' => 'approved',
                         'paid_at' => now()
+                    ]);
+                    
+                    Log::info('Order ditandai sebagai paid (capture)', [
+                        'order_id' => $order->id,
+                        'order_number' => $order->order_number
                     ]);
                     
                     // Send notifications
@@ -291,34 +315,79 @@ class MidtransController extends Controller
                     'paid_at' => now()
                 ]);
                 
+                Log::info('Order ditandai sebagai paid (settlement)', [
+                    'order_id' => $order->id,
+                    'order_number' => $order->order_number
+                ]);
+                
                 // Send notifications
                 $notificationService = app(NotificationService::class);
                 $notificationService->notifyUserAboutPaymentConfirmation($order);
                 $notificationService->notifyAdminAboutPaymentConfirmation($order);
-                
-                // Log the update
-                Log::info('Order marked as paid after settlement', [
-                    'order_id' => $order->id,
-                    'order_number' => $order->order_number
-                ]);
             } else if ($status == 'pending') {
                 // Payment pending
                 $order->update([
                     'payment_status' => 'pending',
                     'status' => 'pending'
                 ]);
-            } else if (in_array($status, ['deny', 'expire', 'cancel'])) {
-                // Payment failed
+                
+                Log::info('Order ditandai sebagai pending', [
+                    'order_id' => $order->id,
+                    'order_number' => $order->order_number
+                ]);
+            } else if ($status == 'deny') {
+                // Payment denied
                 $order->update([
                     'payment_status' => 'failed',
                     'status' => 'failed'
                 ]);
+                
+                Log::info('Order ditandai sebagai failed (deny)', [
+                    'order_id' => $order->id,
+                    'order_number' => $order->order_number
+                ]);
+            } else if ($status == 'expire') {
+                // Payment expired
+                $order->update([
+                    'payment_status' => 'expired',
+                    'status' => 'failed'
+                ]);
+                
+                Log::info('Order ditandai sebagai expired', [
+                    'order_id' => $order->id,
+                    'order_number' => $order->order_number
+                ]);
+            } else if ($status == 'cancel') {
+                // Payment canceled
+                $order->update([
+                    'payment_status' => 'failed',
+                    'status' => 'cancelled'
+                ]);
+                
+                Log::info('Order ditandai sebagai cancelled', [
+                    'order_id' => $order->id,
+                    'order_number' => $order->order_number
+                ]);
             }
             
             // Update Midtrans transaction
-            MidtransTransaction::updateOrCreate(
-                ['order_id' => $order->id],
-                [
+            if ($transaction) {
+                $transaction->update([
+                    'transaction_id' => $transactionId,
+                    'payment_type' => $notification->payment_type,
+                    'transaction_time' => $notification->transaction_time,
+                    'transaction_status' => $status,
+                    'va_numbers' => json_encode($notification->va_numbers ?? []),
+                    'fraud_status' => $fraudStatus,
+                    'status_code' => $notification->status_code,
+                    'status_message' => $notification->status_message,
+                    'payment_code' => $notification->payment_code ?? null,
+                    'pdf_url' => $notification->pdf_url ?? null,
+                ]);
+            } else {
+                // Buat transaksi baru jika tidak ditemukan
+                MidtransTransaction::create([
+                    'order_id' => $order->id,
                     'transaction_id' => $transactionId,
                     'midtrans_order_id' => $orderNumber,
                     'payment_type' => $notification->payment_type,
@@ -330,8 +399,9 @@ class MidtransController extends Controller
                     'status_message' => $notification->status_message,
                     'payment_code' => $notification->payment_code ?? null,
                     'pdf_url' => $notification->pdf_url ?? null,
-                ]
-            );
+                    'gross_amount' => $notification->gross_amount ?? $order->total,
+                ]);
+            }
             
             // Refresh the order from database to get the latest status
             $order = $order->fresh();
@@ -346,7 +416,10 @@ class MidtransController extends Controller
             
             return response()->json(['status' => 'success']);
         } catch (\Exception $e) {
-            Log::error('Error processing Midtrans notification: ' . $e->getMessage());
+            Log::error('Error processing Midtrans notification: ' . $e->getMessage(), [
+                'exception' => $e,
+                'trace' => $e->getTraceAsString()
+            ]);
             
             return response()->json([
                 'status' => 'error',

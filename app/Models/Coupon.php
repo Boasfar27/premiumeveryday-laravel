@@ -69,15 +69,34 @@ class Coupon extends Model
     }
 
     /**
+     * Get the discount value to use (value or discount).
+     * Prioritizes 'value' field but falls back to 'discount' if value is null
+     */
+    public function getDiscountValue()
+    {
+        return $this->value ?? $this->discount ?? 0;
+    }
+
+    /**
      * Calculate the discount amount for a given subtotal.
      */
     public function calculateDiscount($subtotal): float
     {
+        // Get discount value from either column
+        $discountValue = $this->getDiscountValue();
+        
+        // For percentage discount
         if ($this->type === 'percentage') {
-            return ($subtotal * $this->discount) / 100;
+            $calculated = ($subtotal * $discountValue) / 100;
+            // Apply max_discount if set
+            if (isset($this->max_discount) && $this->max_discount > 0) {
+                $calculated = min($calculated, $this->max_discount);
+            }
+            return $calculated;
         }
 
-        return min($this->discount, $subtotal);
+        // For fixed amount, use the min between discount value and subtotal
+        return min($discountValue, $subtotal);
     }
 
     /**
