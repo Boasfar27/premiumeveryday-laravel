@@ -52,7 +52,9 @@
 
                     <div class="sm:col-span-1">
                         <dt class="text-sm font-medium text-gray-500">Total Pembayaran</dt>
-                        <dd class="mt-1 text-sm text-gray-900 font-semibold">{{ $order->getFormattedTotalAttribute() }}</dd>
+                        <dd class="mt-1 text-sm text-gray-900 font-semibold">{{ $order->getFormattedTotalAttribute() }}
+                            <span class="text-xs text-gray-500 font-normal">(sudah termasuk pajak)</span>
+                        </dd>
                     </div>
 
                     <div class="sm:col-span-1">
@@ -149,15 +151,43 @@
                                     <p class="text-sm font-medium text-gray-900 truncate">
                                         {{ $item->orderable->name }}
                                     </p>
-                                    <p class="text-sm text-gray-500">
-                                        {{ $item->subscription_type ?? 'Standard' }}
+                                    <div class="mt-1">
+                                        <span
+                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                                        {{ strtolower($item->subscription_type ?? 'sharing') == 'private' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800' }}">
+                                            {{ strtolower($item->subscription_type ?? 'sharing') == 'private' ? 'Private' : 'Sharing' }}
+                                        </span>
                                         @if ($item->duration)
-                                            ({{ $item->duration }} bulan)
+                                            <span
+                                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 ml-2">
+                                                {{ $item->duration }} bulan
+                                            </span>
                                         @endif
-                                    </p>
+                                    </div>
+                                    <div class="mt-2 text-xs text-gray-500">
+                                        <div class="grid grid-cols-3 gap-2">
+                                            <div>
+                                                <strong>ID Produk:</strong>
+                                                <span>{{ $item->product_id ?? 'P-' . str_pad($item->id, 5, '0', STR_PAD_LEFT) }}</span>
+                                            </div>
+                                            <div>
+                                                <strong>Harga Satuan:</strong>
+                                                <span>{{ $item->formatted_price }}</span>
+                                            </div>
+                                            <div>
+                                                <strong>Jumlah:</strong>
+                                                <span>{{ $item->quantity }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="inline-flex items-center text-sm font-medium text-gray-700">
-                                    {{ 'Rp ' . number_format($item->price * $item->quantity, 0, ',', '.') }}
+                                <div class="inline-flex flex-col items-end justify-between h-full">
+                                    <div class="flex flex-col items-end">
+                                        <span class="text-sm font-medium text-gray-500">Subtotal</span>
+                                        <span class="text-lg font-bold text-indigo-600">
+                                            {{ $item->formatted_total }}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                         </li>
@@ -226,8 +256,9 @@
                                     <div class="mt-4 flex">
                                         <a href="{{ route('user.payments.review.edit', ['order' => $order->id, 'review' => $review->id]) }}"
                                             class="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500">
-                                            <svg class="mr-1.5 h-4 w-4 text-gray-500" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <svg class="mr-1.5 h-4 w-4 text-gray-500" fill="none"
+                                                stroke="currentColor" viewBox="0 0 24 24"
+                                                xmlns="http://www.w3.org/2000/svg">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
                                                 </path>

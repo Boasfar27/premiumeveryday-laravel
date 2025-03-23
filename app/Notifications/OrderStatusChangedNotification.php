@@ -28,7 +28,13 @@ class OrderStatusChangedNotification extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return ['mail', 'database'];
+        // Hanya kirim email jika status baru adalah 'delivered'
+        // Notifikasi database tetap dikirim untuk semua perubahan status
+        if ($this->newStatus === 'delivered') {
+            return ['mail', 'database'];
+        }
+        
+        return ['database']; // Hanya kirim ke database untuk status lainnya
     }
 
     /**
@@ -36,72 +42,21 @@ class OrderStatusChangedNotification extends Notification implements ShouldQueue
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $statusColor = $this->getStatusColor($this->newStatus);
-        $statusLabel = $this->getStatusLabel($this->newStatus);
+        $orderUrl = $this->getOrderUrl();
         $oldStatusLabel = $this->getStatusLabel($this->oldStatus);
+        $newStatusLabel = $this->getStatusLabel($this->newStatus);
         
-        $message = (new MailMessage)
+        // Gunakan view untuk email
+        return (new MailMessage)
             ->subject('Status Pesanan Anda Berubah: #' . $this->order->order_number)
-            ->greeting('Hai ' . $notifiable->name . '!')
-            ->line('Status pesanan Anda dengan nomor #' . $this->order->order_number . ' telah berubah.')
-            ->line("Status sebelumnya: <span style='color: #777777;'>{$oldStatusLabel}</span>")
-            ->line("Status baru: <span style='color: {$statusColor};'><strong>{$statusLabel}</strong></span>");
-        
-        // Tambahkan informasi produk yang dibeli
-        if ($this->order->items->count() > 0) {
-            $message->line('<hr style="border:0;border-top:1px solid #eaeaea;margin:16px 0;">');
-            $message->line('<strong style="font-size: 16px;">Detail Pesanan:</strong>');
-            
-            foreach ($this->order->items as $item) {
-                $message->line(
-                    "<div style='margin:10px 0;padding:10px;background:#f8f8f8;border-radius:5px;'>" .
-                    "<strong>{$item->name}</strong><br>" .
-                    "Jumlah: {$item->quantity} × Rp " . number_format($item->price, 0, ',', '.') . "<br>" .
-                    "Total: Rp " . number_format($item->quantity * $item->price, 0, ',', '.') .
-                    "</div>"
-                );
-            }
-            
-            $message->line('<hr style="border:0;border-top:1px solid #eaeaea;margin:16px 0;">');
-            $message->line("<strong>Subtotal:</strong> Rp " . number_format($this->order->subtotal, 0, ',', '.'));
-            
-            if ($this->order->discount_amount > 0) {
-                $message->line("<strong>Diskon:</strong> - Rp " . number_format($this->order->discount_amount, 0, ',', '.'));
-            }
-            
-            $message->line("<strong>Pajak (PPN):</strong> Rp " . number_format($this->order->tax, 0, ',', '.'));
-            $message->line("<strong style='font-size:16px;color:#000;'>Total:</strong> <strong style='font-size:16px;color:#000;'>Rp " . number_format($this->order->total, 0, ',', '.') . "</strong>");
-        }
-
-        // Tambahkan informasi tambahan berdasarkan status baru
-        if ($this->newStatus === 'approved') {
-            $message->line('<hr style="border:0;border-top:1px solid #eaeaea;margin:16px 0;">');
-            $message->line('<div style="background:#e8f5e9;padding:10px;border-radius:5px;border-left:4px solid #4caf50;">
-                <strong>Pesanan Anda telah disetujui dan sedang diproses.</strong><br>
-                Anda akan menerima email lain ketika pesanan Anda selesai diproses.
-            </div>');
-        } elseif ($this->newStatus === 'delivered') {
-            $message->line('<hr style="border:0;border-top:1px solid #eaeaea;margin:16px 0;">');
-            $message->line('<div style="background:#e3f2fd;padding:10px;border-radius:5px;border-left:4px solid #2196f3;">
-                <strong>Pesanan Anda telah berhasil dikirim!</strong><br>
-                Silakan periksa email Anda untuk informasi akun dan instruksi penggunaan.
-            </div>');
-        } elseif ($this->newStatus === 'canceled') {
-            $message->line('<hr style="border:0;border-top:1px solid #eaeaea;margin:16px 0;">');
-            $message->line('<div style="background:#ffebee;padding:10px;border-radius:5px;border-left:4px solid #f44336;">
-                <strong>Pesanan Anda telah dibatalkan.</strong><br>
-                Silakan hubungi kami jika Anda memiliki pertanyaan.
-            </div>');
-        }
-
-        $message->action('Lihat Pesanan', $this->getOrderUrl());
-        $message->line('Terima kasih telah berbelanja di Premium Everyday!');
-        
-        // Tambahkan footer bantuan
-        $message->line('<hr style="border:0;border-top:1px solid #eaeaea;margin:16px 0;">');
-        $message->line('<p style="font-size:12px;color:#718096;">Butuh bantuan? Hubungi tim support kami melalui <a href="mailto:support@premium-everyday.com">support@premium-everyday.com</a> atau WhatsApp di +628123456789</p>');
-        
-        return $message;
+            ->view('emails.order-status-changed', [
+                'order' => $this->order,
+                'oldStatus' => $this->oldStatus,
+                'newStatus' => $this->newStatus,
+                'oldStatusLabel' => $oldStatusLabel,
+                'newStatusLabel' => $newStatusLabel,
+                'orderUrl' => $orderUrl
+            ]);
     }
 
     /**

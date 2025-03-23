@@ -54,6 +54,7 @@
                         <div>
                             <dt class="text-sm font-medium text-gray-500">Total Pembayaran</dt>
                             <dd class="mt-1 text-sm text-gray-900 font-semibold">{{ $order->getFormattedTotalAttribute() }}
+                                <span class="block text-xs text-gray-500 font-normal">(sudah termasuk pajak)</span>
                             </dd>
                         </div>
                     </div>
@@ -157,15 +158,34 @@
                                     <p class="text-sm font-medium text-gray-900 truncate">
                                         {{ $item->orderable->name }}
                                     </p>
-                                    <p class="text-xs text-gray-500">
-                                        {{ $item->subscription_type ?? 'Standard' }}
+                                    <div class="flex flex-wrap gap-1 mt-1">
+                                        <span
+                                            class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium 
+                                        {{ strtolower($item->subscription_type ?? 'sharing') == 'private' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800' }}">
+                                            {{ strtolower($item->subscription_type ?? 'sharing') == 'private' ? 'Private' : 'Sharing' }}
+                                        </span>
                                         @if ($item->duration)
-                                            ({{ $item->duration }} bulan)
+                                            <span
+                                                class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                                {{ $item->duration }} bulan
+                                            </span>
                                         @endif
-                                    </p>
-                                    <p class="text-sm font-medium text-gray-700 mt-1">
-                                        {{ 'Rp ' . number_format($item->price * $item->quantity, 0, ',', '.') }}
-                                    </p>
+                                    </div>
+                                    <div class="mt-2 grid grid-cols-1 gap-1">
+                                        <div class="flex justify-between text-xs text-gray-500">
+                                            <span>ID:
+                                                {{ $item->product_id ?? 'P-' . str_pad($item->id, 5, '0', STR_PAD_LEFT) }}</span>
+                                            <span>x{{ $item->quantity }}</span>
+                                        </div>
+                                        <div class="flex justify-between items-center">
+                                            <div class="text-xs font-medium text-gray-600">
+                                                {{ $item->formatted_price }}
+                                            </div>
+                                            <div class="text-sm font-bold text-primary">
+                                                {{ $item->formatted_total }}
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </li>

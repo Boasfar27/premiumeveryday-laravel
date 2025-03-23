@@ -234,35 +234,119 @@ class OrderResource extends Resource
                             ->send();
                     }),
                     
-                Tables\Actions\Action::make('sendProduct')
+                Tables\Actions\Action::make('sendOrder')
+                    ->icon('heroicon-o-truck')
                     ->label('Kirim Produk')
-                    ->icon('heroicon-o-paper-airplane')
                     ->color('primary')
-                    ->requiresConfirmation()
-                    ->modalHeading('Konfirmasi Pengiriman Produk')
-                    ->modalDescription('Apakah Anda yakin ingin menandai pesanan ini sebagai TERKIRIM?')
-                    ->modalSubmitActionLabel('Ya, Kirim Produk')
+                    ->form([
+                        Forms\Components\Section::make('Informasi Produk dan Akun')
+                            ->description('Masukkan informasi akun untuk setiap produk yang dibeli oleh pelanggan')
+                            ->schema([
+                                Forms\Components\Repeater::make('product_credentials')
+                                    ->label('Kredensial Akun Per Produk')
+                                    ->schema([
+                                        Forms\Components\Select::make('order_item_id')
+                                            ->label('Produk')
+                                            ->options(function (callable $get, ?Order $record) {
+                                                if (!$record) return [];
+                                                return $record->items->pluck('name', 'id')->toArray();
+                                            })
+                                            ->required(),
+                                        Forms\Components\Grid::make(2)
+                                            ->schema([
+                                                Forms\Components\TextInput::make('username')
+                                                    ->label('Username/Email')
+                                                    ->required()
+                                                    ->placeholder('Masukkan username/email akun'),
+                                                Forms\Components\TextInput::make('password')
+                                                    ->label('Password')
+                                                    ->required()
+                                                    ->placeholder('Masukkan password akun'),
+                                            ]),
+                                        Forms\Components\Grid::make(3)
+                                            ->schema([
+                                                Forms\Components\Select::make('subscription_type')
+                                                    ->label('Tipe Langganan')
+                                                    ->options([
+                                                        'private' => 'Private',
+                                                        'sharing' => 'Sharing',
+                                                    ])
+                                                    ->default('private')
+                                                    ->required(),
+                                                Forms\Components\TextInput::make('duration')
+                                                    ->label('Durasi (bulan)')
+                                                    ->numeric()
+                                                    ->default(1)
+                                                    ->required(),
+                                                Forms\Components\DatePicker::make('expired_at')
+                                                    ->label('Tanggal Kadaluarsa')
+                                                    ->default(now()->addMonth())
+                                                    ->required(),
+                                            ]),
+                                        Forms\Components\Textarea::make('instructions')
+                                            ->label('Instruksi Penggunaan')
+                                            ->placeholder('Masukkan petunjuk penggunaan akun (opsional)')
+                                            ->rows(2),
+                                    ])
+                                    ->itemLabel(fn (array $state): ?string => 
+                                        $state['username'] ?? 'Kredensial Baru')
+                                    ->defaultItems(fn (?Order $record) => $record ? $record->items->count() : 1)
+                                    ->required()
+                                    ->minItems(1),
+                            ]),
+                    ])
+                    ->modalHeading('Kirim Produk dan Informasi Akun')
+                    ->modalDescription('Masukkan informasi akun premium untuk setiap produk. Pastikan data yang dimasukkan sudah benar.')
+                    ->modalSubmitActionLabel('Kirim Produk dan Akun')
                     ->visible(fn (Order $record) => $record->payment_status === 'paid' && $record->status === 'approved')
-                    ->action(function (Order $record) {
+                    ->action(function (Order $record, array $data) {
                         // Perbarui status pesanan
                         $record->update([
-                            'status' => 'completed',
+                            'status' => 'approved', // Tetap menggunakan nilai yang valid dalam database
+                            'admin_notes' => ($record->admin_notes ? $record->admin_notes . "\n\n" : '') . 
+                                            'Produk telah dikirim pada: ' . now()->format('d M Y H:i') . 
+                                            ' oleh: ' . auth()->user()->name
                         ]);
                         
                         // Log aktivitas
-                        \Illuminate\Support\Facades\Log::info('Admin sent product', [
+                        \Illuminate\Support\Facades\Log::info('Admin sent products and credentials', [
                             'order_id' => $record->id,
                             'order_number' => $record->order_number,
                             'user_id' => auth()->id(),
+                            'products_count' => count($data['product_credentials']),
                         ]);
                         
-                        // Notifikasi ke user
+                        // Siapkan array untuk menyimpan semua credentials
+                        $allCredentials = [];
+                        
+                        // Loop setiap credential yang diinput
+                        foreach ($data['product_credentials'] as $credential) {
+                            $orderItem = \App\Models\OrderItem::find($credential['order_item_id']);
+                            
+                            if ($orderItem) {
+                                // Tambahkan informasi produk ke dalam credential
+                                $credential['product_name'] = $orderItem->name;
+                                $credential['product_id'] = $orderItem->product_id ?? 'P-' . str_pad($orderItem->id, 5, '0', STR_PAD_LEFT);
+                                
+                                // Tambahkan ke array credentials
+                                $allCredentials[] = $credential;
+                                
+                                // Update admin notes dengan info credential untuk setiap produk
+                                $record->update([
+                                    'admin_notes' => $record->admin_notes . "\n" .
+                                        'Info akun untuk produk "' . $orderItem->name . '": ' . 
+                                        $credential['username'] . ' / [PASSWORD]'
+                                ]);
+                            }
+                        }
+                        
+                        // Kirim notifikasi credentials ke user dengan semua credentials
                         $notificationService = app(\App\Services\NotificationService::class);
-                        $notificationService->notifyUserAboutProductDelivery($record);
+                        $notificationService->sendAccountCredentials($record, $allCredentials);
                         
                         // Tampilkan notifikasi sukses
                         \Filament\Notifications\Notification::make()
-                            ->title('Produk Berhasil Dikirim')
+                            ->title('Produk dan Informasi Akun Berhasil Dikirim')
                             ->success()
                             ->send();
                     }),

@@ -37,20 +37,12 @@ class ProductDeliveredNotification extends Notification implements ShouldQueue
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $items = $this->order->items->map(function ($item) {
-            return $item->orderable->name . ' (' . ($item->subscription_type ?? 'Standard') . ')';
-        })->implode(', ');
-
+        // Gunakan view untuk email
         return (new MailMessage)
             ->subject('Produk Anda Telah Dikirim - Order #' . $this->order->order_number)
-            ->greeting('Halo ' . $notifiable->name . '!')
-            ->line('Kami dengan senang hati memberitahukan bahwa pesanan Anda dengan nomor #' . $this->order->order_number . ' telah diproses dan produk telah dikirim.')
-            ->line('Produk yang Anda pesan:')
-            ->line($items)
-            ->line('Silakan periksa email Anda untuk informasi lebih lanjut tentang cara mengakses produk digital Anda.')
-            ->line('Jika Anda memerlukan bantuan atau memiliki pertanyaan, jangan ragu untuk menghubungi kami.')
-            ->action('Lihat Detail Pesanan', route('user.payments.detail', $this->order))
-            ->line('Terima kasih atas kepercayaan Anda kepada Premium Everyday!');
+            ->view('emails.product-delivered', [
+                'order' => $this->order
+            ]);
     }
 
     /**

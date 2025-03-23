@@ -261,11 +261,14 @@ class NotificationService
         
         // Update status pesanan menjadi completed
         $oldStatus = $order->status;
-        $order->status = 'completed';
+        // Gunakan 'approved' karena 'completed' tidak sesuai dengan enum di database
+        // Tambahkan informasi di admin_notes bahwa pesanan telah selesai
+        $order->admin_notes = ($order->admin_notes ? $order->admin_notes . "\n\n" : '') . 
+                               'Pesanan telah diselesaikan pada: ' . now()->format('d M Y H:i');
         $order->save();
         
-        // Kirim notifikasi perubahan status
-        $this->notifyOrderStatusChange($order, $oldStatus, 'completed');
+        // Kirim notifikasi perubahan status dengan informasi bahwa pesanan telah selesai
+        $this->notifyOrderStatusChange($order, $oldStatus, $order->status);
         
         // Log aktivitas
         \Illuminate\Support\Facades\Log::info('Product delivered notification sent', [

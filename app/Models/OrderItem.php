@@ -23,6 +23,10 @@ class OrderItem extends Model
         'tax',
         'total',
         'options',
+        'price',
+        'subscription_type',
+        'duration',
+        'account_type',
     ];
 
     protected $casts = [
@@ -33,7 +37,11 @@ class OrderItem extends Model
         'tax' => 'decimal:2',
         'total' => 'decimal:2',
         'options' => 'array',
+        'price' => 'decimal:2',
+        'duration' => 'integer',
     ];
+    
+    protected $appends = ['formatted_price', 'formatted_total'];
 
     /**
      * Get the order that owns the item.
@@ -50,13 +58,72 @@ class OrderItem extends Model
     {
         return $this->morphTo();
     }
+    
+    /**
+     * Get the formatted price attribute.
+     */
+    public function getFormattedPriceAttribute()
+    {
+        $price = $this->price ?? $this->unit_price ?? 0;
+        return 'Rp ' . number_format($price, 0, ',', '.');
+    }
+    
+    /**
+     * Get the formatted total attribute.
+     */
+    public function getFormattedTotalAttribute()
+    {
+        // Jika total sudah disimpan di database, gunakan nilai tersebut
+        if ($this->total > 0) {
+            return 'Rp ' . number_format($this->total, 0, ',', '.');
+        }
+        
+        // Jika tidak, hitung total termasuk pajak
+        $price = $this->price ?? $this->unit_price ?? 0;
+        $quantity = $this->quantity ?? 1;
+        
+        // Total = price * quantity (pajak sudah termasuk dalam total order, bukan per item)
+        $totalItem = $price * $quantity;
+        
+        return 'Rp ' . number_format($totalItem, 0, ',', '.');
+    }
+    
+    /**
+     * Get a new accessor to show subtotal without tax
+     */
+    public function getFormattedSubtotalAttribute()
+    {
+        $price = $this->price ?? $this->unit_price ?? 0;
+        $quantity = $this->quantity ?? 1;
+        return 'Rp ' . number_format($price * $quantity, 0, ',', '.');
+    }
+    
+    /**
+     * Get the price attribute with fallback.
+     */
+    public function getPriceAttribute($value)
+    {
+        return $value > 0 ? $value : ($this->unit_price ?? 0);
+    }
+    
+    /**
+     * Get the subscription_type attribute with fallback.
+     */
+    public function getSubscriptionTypeAttribute($value)
+    {
+        if (empty($value) || !in_array(strtolower($value), ['private', 'sharing'])) {
+            return 'sharing';
+        }
+        return strtolower($value);
+    }
 
     /**
      * Calculate the subtotal.
      */
     public function calculateSubtotal()
     {
-        $this->subtotal = $this->unit_price * $this->quantity;
+        $price = $this->price ?? $this->unit_price ?? 0;
+        $this->subtotal = $price * $this->quantity;
         return $this;
     }
 
