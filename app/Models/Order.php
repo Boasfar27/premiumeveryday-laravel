@@ -102,7 +102,12 @@ class Order extends Model
      */
     public function getFormattedStatusAttribute()
     {
-        // Status yang ditampilkan berdasarkan prioritas
+        // Check order status first for rejected orders
+        if ($this->status == 'rejected') {
+            return '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Ditolak</span>';
+        }
+        
+        // For other cases, check payment status first
         if ($this->payment_status == 'paid') {
             return '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Pembayaran Selesai</span>';
         } else if ($this->payment_status == 'pending') {
@@ -116,11 +121,6 @@ class Order extends Model
             return match($this->status) {
                 'approved' => '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Disetujui</span>',
                 'pending' => '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Menunggu</span>',
-                'processing' => '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Diproses</span>',
-                'shipped' => '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-indigo-100 text-indigo-800">Dikirim</span>',
-                'delivered' => '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Terkirim</span>',
-                'cancelled' => '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Dibatalkan</span>',
-                'failed' => '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Gagal</span>',
                 default => '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">'.ucfirst($this->status).'</span>',
             };
         }
@@ -149,12 +149,8 @@ class Order extends Model
         // Jika pembayaran berhasil (paid), warna berdasarkan status order
         return match($this->status) {
             'pending' => 'blue',
-            'processing' => 'indigo',
-            'active' => 'green',
-            'completed' => 'primary',
-            'cancelled' => 'red',
             'approved' => 'green',
-            'failed' => 'red',
+            'rejected' => 'red',
             default => 'secondary',
         };
     }
@@ -180,11 +176,11 @@ class Order extends Model
     }
 
     /**
-     * Scope a query to only include active orders.
+     * Scope a query to only include approved orders.
      */
-    public function scopeActive($query)
+    public function scopeApproved($query)
     {
-        return $query->whereIn('status', ['active', 'processing']);
+        return $query->where('status', 'approved');
     }
 
     /**
@@ -196,18 +192,10 @@ class Order extends Model
     }
 
     /**
-     * Scope a query to only include completed orders.
+     * Scope a query to only include rejected orders.
      */
-    public function scopeCompleted($query)
+    public function scopeRejected($query)
     {
-        return $query->where('status', 'completed');
-    }
-
-    /**
-     * Scope a query to only include cancelled orders.
-     */
-    public function scopeCancelled($query)
-    {
-        return $query->where('status', 'cancelled');
+        return $query->where('status', 'rejected');
     }
 }

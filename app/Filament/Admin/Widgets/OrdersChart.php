@@ -69,76 +69,27 @@ class OrdersChart extends ChartWidget
     protected function getOptions(): array
     {
         return [
+            'plugins' => [
+                'legend' => [
+                    'display' => true,
+                    'position' => 'bottom',
+                ],
+            ],
             'scales' => [
                 'y' => [
                     'beginAtZero' => true,
-                    'grid' => [
-                        'display' => true,
-                        'color' => 'rgba(200, 200, 200, 0.15)',
-                    ],
                     'ticks' => [
                         'precision' => 0,
                     ],
                 ],
-                'y1' => [
-                    'beginAtZero' => true,
-                    'position' => 'right',
-                    'grid' => [
-                        'display' => false,
-                    ],
-                    'ticks' => [
-                        'precision' => 1,
-                    ],
-                ],
-                'x' => [
-                    'grid' => [
-                        'display' => false,
-                    ],
-                ],
             ],
-            'plugins' => [
-                'legend' => [
-                    'position' => 'top',
-                    'labels' => [
-                        'usePointStyle' => true,
-                        'padding' => 20,
-                        'font' => [
-                            'size' => 12,
-                        ],
-                    ],
+            'elements' => [
+                'line' => [
+                    'tension' => 0.1, // Slight curve for line charts
                 ],
-                'tooltip' => [
-                    'backgroundColor' => 'rgba(0, 0, 0, 0.7)',
-                    'padding' => 12,
-                    'usePointStyle' => true,
-                    'callbacks' => [
-                        'label' => "function(context) {
-                            let label = context.dataset.label || '';
-                            if (label) {
-                                label += ': ';
-                            }
-                            if (context.parsed.y !== null) {
-                                if (context.dataset.label === 'Pendapatan (dalam ribuan)') {
-                                    label += new Intl.NumberFormat('id-ID', { 
-                                        style: 'currency', 
-                                        currency: 'IDR',
-                                        minimumFractionDigits: 0,
-                                        maximumFractionDigits: 0
-                                    }).format(context.parsed.y * 1000);
-                                } else {
-                                    label += context.parsed.y;
-                                }
-                            }
-                            return label;
-                        }"
-                    ]
+                'point' => [
+                    'radius' => 3,
                 ],
-            ],
-            'responsive' => true,
-            'maintainAspectRatio' => false,
-            'interaction' => [
-                'intersect' => false,
-                'mode' => 'index',
             ],
         ];
     }
@@ -239,6 +190,49 @@ class OrdersChart extends ChartWidget
             'labels' => $labels,
             'orders' => $orders,
             'revenue' => $revenue,
+        ];
+    }
+
+    // New method to render an additional chart showing order status breakdown
+    public function extraCharts(): array
+    {
+        // Get counts of each order status
+        $pendingOrders = Order::where('status', 'pending')->count();
+        $approvedOrders = Order::where('status', 'approved')->count();
+        $rejectedOrders = Order::where('status', 'rejected')->count();
+        
+        return [
+            'orderStatusChart' => [
+                'type' => 'doughnut',
+                'data' => [
+                    'labels' => ['Menunggu', 'Disetujui', 'Ditolak'],
+                    'datasets' => [
+                        [
+                            'label' => 'Status Pesanan',
+                            'data' => [$pendingOrders, $approvedOrders, $rejectedOrders],
+                            'backgroundColor' => [
+                                '#FCD34D', // yellow for pending
+                                '#10B981', // green for approved
+                                '#EF4444', // red for rejected
+                            ],
+                            'borderColor' => '#FFFFFF',
+                            'borderWidth' => 2,
+                        ],
+                    ],
+                ],
+                'options' => [
+                    'responsive' => true,
+                    'plugins' => [
+                        'legend' => [
+                            'position' => 'bottom',
+                        ],
+                        'title' => [
+                            'display' => true,
+                            'text' => 'Distribusi Status Pesanan',
+                        ],
+                    ],
+                ],
+            ],
         ];
     }
 } 

@@ -30,11 +30,8 @@ class EditOrder extends EditRecord
                 ->form([
                     Select::make('status')
                         ->options([
-                            'pending' => 'Pending',
+                            'rejected' => 'Rejected',
                             'approved' => 'Approved',
-                            'processing' => 'Processing',
-                            'delivered' => 'Delivered',
-                            'canceled' => 'Canceled',
                         ])
                         ->required(),
                 ])
@@ -48,7 +45,7 @@ class EditOrder extends EditRecord
                         ->send();
                         
                     // Jika status delivered, tambahkan form untuk informasi akun
-                    if ($data['status'] === 'delivered') {
+                    if ($data['status'] === 'approved') {
                         $this->openDeliveryInformationForm();
                     }
                 }),
@@ -57,7 +54,7 @@ class EditOrder extends EditRecord
                 ->label('Kirim Info Akun')
                 ->icon('heroicon-o-envelope')
                 ->color('warning')
-                ->visible(fn () => $this->record->status === 'approved' || $this->record->status === 'processing' || $this->record->status === 'delivered')
+                ->visible(fn () => $this->record->status === 'approved')
                 ->action(fn () => $this->openDeliveryInformationForm()),
         ];
     }
@@ -117,11 +114,6 @@ class EditOrder extends EditRecord
                     // Use the notification service to send credentials
                     $notificationService = app(\App\Services\NotificationService::class);
                     $notificationService->sendAccountCredentials($this->record, $accountCredentials);
-                    
-                    // Update the order status to 'delivered' if not already
-                    if ($this->record->status !== 'delivered') {
-                        $notificationService->updateOrderStatus($this->record, 'delivered');
-                    }
                     
                     // Show success notification
                     Notification::make()

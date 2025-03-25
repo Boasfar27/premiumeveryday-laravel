@@ -40,6 +40,21 @@ class LatestOrders extends BaseWidget
                         'refunded' => 'gray',
                         default => 'gray',
                     }),
+                Tables\Columns\TextColumn::make('status')
+                    ->label('Status')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'pending' => 'warning',
+                        'approved' => 'success',
+                        'rejected' => 'danger',
+                        default => 'secondary',
+                    })
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'approved' => 'Disetujui',
+                        'pending' => 'Menunggu',
+                        'rejected' => 'Ditolak',
+                        default => ucfirst($state),
+                    }),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Date')
                     ->dateTime()

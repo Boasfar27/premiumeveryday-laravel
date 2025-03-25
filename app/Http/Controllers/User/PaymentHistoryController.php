@@ -82,10 +82,8 @@ class PaymentHistoryController extends Controller
     {
         return match($status) {
             'pending' => 'warning',
-            'processing' => 'info',
-            'active' => 'success',
-            'completed' => 'primary',
-            'cancelled' => 'danger',
+            'approved' => 'success',
+            'rejected' => 'danger',
             default => 'secondary',
         };
     }

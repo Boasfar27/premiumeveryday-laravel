@@ -107,7 +107,11 @@ class StatsOverview extends BaseWidget
                 ->color($revenueChange >= 0 ? 'success' : 'danger'),
                 
             Stat::make('Total Pesanan', Order::count())
-                ->description(Order::where('payment_status', 'paid')->count() . ' pesanan selesai')
+                ->description(
+                    Order::where('payment_status', 'paid')->count() . ' lunas, ' . 
+                    Order::where('status', 'pending')->count() . ' menunggu, ' .
+                    Order::where('status', 'rejected')->count() . ' ditolak'
+                )
                 ->descriptionIcon('heroicon-m-shopping-cart')
                 ->chart(Order::selectRaw('COUNT(*) as count, DATE(created_at) as date')
                     ->where('created_at', '>=', now()->subDays(30))

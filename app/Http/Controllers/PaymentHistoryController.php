@@ -47,7 +47,7 @@ class PaymentHistoryController extends Controller
                         } else if (in_array($status->transaction_status, ['deny', 'cancel', 'expire', 'failure'])) {
                             $order->update([
                                 'payment_status' => 'failed',
-                                'status' => 'failed'
+                                'status' => 'rejected'
                             ]);
                         }
                         

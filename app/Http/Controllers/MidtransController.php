@@ -339,7 +339,7 @@ class MidtransController extends Controller
                 // Payment denied
                 $order->update([
                     'payment_status' => 'failed',
-                    'status' => 'failed'
+                    'status' => 'rejected'
                 ]);
                 
                 Log::info('Order ditandai sebagai failed (deny)', [
@@ -350,7 +350,7 @@ class MidtransController extends Controller
                 // Payment expired
                 $order->update([
                     'payment_status' => 'expired',
-                    'status' => 'failed'
+                    'status' => 'rejected'
                 ]);
                 
                 Log::info('Order ditandai sebagai expired', [
@@ -361,7 +361,7 @@ class MidtransController extends Controller
                 // Payment canceled
                 $order->update([
                     'payment_status' => 'failed',
-                    'status' => 'cancelled'
+                    'status' => 'rejected'
                 ]);
                 
                 Log::info('Order ditandai sebagai cancelled', [
@@ -568,7 +568,7 @@ class MidtransController extends Controller
                         case 'failure':
                             $order->update([
                                 'payment_status' => 'failed',
-                                'status' => 'failed'
+                                'status' => 'rejected'
                             ]);
                             $message = 'Payment has been ' . $status->transaction_status . '. Please try again or contact support.';
                             $alertType = 'error';

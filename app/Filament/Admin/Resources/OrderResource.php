@@ -92,11 +92,8 @@ class OrderResource extends Resource
                             ->label('Status Pesanan')
                             ->options([
                                 'pending' => 'Menunggu',
+                                'rejected' => 'Ditolak',
                                 'approved' => 'Disetujui',
-                                'processing' => 'Diproses',
-                                'completed' => 'Selesai',
-                                'cancelled' => 'Dibatalkan',
-                                'failed' => 'Gagal',
                             ])
                             ->required(),
                         Forms\Components\DateTimePicker::make('paid_at')
@@ -160,19 +157,13 @@ class OrderResource extends Resource
                     ->color(fn (string $state): string => match ($state) {
                         'approved' => 'success',
                         'pending' => 'warning',
-                        'processing' => 'info',
-                        'completed' => 'success',
-                        'cancelled' => 'danger',
-                        'failed' => 'danger',
+                        'rejected' => 'danger',
                         default => 'secondary',
                     })
                     ->formatStateUsing(fn (string $state): string => match ($state) {
                         'approved' => 'Disetujui',
                         'pending' => 'Menunggu',
-                        'processing' => 'Diproses',
-                        'completed' => 'Selesai',
-                        'cancelled' => 'Dibatalkan',
-                        'failed' => 'Gagal',
+                        'rejected' => 'Ditolak',
                         default => ucfirst($state),
                     }),
             ])
@@ -191,10 +182,7 @@ class OrderResource extends Resource
                     ->options([
                         'approved' => 'Disetujui',
                         'pending' => 'Menunggu',
-                        'processing' => 'Diproses',
-                        'completed' => 'Selesai',
-                        'cancelled' => 'Dibatalkan',
-                        'failed' => 'Gagal',
+                        'rejected' => 'Ditolak',
                     ]),
             ])
             ->actions([

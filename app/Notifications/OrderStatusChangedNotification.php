@@ -28,13 +28,12 @@ class OrderStatusChangedNotification extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        // Hanya kirim email jika status baru adalah 'delivered'
-        // Notifikasi database tetap dikirim untuk semua perubahan status
-        if ($this->newStatus === 'delivered') {
-            return ['mail', 'database'];
+        // Send email for approved or rejected orders
+        $channels = ['database'];
+        if ($this->newStatus === 'approved' || $this->newStatus === 'rejected') {
+            $channels[] = 'mail';
         }
-        
-        return ['database']; // Hanya kirim ke database untuk status lainnya
+        return $channels;
     }
 
     /**
@@ -94,9 +93,7 @@ class OrderStatusChangedNotification extends Notification implements ShouldQueue
         return match ($status) {
             'pending' => 'Menunggu Pembayaran',
             'approved' => 'Disetujui',
-            'processing' => 'Sedang Diproses',
-            'delivered' => 'Terkirim',
-            'canceled' => 'Dibatalkan',
+            'rejected' => 'Ditolak',
             default => ucfirst($status),
         };
     }
@@ -154,9 +151,7 @@ class OrderStatusChangedNotification extends Notification implements ShouldQueue
         $statusLabel = match ($newStatus) {
             'pending' => 'Menunggu Pembayaran',
             'approved' => 'Disetujui',
-            'processing' => 'Sedang Diproses',
-            'delivered' => 'Terkirim',
-            'canceled' => 'Dibatalkan',
+            'rejected' => 'Ditolak',
             default => ucfirst($newStatus),
         };
         
@@ -209,9 +204,7 @@ class OrderStatusChangedNotification extends Notification implements ShouldQueue
         return match ($status) {
             'pending' => '#ffa000',   // Amber
             'approved' => '#4caf50',  // Green
-            'processing' => '#2196f3', // Blue
-            'delivered' => '#009688', // Teal
-            'canceled' => '#f44336',  // Red
+            'rejected' => '#f44336',  // Red
             default => '#757575',     // Grey
         };
     }

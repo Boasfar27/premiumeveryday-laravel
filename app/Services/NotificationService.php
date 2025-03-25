@@ -202,8 +202,8 @@ class NotificationService
         // Kirim notifikasi ke admin
         \App\Notifications\OrderStatusChangedNotification::notifyAdmin($order, $oldStatus, $newStatus);
         
-        // Kirim informasi akun jika status menjadi 'delivered'
-        if ($newStatus === 'delivered') {
+        // Kirim informasi akun jika status menjadi 'approved'
+        if ($newStatus === 'approved') {
             // Kirim email informasi akun (harus dibuat dulu)
             // Contoh data akun (akan diisi dengan data sebenarnya oleh admin)
             $accountCredentials = [
