@@ -32,6 +32,7 @@ use App\Http\Controllers\User\OrderReviewController;
 use App\Http\Controllers\ReviewController;
 use App\Models\Review;
 use App\Http\Controllers\LicenseController;
+use App\Http\Controllers\GoogleAuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -136,6 +137,15 @@ Route::get('/faq', [FaqController::class, 'index'])->name('faq');
 Route::get('/contact', [ContactController::class, 'index'])->name('contact');
 Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
 
+// Google OAuth Routes (pindahkan ke luar middleware untuk memudahkan akses)
+Route::get('/auth/google', [GoogleAuthController::class, 'redirectToGoogle'])->name('auth.google');
+Route::get('/auth/google/callback', [GoogleAuthController::class, 'handleGoogleCallback']);
+
+// Debug route untuk memastikan server berjalan
+Route::get('/auth-test', function() {
+    return "Auth routes are working!";
+});
+
 // Authentication Routes
 Route::middleware('guest')->group(function () {
     // Login Routes
@@ -145,10 +155,6 @@ Route::middleware('guest')->group(function () {
     // Register Routes
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [AuthController::class, 'register']);
-
-    // Google OAuth Routes
-    Route::get('auth/google', [AuthController::class, 'redirectToGoogle'])->name('auth.google');
-    Route::get('auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
 
     // Password Reset Routes
     Route::get('/forgot-password', function () {

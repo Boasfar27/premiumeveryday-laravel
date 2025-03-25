@@ -175,13 +175,17 @@ class AuthController extends BaseController
 
     public function redirectToGoogle()
     {
-        return Socialite::driver('google')->redirect();
+        return Socialite::driver('google')
+            ->redirectUrl('http://localhost:8888/premium-everyday/auth/google/callback')
+            ->redirect();
     }
 
     public function handleGoogleCallback()
     {
         try {
-            $googleUser = Socialite::driver('google')->user();
+            $googleUser = Socialite::driver('google')
+                ->redirectUrl('http://localhost:8888/premium-everyday/auth/google/callback')
+                ->user();
             
             $user = User::where('email', $googleUser->email)->first();
 
