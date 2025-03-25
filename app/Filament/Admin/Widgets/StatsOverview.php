@@ -38,13 +38,13 @@ class StatsOverview extends BaseWidget
         $currencySymbol = Setting::get('currency_symbol', 'Rp');
         
         // Get this month's revenue
-        $thisMonthRevenue = Order::where('status', 'completed')
+        $thisMonthRevenue = Order::where('payment_status', 'paid')
             ->whereMonth('created_at', Carbon::now()->month)
             ->whereYear('created_at', Carbon::now()->year)
             ->sum('total');
             
         // Get last month's revenue for comparison
-        $lastMonthRevenue = Order::where('status', 'completed')
+        $lastMonthRevenue = Order::where('payment_status', 'paid')
             ->whereMonth('created_at', Carbon::now()->subMonth()->month)
             ->whereYear('created_at', Carbon::now()->subMonth()->year)
             ->sum('total');
@@ -107,7 +107,7 @@ class StatsOverview extends BaseWidget
                 ->color($revenueChange >= 0 ? 'success' : 'danger'),
                 
             Stat::make('Total Pesanan', Order::count())
-                ->description(Order::where('status', 'completed')->count() . ' pesanan selesai')
+                ->description(Order::where('payment_status', 'paid')->count() . ' pesanan selesai')
                 ->descriptionIcon('heroicon-m-shopping-cart')
                 ->chart(Order::selectRaw('COUNT(*) as count, DATE(created_at) as date')
                     ->where('created_at', '>=', now()->subDays(30))
@@ -128,9 +128,9 @@ class StatsOverview extends BaseWidget
                 ->color('warning'),
                 
             Stat::make('Tingkat Konversi', Order::count() > 0 
-                ? round((Order::where('status', 'completed')->count() / Order::count()) * 100, 1) . '%'
+                ? round((Order::where('payment_status', 'paid')->count() / Order::count()) * 100, 1) . '%'
                 : '0%')
-                ->description('Pesanan selesai/total pesanan')
+                ->description('Pesanan lunas/total pesanan')
                 ->descriptionIcon('heroicon-m-presentation-chart-line')
                 ->color('success'),
         ];

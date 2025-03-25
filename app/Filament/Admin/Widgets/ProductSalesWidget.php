@@ -135,7 +135,7 @@ class ProductSalesWidget extends ChartWidget
             })
             ->join('orders', function($join) use ($startDate) {
                 $join->on('order_items.order_id', '=', 'orders.id')
-                    ->where('orders.status', 'completed')
+                    ->where('orders.payment_status', 'paid')
                     ->where('orders.created_at', '>=', $startDate);
             })
             ->groupBy('digital_products.id', 'digital_products.name')
@@ -152,7 +152,7 @@ class ProductSalesWidget extends ChartWidget
             $salesCount = OrderItem::where('orderable_id', $productId)
                 ->where('orderable_type', DigitalProduct::class)
                 ->whereHas('order', function ($query) use ($startDate) {
-                    $query->where('status', 'completed')
+                    $query->where('payment_status', 'paid')
                           ->where('created_at', '>=', $startDate);
                 })
                 ->count();
@@ -171,7 +171,7 @@ class ProductSalesWidget extends ChartWidget
             $revenue = OrderItem::where('orderable_id', $productId)
                 ->where('orderable_type', DigitalProduct::class)
                 ->whereHas('order', function ($query) use ($startDate) {
-                    $query->where('status', 'completed')
+                    $query->where('payment_status', 'paid')
                           ->where('created_at', '>=', $startDate);
                 })
                 ->sum('price') / 1000; // Divide by 1000 to make the chart more readable

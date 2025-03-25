@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 
 class OrdersChart extends ChartWidget
 {
-    protected static ?string $heading = 'Sales Analytics';
+    protected static ?string $heading = 'Analisis Penjualan';
     protected static ?int $sort = 2;
     protected int | string | array $columnSpan = 'full';
     protected static ?string $maxHeight = '300px';
@@ -35,7 +35,7 @@ class OrdersChart extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => 'Orders',
+                    'label' => 'Pesanan',
                     'data' => $data['orders'],
                     'backgroundColor' => 'rgba(59, 130, 246, 0.1)', // Light blue background
                     'borderColor' => 'rgba(59, 130, 246, 0.8)', // Blue border
@@ -48,7 +48,7 @@ class OrdersChart extends ChartWidget
                     'fill' => true,
                 ],
                 [
-                    'label' => 'Revenue (in thousands)',
+                    'label' => 'Pendapatan (dalam ribuan)',
                     'data' => $data['revenue'],
                     'backgroundColor' => 'rgba(16, 185, 129, 0.1)', // Light green background
                     'borderColor' => 'rgba(16, 185, 129, 0.8)', // Green border
@@ -118,8 +118,8 @@ class OrdersChart extends ChartWidget
                                 label += ': ';
                             }
                             if (context.parsed.y !== null) {
-                                if (context.dataset.label === 'Revenue (in thousands)') {
-                                    label += new Intl.NumberFormat('en-US', { 
+                                if (context.dataset.label === 'Pendapatan (dalam ribuan)') {
+                                    label += new Intl.NumberFormat('id-ID', { 
                                         style: 'currency', 
                                         currency: 'IDR',
                                         minimumFractionDigits: 0,

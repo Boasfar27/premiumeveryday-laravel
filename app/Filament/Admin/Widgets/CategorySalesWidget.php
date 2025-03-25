@@ -127,7 +127,7 @@ class CategorySalesWidget extends ChartWidget
             })
             ->join('orders', function($join) use ($startDate) {
                 $join->on('order_items.order_id', '=', 'orders.id')
-                    ->where('orders.status', 'completed')
+                    ->where('orders.payment_status', 'paid')
                     ->where('orders.created_at', '>=', $startDate);
             })
             ->groupBy('categories.id', 'categories.name')
