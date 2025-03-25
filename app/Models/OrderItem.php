@@ -41,7 +41,7 @@ class OrderItem extends Model
         'duration' => 'integer',
     ];
     
-    protected $appends = ['formatted_price', 'formatted_total'];
+    protected $appends = ['formatted_price', 'formatted_total', 'product_name'];
 
     /**
      * Get the order that owns the item.
@@ -134,5 +134,22 @@ class OrderItem extends Model
     {
         $this->total = $this->subtotal - $this->discount + $this->tax;
         return $this;
+    }
+
+    /**
+     * Get the product name for display in admin panel.
+     */
+    public function getProductNameAttribute()
+    {
+        if (!empty($this->name)) {
+            return $this->name;
+        }
+        
+        // Try to get name from the orderable relationship
+        if ($this->orderable) {
+            return $this->orderable->name ?? 'Unknown Product';
+        }
+        
+        return 'Unknown Product';
     }
 }

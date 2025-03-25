@@ -71,7 +71,7 @@ class StatsOverview extends BaseWidget
                     ->where('order_items.orderable_type', '=', DigitalProduct::class);
             })
             ->join('orders', 'order_items.order_id', '=', 'orders.id')
-            ->where('orders.status', 'completed')
+            ->where('orders.payment_status', 'paid')
             ->groupBy('digital_products.id', 'digital_products.name')
             ->orderBy('sales_count', 'desc')
             ->first();
