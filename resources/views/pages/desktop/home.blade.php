@@ -557,21 +557,47 @@
                         @csrf
                         <div class="mb-4">
                             <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Nama</label>
-                            <input type="text" id="name" name="name"
-                                class="w-full rounded-md border-gray-300 shadow-sm focus:border-pink-500 focus:ring-pink-500 transition-colors">
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-user text-gray-400"></i>
+                                </div>
+                                <input type="text" id="name" name="name" placeholder="Nama lengkap anda"
+                                    class="w-full rounded-md border-gray-300 pl-10 shadow-sm focus:border-pink-500 focus:ring-pink-500 transition-colors">
+                            </div>
                         </div>
                         <div class="mb-4">
                             <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                            <input type="email" id="email" name="email"
-                                class="w-full rounded-md border-gray-300 shadow-sm focus:border-pink-500 focus:ring-pink-500 transition-colors">
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-envelope text-gray-400"></i>
+                                </div>
+                                <input type="email" id="email" name="email" placeholder="email@example.com"
+                                    class="w-full rounded-md border-gray-300 pl-10 shadow-sm focus:border-pink-500 focus:ring-pink-500 transition-colors">
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label for="subject" class="block text-sm font-medium text-gray-700 mb-1">Subjek</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-bookmark text-gray-400"></i>
+                                </div>
+                                <input type="text" id="subject" name="subject" placeholder="Subjek pesan anda"
+                                    class="w-full rounded-md border-gray-300 pl-10 shadow-sm focus:border-pink-500 focus:ring-pink-500 transition-colors">
+                            </div>
                         </div>
                         <div class="mb-6">
                             <label for="message" class="block text-sm font-medium text-gray-700 mb-1">Pesan</label>
-                            <textarea id="message" name="message" rows="4"
-                                class="w-full rounded-md border-gray-300 shadow-sm focus:border-pink-500 focus:ring-pink-500 transition-colors"></textarea>
+                            <div class="relative">
+                                <div class="absolute top-3 left-0 pl-3 flex items-start pointer-events-none">
+                                    <i class="fas fa-comment text-gray-400"></i>
+                                </div>
+                                <textarea id="message" name="message" rows="4" placeholder="Tulis pesan anda disini..."
+                                    class="w-full rounded-md border-gray-300 pl-10 shadow-sm focus:border-pink-500 focus:ring-pink-500 transition-colors"></textarea>
+                            </div>
                         </div>
                         <button type="submit"
-                            class="w-full bg-pink-600 hover:bg-pink-700 text-white py-3 px-4 rounded-md font-medium transition-colors shadow-sm hover:shadow">
+                            class="w-full bg-pink-600 hover:bg-pink-700 text-white py-3 px-4 rounded-md font-medium transition-colors shadow-sm hover:shadow flex items-center justify-center">
+                            <i class="fas fa-paper-plane mr-2"></i>
                             Kirim Pesan
                         </button>
                     </form>
