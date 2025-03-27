@@ -358,11 +358,30 @@
             </div>
 
             @if (is_object($testimonials) && count($testimonials) > 0)
-                <div class="testimonial-carousel relative">
+                <div class="testimonial-carousel relative" id="mobileTestimonialCarousel">
+                    <!-- Navigation buttons -->
+                    <button type="button"
+                        class="carousel-nav-prev absolute top-1/2 left-0 -translate-y-1/2 -translate-x-1 bg-white rounded-full p-1.5 shadow-md z-10 focus:outline-none transition-all duration-300 hover:bg-pink-50 group opacity-0">
+                        <svg class="w-4 h-4 text-gray-700 group-hover:text-pink-600" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7">
+                            </path>
+                        </svg>
+                    </button>
+
+                    <button type="button"
+                        class="carousel-nav-next absolute top-1/2 right-0 -translate-y-1/2 translate-x-1 bg-white rounded-full p-1.5 shadow-md z-10 focus:outline-none transition-all duration-300 hover:bg-pink-50 group opacity-0">
+                        <svg class="w-4 h-4 text-gray-700 group-hover:text-pink-600" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
+                            </path>
+                        </svg>
+                    </button>
+
                     <div class="overflow-hidden">
-                        <div class="carousel-inner flex transition-transform duration-500">
+                        <div class="carousel-inner flex transition-transform duration-700 ease-in-out">
                             @foreach (collect($testimonials)->chunk(1) as $chunk)
-                                <div class="carousel-page flex-shrink-0 w-full grid grid-cols-1 gap-6">
+                                <div class="carousel-page flex-shrink-0 w-full grid grid-cols-1 gap-6 px-2">
                                     @foreach ($chunk as $testimonial)
                                         <div
                                             class="bg-white p-5 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1">
@@ -409,7 +428,7 @@
                     <div class="flex justify-center mt-4">
                         @foreach (collect($testimonials)->chunk(1) as $index => $chunk)
                             <button type="button" data-mobile-carousel-target="{{ $index }}"
-                                class="mobile-carousel-indicator mx-1 w-2 h-2 rounded-full bg-gray-300 hover:bg-pink-500 focus:outline-none"></button>
+                                class="mobile-carousel-indicator mx-1.5 w-3 h-3 rounded-full bg-gray-300 hover:bg-pink-500 focus:outline-none transition-all duration-300 {{ $index === 0 ? 'bg-pink-500' : '' }}"></button>
                         @endforeach
                     </div>
                 </div>
@@ -573,21 +592,20 @@
 @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const sections = document.querySelectorAll('section');
-            const navLinks = document.querySelectorAll('nav a');
-
+            // Navigation active state for mobile
             function onScroll() {
                 let current = '';
+                const sections = document.querySelectorAll('section[id]');
 
                 sections.forEach(section => {
                     const sectionTop = section.offsetTop;
                     const sectionHeight = section.clientHeight;
-                    if (pageYOffset >= (sectionTop - 60)) {
+                    if (window.scrollY >= (sectionTop - 300)) {
                         current = section.getAttribute('id');
                     }
                 });
 
-                navLinks.forEach(link => {
+                document.querySelectorAll('.mobile-nav a').forEach(link => {
                     link.classList.remove('text-pink-600');
                     link.classList.add('text-gray-500');
                     if (link.getAttribute('href').includes(current)) {
@@ -600,55 +618,230 @@
             window.addEventListener('scroll', onScroll);
 
             // Mobile Testimonial Carousel
-            const carousel = document.querySelector('.testimonial-carousel .carousel-inner');
-            if (carousel) {
-                const pages = document.querySelectorAll('.carousel-page');
-                const indicators = document.querySelectorAll('.mobile-carousel-indicator');
+            const carouselContainer = document.getElementById('mobileTestimonialCarousel');
+            if (carouselContainer) {
+                const carousel = carouselContainer.querySelector('.carousel-inner');
+                const pages = carouselContainer.querySelectorAll('.carousel-page');
+                const indicators = carouselContainer.querySelectorAll('.mobile-carousel-indicator');
+                const prevButton = carouselContainer.querySelector('.carousel-nav-prev');
+                const nextButton = carouselContainer.querySelector('.carousel-nav-next');
 
                 let currentPage = 0;
                 let pageCount = pages.length;
+                let intervalId = null;
+                let isPaused = false;
+                const autoplaySpeed = 5000; // 5 seconds
+                let isTransitioning = false; // Flag to prevent rapid multiple transitions
 
-                // Initialize
-                updateCarousel();
+                // Clone the first and last slides for infinite effect if we have more than 1 slide
+                if (pageCount > 1) {
+                    const firstPageClone = pages[0].cloneNode(true);
+                    const lastPageClone = pages[pageCount - 1].cloneNode(true);
 
-                // Set first indicator as active
-                if (indicators.length > 0) {
-                    indicators[0].classList.add('bg-pink-500');
+                    // Add data attributes to identify clones
+                    firstPageClone.setAttribute('data-clone', 'true');
+                    lastPageClone.setAttribute('data-clone', 'true');
+
+                    // Append/prepend clones
+                    carousel.appendChild(firstPageClone);
+                    carousel.insertBefore(lastPageClone, carousel.firstChild);
+
+                    // Move to the real first slide (skip the prepended clone)
+                    carousel.style.transform = `translateX(-100%)`;
+                    currentPage = 0; // Reset to first real slide
                 }
 
-                // Set up auto scroll every 3 seconds
-                let intervalId = setInterval(() => {
-                    currentPage = (currentPage + 1) % pageCount;
-                    updateCarousel();
-                }, 3000);
+                // Initialize
+                updateCarousel(false);
+                startAutoplay();
 
-                // Indicator click handling
+                // Show navigation buttons on touch/hover
+                carouselContainer.addEventListener('touchstart', function() {
+                    if (pageCount > 1) {
+                        showNavButtons();
+                        // Don't pause on touch because users expect continued autoplay
+                    }
+                });
+
+                carouselContainer.addEventListener('mouseenter', function() {
+                    if (pageCount > 1) {
+                        showNavButtons();
+                        isPaused = true; // Pause on mouse hover
+                    }
+                });
+
+                carouselContainer.addEventListener('mouseleave', function() {
+                    hideNavButtons();
+                    isPaused = false; // Resume on mouse leave
+                });
+
+                carouselContainer.addEventListener('touchend', function() {
+                    setTimeout(hideNavButtons, 2000); // Hide after 2 seconds
+                });
+
+                // Navigation buttons
+                prevButton.addEventListener('click', function() {
+                    if (!isTransitioning) {
+                        goToPage(currentPage - 1);
+                    }
+                });
+
+                nextButton.addEventListener('click', function() {
+                    if (!isTransitioning) {
+                        goToPage(currentPage + 1);
+                    }
+                });
+
+                // Indicators click handling
                 indicators.forEach((indicator, index) => {
-                    indicator.addEventListener('click', () => {
-                        currentPage = index;
-                        updateCarousel();
-
-                        // Reset the interval
-                        clearInterval(intervalId);
-                        intervalId = setInterval(() => {
-                            currentPage = (currentPage + 1) % pageCount;
-                            updateCarousel();
-                        }, 3000);
+                    indicator.addEventListener('click', function() {
+                        if (!isTransitioning) {
+                            // Adjust for cloned slides - indicators point to real slides
+                            goToPage(index + 1); // +1 because of prepended clone
+                        }
                     });
                 });
 
-                function updateCarousel() {
-                    // Move carousel
+                // Swipe detection for mobile
+                let touchStartX = 0;
+                let touchEndX = 0;
+
+                carouselContainer.addEventListener('touchstart', function(e) {
+                    touchStartX = e.changedTouches[0].screenX;
+                });
+
+                carouselContainer.addEventListener('touchend', function(e) {
+                    touchEndX = e.changedTouches[0].screenX;
+                    handleSwipe();
+                });
+
+                function handleSwipe() {
+                    const threshold = 50; // Minimum distance for swipe
+                    if (!isTransitioning) {
+                        if (touchEndX < touchStartX - threshold) {
+                            // Swipe left - next slide
+                            goToPage(currentPage + 1);
+                        } else if (touchEndX > touchStartX + threshold) {
+                            // Swipe right - previous slide
+                            goToPage(currentPage - 1);
+                        }
+                    }
+                }
+
+                function showNavButtons() {
+                    prevButton.classList.remove('opacity-0');
+                    nextButton.classList.remove('opacity-0');
+                    prevButton.classList.add('opacity-100');
+                    nextButton.classList.add('opacity-100');
+                }
+
+                function hideNavButtons() {
+                    prevButton.classList.remove('opacity-100');
+                    nextButton.classList.remove('opacity-100');
+                    prevButton.classList.add('opacity-0');
+                    nextButton.classList.add('opacity-0');
+                }
+
+                function startAutoplay() {
+                    // Only start autoplay if we have more than 1 page
+                    if (pageCount > 1) {
+                        intervalId = setInterval(function() {
+                            if (!isPaused && !isTransitioning) {
+                                goToPage(currentPage + 1);
+                            }
+                        }, autoplaySpeed);
+                    }
+                }
+
+                function goToPage(pageIndex) {
+                    if (isTransitioning) return; // Prevent multiple rapid transitions
+
+                    isTransitioning = true;
+                    currentPage = pageIndex;
+
+                    // Move carousel with smooth animation
+                    updateCarousel(true);
+
+                    // Handle the infinite loop behavior
+                    if (pageCount > 1) {
+                        setTimeout(() => {
+                            if (currentPage === 0) {
+                                // If we're at the first clone (before real first), jump to real last
+                                carousel.style.transition = 'none';
+                                currentPage = pageCount;
+                                updateCarousel(false);
+                            } else if (currentPage === pageCount + 1) {
+                                // If we're at the last clone (after real last), jump to real first
+                                carousel.style.transition = 'none';
+                                currentPage = 1;
+                                updateCarousel(false);
+                            }
+
+                            setTimeout(() => {
+                                carousel.style.transition = 'transform 700ms ease-in-out';
+                                isTransitioning = false;
+                            }, 50);
+                        }, 700); // Match the CSS transition duration
+                    } else {
+                        // For a single slide, just reset transition state
+                        setTimeout(() => {
+                            isTransitioning = false;
+                        }, 700);
+                    }
+
+                    // Update indicators - adjust for cloned slides
+                    updateIndicators();
+
+                    // Reset the timer when manually changing slides
+                    if (intervalId) {
+                        clearInterval(intervalId);
+                        startAutoplay();
+                    }
+                }
+
+                function updateCarousel(withTransition) {
+                    // Enable/disable transition
+                    if (!withTransition) {
+                        carousel.style.transition = 'none';
+                    } else {
+                        carousel.style.transition = 'transform 700ms ease-in-out';
+                    }
+
+                    // Account for cloned slides in transform calculation
+                    // First cloned slide is at index 0, real slides start at index 1
                     carousel.style.transform = `translateX(-${currentPage * 100}%)`;
 
-                    // Update indicators
+                    if (!withTransition) {
+                        // Force a reflow to make the non-transition take effect immediately
+                        carousel.offsetHeight;
+                    }
+                }
+
+                function updateIndicators() {
+                    // Map currentPage to indicator index (accounting for clones)
+                    let indicatorIndex;
+
+                    if (currentPage === 0) {
+                        // We're at the cloned last slide (appearing before the first)
+                        indicatorIndex = pageCount - 1;
+                    } else if (currentPage === pageCount + 1) {
+                        // We're at the cloned first slide (appearing after the last)
+                        indicatorIndex = 0;
+                    } else {
+                        // We're at a real slide
+                        indicatorIndex = currentPage - 1;
+                    }
+
+                    // Update indicator classes
                     indicators.forEach((indicator, index) => {
-                        if (index === currentPage) {
+                        if (index === indicatorIndex) {
                             indicator.classList.add('bg-pink-500');
                             indicator.classList.remove('bg-gray-300');
+                            indicator.classList.add('scale-110'); // Slightly enlarge active indicator
                         } else {
                             indicator.classList.remove('bg-pink-500');
                             indicator.classList.add('bg-gray-300');
+                            indicator.classList.remove('scale-110');
                         }
                     });
                 }
