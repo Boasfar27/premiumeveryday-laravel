@@ -49,7 +49,7 @@ Route::get('/', function () {
         ->where('is_active', true)
         ->where('is_featured', true)
         ->orderBy('sort_order')
-        ->take(3)
+        ->take(4)
         ->get();
     
     // Get latest products
@@ -96,7 +96,7 @@ Route::get('/', function () {
     $testimonials = \App\Models\Review::where('is_active', true)
         ->where('rating', '>=', 4)
         ->latest()
-        ->take(12)
+        ->take(9)
         ->get();
     
     return view(

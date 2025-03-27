@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\DigitalProduct;
 use App\Models\Coupon;
-use App\Models\Product;
 use App\Models\User;
 use App\Services\NotificationService;
 use Illuminate\Http\Request;
@@ -64,7 +63,7 @@ class CartController extends Controller
         $tax = 0;
         $total = $subtotal - $discount + $tax;
         
-        $recentProducts = Product::latest()->take(4)->get();
+        $recentProducts = DigitalProduct::latest()->take(4)->get();
 
         return view('pages.' . (request()->is('mobile/*') ? 'mobile' : 'desktop') . '.cart.index', compact(
             'products',
