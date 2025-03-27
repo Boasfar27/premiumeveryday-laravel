@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
@@ -62,8 +63,10 @@ class GoogleAuthController extends Controller
             ]);
             
             $user = User::where('email', $googleUser->email)->first();
+            $isNewUser = false;
 
             if (!$user) {
+                $isNewUser = true;
                 Log::info('Creating new user from Google login', ['email' => $googleUser->email]);
                 $user = User::create([
                     'name' => $googleUser->name,
@@ -74,6 +77,17 @@ class GoogleAuthController extends Controller
                     'is_active' => true,
                     'email_verified_at' => now(),
                 ]);
+                
+                // Kirim email selamat datang untuk pengguna baru
+                try {
+                    Mail::send('emails.google-welcome', ['user' => $user], function($message) use ($user) {
+                        $message->to($user->email)
+                                ->subject('Selamat Datang di Premium Everyday!');
+                    });
+                    Log::info('Welcome email sent to new Google user', ['email' => $user->email]);
+                } catch (\Exception $e) {
+                    Log::error('Failed to send welcome email to Google user: ' . $e->getMessage());
+                }
             } else {
                 Log::info('Updating existing user from Google login', ['email' => $googleUser->email, 'id' => $user->id]);
                 $user->update([
@@ -89,26 +103,52 @@ class GoogleAuthController extends Controller
                 return redirect('/admin/login');
             }
 
-            return redirect()->route('home')->with('swal', [
-                'icon' => 'success',
-                'title' => 'Selamat Datang! 🛍️',
-                'html' => '
-                    <div class="text-center">
-                        <div class="mb-4">
-                            <svg class="mx-auto h-12 w-12 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                            </svg>
+            // Ubah pesan sweet alert jika pengguna baru
+            if ($isNewUser) {
+                return redirect()->route('home')->with('swal', [
+                    'icon' => 'success',
+                    'title' => 'Pendaftaran Berhasil! 🎉',
+                    'html' => '
+                        <div class="text-center">
+                            <div class="mb-4">
+                                <svg class="mx-auto h-12 w-12 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <p class="text-lg">Hai <strong>' . $user->name . '</strong>!</p>
+                            <p class="mb-3">Akun Anda berhasil dibuat dengan Google</p>
+                            <p class="text-sm text-gray-600 mb-3">Email konfirmasi telah dikirim ke ' . $user->email . '</p>
+                            <p>Silahkan belanja produk digital di Premium Everyday</p>
                         </div>
-                        <p class="text-lg">Hai <strong>' . $user->name . '</strong>!</p>
-                        <p>Silahkan belanja produk digital di Premium Everyday</p>
-                    </div>
-                ',
-                'showConfirmButton' => true,
-                'confirmButtonText' => 'Mulai Belanja',
-                'confirmButtonColor' => '#EC4899',
-                'timer' => 5000,
-                'timerProgressBar' => true,
-            ]);
+                    ',
+                    'showConfirmButton' => true,
+                    'confirmButtonText' => 'Mulai Belanja',
+                    'confirmButtonColor' => '#EC4899',
+                    'timer' => 6000,
+                    'timerProgressBar' => true,
+                ]);
+            } else {
+                return redirect()->route('home')->with('swal', [
+                    'icon' => 'success',
+                    'title' => 'Selamat Datang! 🛍️',
+                    'html' => '
+                        <div class="text-center">
+                            <div class="mb-4">
+                                <svg class="mx-auto h-12 w-12 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                </svg>
+                            </div>
+                            <p class="text-lg">Hai <strong>' . $user->name . '</strong>!</p>
+                            <p>Silahkan belanja produk digital di Premium Everyday</p>
+                        </div>
+                    ',
+                    'showConfirmButton' => true,
+                    'confirmButtonText' => 'Mulai Belanja',
+                    'confirmButtonColor' => '#EC4899',
+                    'timer' => 5000,
+                    'timerProgressBar' => true,
+                ]);
+            }
 
         } catch (\Exception $e) {
             Log::error('Google callback error: ' . $e->getMessage() . "\n" . $e->getTraceAsString());
