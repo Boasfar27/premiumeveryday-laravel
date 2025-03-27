@@ -187,13 +187,13 @@
                 <div class="p-4 space-y-3">
                     <h3 class="text-base font-semibold text-gray-900 mb-3">Order Summary</h3>
 
-                    <div class="flex justify-between text-sm">
+                    <div class="flex justify-between mb-2">
                         <span class="text-gray-600">Subtotal</span>
                         <span class="font-medium">Rp {{ number_format($subtotal, 0, ',', '.') }}</span>
                     </div>
 
                     @if (session('coupon'))
-                        <div class="flex justify-between text-sm">
+                        <div class="flex justify-between mb-2">
                             <span class="text-gray-600 flex items-center">
                                 Discount ({{ session('coupon')['code'] }})
                                 <form action="{{ route('cart.remove-coupon') }}" method="POST" class="inline">
@@ -213,17 +213,9 @@
                         </div>
                     @endif
 
-                    <div class="flex justify-between text-sm">
-                        <span class="text-gray-600">Tax ({{ App\Models\Setting::get('tax_rate', 5) }}%)</span>
-                        <span class="font-medium">Rp {{ number_format($tax, 0, ',', '.') }}</span>
-                    </div>
-
-                    <div class="pt-3 border-t border-gray-200">
-                        <div class="flex justify-between items-center">
-                            <span class="text-base font-semibold text-gray-900">Total</span>
-                            <span class="text-xl font-bold text-primary">Rp
-                                {{ number_format($total, 0, ',', '.') }}</span>
-                        </div>
+                    <div class="flex justify-between pt-2 border-t border-gray-200 mt-2">
+                        <span class="text-gray-800 font-bold">Total</span>
+                        <span class="font-bold">Rp {{ number_format($total, 0, ',', '.') }}</span>
                     </div>
                 </div>
             </div>

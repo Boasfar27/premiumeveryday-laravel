@@ -204,32 +204,24 @@
                             <h2 class="text-lg font-semibold text-gray-900 mb-4">Ringkasan Pesanan</h2>
 
                             <!-- Price Summary -->
-                            <div class="space-y-3 border-b border-gray-200 pb-6 mb-6">
+                            <div class="py-6 px-6 bg-gray-50 rounded-lg space-y-4">
                                 <div class="flex justify-between">
                                     <span class="text-gray-600">Subtotal</span>
                                     <span class="font-medium">Rp {{ number_format($subtotal, 0, ',', '.') }}</span>
                                 </div>
 
-                                @if (session()->has('coupon'))
+                                @if ($discount > 0)
                                     <div class="flex justify-between">
-                                        <span class="text-gray-600">Diskon ({{ session('coupon')['code'] }})</span>
-                                        <span class="font-medium text-green-600">- Rp
-                                            {{ number_format(session('coupon')['discount'], 0, ',', '.') }}</span>
+                                        <span class="text-gray-600">Diskon</span>
+                                        <span class="font-medium text-red-500">- Rp
+                                            {{ number_format($discount, 0, ',', '.') }}</span>
                                     </div>
                                 @endif
 
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600">Pajak
-                                        ({{ App\Models\Setting::get('tax_rate', 5) }}%)</span>
-                                    <span class="font-medium">Rp {{ number_format($tax, 0, ',', '.') }}</span>
+                                <div class="flex justify-between pt-4 border-t border-gray-200 mt-4">
+                                    <span class="text-gray-800 font-bold">Total</span>
+                                    <span class="font-bold text-xl">Rp {{ number_format($total, 0, ',', '.') }}</span>
                                 </div>
-                            </div>
-
-                            <!-- Total -->
-                            <div class="flex justify-between">
-                                <span class="text-lg font-medium text-gray-900">Total</span>
-                                <span class="text-xl font-bold text-pink-600">Rp
-                                    {{ number_format($total, 0, ',', '.') }}</span>
                             </div>
                         </div>
                     </div>

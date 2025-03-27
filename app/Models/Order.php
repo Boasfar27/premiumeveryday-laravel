@@ -169,8 +169,7 @@ class Order extends Model
     public function calculateTotals()
     {
         $this->subtotal = $this->items->sum('subtotal');
-        $this->tax = $this->items->sum('tax');
-        $this->total = $this->subtotal + $this->tax + $this->shipping - $this->discount_amount;
+        $this->total = $this->subtotal + $this->shipping - $this->discount_amount;
         
         return $this;
     }

@@ -20,7 +20,6 @@ class OrderItem extends Model
         'unit_price',
         'subtotal',
         'discount',
-        'tax',
         'total',
         'options',
         'price',
@@ -34,7 +33,6 @@ class OrderItem extends Model
         'unit_price' => 'decimal:2',
         'subtotal' => 'decimal:2',
         'discount' => 'decimal:2',
-        'tax' => 'decimal:2',
         'total' => 'decimal:2',
         'options' => 'array',
         'price' => 'decimal:2',
@@ -132,7 +130,7 @@ class OrderItem extends Model
      */
     public function calculateTotal()
     {
-        $this->total = $this->subtotal - $this->discount + $this->tax;
+        $this->total = $this->subtotal - $this->discount;
         return $this;
     }
 

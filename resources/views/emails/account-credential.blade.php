@@ -303,11 +303,6 @@
                             </tr>
                         @endif
                         <tr>
-                            <td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Pajak (PPN)</strong></td>
-                            <td style="padding: 8px 0; border-bottom: 1px solid #eee; text-align: right;">Rp
-                                {{ number_format($order->tax, 0, ',', '.') }}</td>
-                        </tr>
-                        <tr>
                             <td style="padding: 10px 0; font-weight: bold; font-size: 16px;"><strong>Total</strong></td>
                             <td
                                 style="padding: 10px 0; text-align: right; font-weight: bold; font-size: 16px; color: #673ab7;">

@@ -61,8 +61,7 @@ class CartController extends Controller
             }
         }
 
-        $taxRate = Setting::get('tax_rate', 5) / 100;
-        $tax = ($subtotal - $discount) * $taxRate;
+        $tax = 0;
         $total = $subtotal - $discount + $tax;
         
         $recentProducts = Product::latest()->take(4)->get();
@@ -277,8 +276,7 @@ class CartController extends Controller
             }
             
             $discount = Session::get('discount', 0);
-            $taxRate = Setting::get('tax_rate', 5) / 100;
-            $tax = ($subtotal - $discount) * $taxRate;
+            $tax = 0;
             $total = $subtotal - $discount + $tax;
             
             if ($request->ajax() || $request->expectsJson()) {
@@ -340,8 +338,7 @@ class CartController extends Controller
                 }
                 
                 $discount = Session::get('discount', 0);
-                $taxRate = Setting::get('tax_rate', 5) / 100;
-                $tax = ($subtotal - $discount) * $taxRate;
+                $tax = 0;
                 $total = $subtotal - $discount + $tax;
                 
                 if ($request->ajax() || $request->expectsJson()) {
@@ -511,9 +508,7 @@ class CartController extends Controller
             $couponCode = $couponData['code'] ?? null;
         }
         
-        // Calculate tax and total
-        $taxRate = Setting::get('tax_rate', 5) / 100;
-        $tax = ($subtotal - $discount) * $taxRate;
+        $tax = 0;
         $total = $subtotal - $discount + $tax;
         
         // Generate unique order number

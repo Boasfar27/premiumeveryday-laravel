@@ -49,9 +49,6 @@ class ItemsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('price')
                     ->label('Harga')
                     ->money('IDR'),
-                Tables\Columns\TextColumn::make('tax')
-                    ->label('Pajak')
-                    ->money('IDR'),
                 Tables\Columns\TextColumn::make('total')
                     ->label('Total')
                     ->money('IDR'),

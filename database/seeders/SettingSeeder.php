@@ -31,14 +31,6 @@ class SettingSeeder extends Seeder
         ]);
         
         // Payment Settings
-        Setting::set('tax_rate', '5', [
-            'group' => 'payment',
-            'type' => 'number',
-            'label' => 'Tax Rate (%)',
-            'description' => 'Tax rate in percentage (e.g. 5 for 5%)',
-            'is_public' => true,
-        ]);
-        
         Setting::set('currency', 'IDR', [
             'group' => 'payment',
             'type' => 'text',

@@ -205,44 +205,23 @@
 
                                 <!-- Price Summary -->
                                 <div class="space-y-4">
-                                    <div class="flex justify-between">
+                                    <div class="flex justify-between text-sm mb-3">
                                         <span class="text-gray-600">Subtotal</span>
                                         <span class="font-medium">Rp {{ number_format($subtotal, 0, ',', '.') }}</span>
                                     </div>
 
                                     @if (session('coupon'))
-                                        <div class="flex justify-between">
-                                            <span class="text-gray-600 flex items-center">
-                                                Discount ({{ session('coupon')['code'] }})
-                                                <form action="{{ route('cart.remove-coupon') }}" method="POST"
-                                                    class="inline">
-                                                    @csrf
-                                                    <button type="submit"
-                                                        class="ml-2 text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-50 transition-colors"
-                                                        title="Remove coupon">
-                                                        <svg class="w-5 h-5" fill="none" stroke="currentColor"
-                                                            viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                                        </svg>
-                                                    </button>
-                                                </form>
-                                            </span>
-                                            <span class="font-medium text-green-600">- Rp
+                                        <div class="flex justify-between text-sm mb-3">
+                                            <span class="text-gray-600">Diskon</span>
+                                            <span class="font-medium text-red-500">- Rp
                                                 {{ number_format(session('coupon')['discount'], 0, ',', '.') }}</span>
                                         </div>
                                     @endif
 
-                                    <div class="flex justify-between">
-                                        <span class="text-gray-600">Tax
-                                            ({{ App\Models\Setting::get('tax_rate', 5) }}%)</span>
-                                        <span class="font-medium">Rp {{ number_format($tax, 0, ',', '.') }}</span>
-                                    </div>
-
-                                    <div class="pt-4 border-t border-gray-200">
+                                    <div class="pt-3 border-t border-gray-200">
                                         <div class="flex justify-between items-center">
                                             <span class="text-base font-semibold text-gray-900">Total</span>
-                                            <span class="text-xl font-bold text-pink-600">Rp
+                                            <span class="text-xl font-bold text-primary">Rp
                                                 {{ number_format($total, 0, ',', '.') }}</span>
                                         </div>
                                     </div>

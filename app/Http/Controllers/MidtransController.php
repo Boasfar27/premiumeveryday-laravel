@@ -54,7 +54,7 @@ class MidtransController extends Controller
                 'order_number' => $order->order_number,
                 'total' => $order->total,
                 'subtotal' => $order->subtotal,
-                'tax' => $order->tax,
+                'tax' => 0,
                 'discount' => $order->discount_amount
             ]);
             
@@ -89,16 +89,6 @@ class MidtransController extends Controller
                     $item['price'] = 1000; // Default price if missing
                 }
                 $total += $item['price'] * $item['quantity'];
-            }
-            
-            // Tambahkan komponen pajak sebagai item tersendiri untuk transparansi
-            if ($order->tax > 0) {
-                $items[] = [
-                    'id' => 'tax-' . $order->id,
-                    'price' => (int) $order->tax,
-                    'quantity' => 1,
-                    'name' => 'Pajak (PPN)',
-                ];
             }
             
             // Tambahkan diskon jika ada (dengan nilai negatif)
