@@ -53,19 +53,19 @@
                 </div>
                 <div class="grid grid-cols-2 sm:grid-cols-2 gap-6">
                     <div class="transform hover:scale-105 transition duration-300">
-                        <img src="{{ asset('storage/products/thumbnails/netflix.webp') }}" alt="Netflix"
+                        <img src="{{ asset('/images/products/thumbnails/netflix.webp') }}" alt="Netflix"
                             class="w-full h-32 object-contain bg-white rounded-xl p-4 shadow-lg">
                     </div>
                     <div class="transform hover:scale-105 transition duration-300">
-                        <img src="{{ asset('storage/products/thumbnails/spotify.webp') }}" alt="Spotify"
+                        <img src="{{ asset('/images/products/thumbnails/spotify.webp') }}" alt="Spotify"
                             class="w-full h-32 object-contain bg-white rounded-xl p-4 shadow-lg">
                     </div>
                     <div class="transform hover:scale-105 transition duration-300">
-                        <img src="{{ asset('storage/products/thumbnails/youtube.webp') }}" alt="YouTube"
+                        <img src="{{ asset('/images/products/thumbnails/youtube.webp') }}" alt="YouTube"
                             class="w-full h-32 object-contain bg-white rounded-xl p-4 shadow-lg">
                     </div>
                     <div class="transform hover:scale-105 transition duration-300">
-                        <img src="{{ asset('storage/products/thumbnails/appletv.webp') }}" alt="Apple TV+"
+                        <img src="{{ asset('/images/products/thumbnails/appletv.webp') }}" alt="Apple TV+"
                             class="w-full h-32 object-contain bg-white rounded-xl p-4 shadow-lg">
                     </div>
                 </div>
