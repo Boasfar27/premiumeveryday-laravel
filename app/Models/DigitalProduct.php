@@ -74,14 +74,6 @@ class DigitalProduct extends Model
     }
 
     /**
-     * Get the licenses for the digital product.
-     */
-    public function licenses(): HasMany
-    {
-        return $this->hasMany(DigitalProductLicense::class);
-    }
-
-    /**
      * Get the order items for the digital product.
      */
     public function orderItems(): MorphMany

@@ -90,12 +90,6 @@ class AdminPanelProvider extends PanelProvider
                     ->icon('heroicon-o-shopping-cart')
                     ->collapsible(),
                 
-                // Lisensi dan Aktivasi
-                NavigationGroup::make()
-                    ->label('Lisensi & Aktivasi')
-                    ->icon('heroicon-o-key')
-                    ->collapsible(),
-                
                 // Langganan
                 NavigationGroup::make()
                     ->label('Langganan')

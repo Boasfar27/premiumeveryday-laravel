@@ -48,20 +48,23 @@ class ExportReports extends Page
     {
         return $form
             ->schema([
-                Section::make('Pengaturan Laporan')
-                    ->description('Konfigurasi laporan yang ingin Anda ekspor')
+                Section::make('Filter Laporan')
+                    ->columns(2)
                     ->schema([
-                        Radio::make('report_type')
+                        Select::make('report_type')
                             ->label('Jenis Laporan')
                             ->options([
                                 'sales' => 'Laporan Penjualan',
                                 'products' => 'Laporan Produk',
                                 'category' => 'Laporan Kategori',
-                                'licenses' => 'Laporan Lisensi',
                             ])
-                            ->default('sales')
-                            ->required(),
-                            
+                            ->required()
+                            ->reactive()
+                            ->afterStateUpdated(function ($state, $set) {
+                                // Reset additional options when changing report type
+                                $set('include_product_details', false);
+                                $set('include_customer_data', false);
+                            }),
                         Radio::make('date_range')
                             ->label('Rentang Waktu')
                             ->options([
@@ -98,7 +101,7 @@ class ExportReports extends Page
                         Toggle::make('include_customer_data')
                             ->label('Sertakan Data Pelanggan')
                             ->default(false)
-                            ->visible(fn (callable $get) => in_array($get('report_type'), ['sales', 'licenses'])),
+                            ->visible(fn (callable $get) => in_array($get('report_type'), ['sales'])),
                             
                         Select::make('file_format')
                             ->label('Format File')
@@ -337,32 +340,6 @@ class ExportReports extends Page
                     ];
                 }
                 break;
-                
-            case 'licenses':
-                // Get license data
-                $licenses = \App\Models\DigitalProductLicense::whereBetween('created_at', [$startDate, $endDate])
-                    ->with(['product', 'user', 'order'])
-                    ->get();
-                    
-                // Prepare license report data
-                foreach ($licenses as $license) {
-                    $licenseData = [
-                        'ID Lisensi' => $license->id,
-                        'Kode Lisensi' => $license->license_code,
-                        'Produk' => $license->product ? $license->product->name : 'Produk Dihapus',
-                        'Status' => $license->status,
-                        'Tanggal Pembuatan' => $license->created_at->format('Y-m-d'),
-                        'Tanggal Aktivasi' => $license->activated_at ? Carbon::parse($license->activated_at)->format('Y-m-d') : 'Belum Diaktivasi',
-                    ];
-                    
-                    if ($includeCustomerData) {
-                        $licenseData['Nama Pelanggan'] = $license->user ? $license->user->name : 'Pengguna Dihapus';
-                        $licenseData['Email Pelanggan'] = $license->user ? $license->user->email : '-';
-                    }
-                    
-                    $data[] = $licenseData;
-                }
-                break;
         }
         
         return $data;
@@ -456,7 +433,6 @@ class ExportReports extends Page
             'sales' => 'penjualan',
             'products' => 'produk',
             'category' => 'kategori',
-            'licenses' => 'lisensi',
         ];
         
         return sprintf(
@@ -474,7 +450,6 @@ class ExportReports extends Page
             'sales' => 'Laporan Penjualan',
             'products' => 'Laporan Produk',
             'category' => 'Laporan Kategori',
-            'licenses' => 'Laporan Lisensi',
         ];
         
         return $titleMap[$reportType] . ' (' . $startDate->format('d M Y') . ' - ' . $endDate->format('d M Y') . ')';

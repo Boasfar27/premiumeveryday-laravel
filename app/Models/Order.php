@@ -50,6 +50,14 @@ class Order extends Model
     protected $appends = ['status_color'];
 
     /**
+     * Get the order items for the order.
+     */
+    public function items(): HasMany
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+
+    /**
      * Get the user that owns the order.
      */
     public function user(): BelongsTo
@@ -58,27 +66,11 @@ class Order extends Model
     }
 
     /**
-     * Get the items for the order.
-     */
-    public function items(): HasMany
-    {
-        return $this->hasMany(OrderItem::class);
-    }
-
-    /**
      * Get the user subscriptions for the order.
      */
     public function userSubscriptions(): HasMany
     {
         return $this->hasMany(UserSubscription::class);
-    }
-
-    /**
-     * Get the licenses for the order.
-     */
-    public function licenses(): HasMany
-    {
-        return $this->hasMany(DigitalProductLicense::class);
     }
 
     /**

@@ -10,6 +10,7 @@ use Laravel\Sanctum\HasApiTokens;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable implements MustVerifyEmail, FilamentUser
 {
@@ -58,15 +59,23 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser
     ];
 
     /**
-     * Get user's orders
+     * Get the reviews for the user.
      */
-    public function orders()
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    /**
+     * Get the orders for the user.
+     */
+    public function orders(): HasMany
     {
         return $this->hasMany(Order::class);
     }
 
     /**
-     * Get user's subscriptions
+     * Get the subscriptions that belong to the user.
      */
     public function subscriptions()
     {
@@ -79,30 +88,6 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser
     public function activeSubscriptions()
     {
         return $this->subscriptions()->where('status', 'active');
-    }
-
-    /**
-     * Get user's licenses
-     */
-    public function licenses()
-    {
-        return $this->hasMany(DigitalProductLicense::class);
-    }
-
-    /**
-     * Get user's active licenses
-     */
-    public function activeLicenses()
-    {
-        return $this->licenses()->where('status', 'used');
-    }
-
-    /**
-     * Get the reviews that belong to the user.
-     */
-    public function reviews()
-    {
-        return $this->hasMany(Review::class);
     }
 
     /**
@@ -126,7 +111,7 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser
      */
     public function canAccessPanel(Panel $panel): bool
     {
-        return $this->isAdmin();
+        return $this->role === 1;
     }
 
     /**

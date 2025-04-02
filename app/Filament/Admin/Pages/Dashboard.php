@@ -6,9 +6,7 @@ use Filament\Pages\Dashboard as BasePage;
 use App\Filament\Admin\Widgets\StatsOverview;
 use App\Filament\Admin\Widgets\OrdersChart;
 use App\Filament\Admin\Widgets\LatestOrders;
-use App\Filament\Admin\Widgets\LicenseActivationWidget;
 use App\Filament\Admin\Widgets\ProductSalesWidget;
-use App\Filament\Admin\Widgets\LatestLicenseActivations;
 use App\Filament\Admin\Widgets\CategorySalesWidget;
 
 class Dashboard extends BasePage
@@ -18,7 +16,7 @@ class Dashboard extends BasePage
     
     protected ?string $heading = 'Dashboard Analytics';
     
-    protected ?string $subheading = 'Lihat data penting tentang penjualan, lisensi, dan produk Anda';
+    protected ?string $subheading = 'Lihat data penting tentang penjualan dan produk Anda';
     
     /**
      * Override the default widgets to prevent duplication and define custom layout
@@ -35,9 +33,6 @@ class Dashboard extends BasePage
             // Charts for revenue and orders
             OrdersChart::class,
             
-            // License activation stats
-            LicenseActivationWidget::class,
-            
             // Product sales comparison
             ProductSalesWidget::class,
             
@@ -46,7 +41,6 @@ class Dashboard extends BasePage
             
             // Tables for latest data
             LatestOrders::class,
-            LatestLicenseActivations::class,
         ];
     }
 } 
