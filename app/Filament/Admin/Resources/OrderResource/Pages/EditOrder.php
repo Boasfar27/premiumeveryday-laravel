@@ -23,33 +23,6 @@ class EditOrder extends EditRecord
             Actions\DeleteAction::make(),
             Actions\ForceDeleteAction::make(),
             Actions\RestoreAction::make(),
-            Actions\Action::make('update_status')
-                ->label('Update Status')
-                ->icon('heroicon-o-arrow-path')
-                ->color('success')
-                ->form([
-                    Select::make('status')
-                        ->options([
-                            'rejected' => 'Rejected',
-                            'approved' => 'Approved',
-                        ])
-                        ->required(),
-                ])
-                ->action(function (array $data, OrderResource\RelationManagers\ItemsRelationManager $itemsRelationManager) {
-                    $notificationService = app(\App\Services\NotificationService::class);
-                    $notificationService->updateOrderStatus($this->record, $data['status']);
-                    
-                    Notification::make()
-                        ->title('Order status updated')
-                        ->success()
-                        ->send();
-                        
-                    // Jika status delivered, tambahkan form untuk informasi akun
-                    if ($data['status'] === 'approved') {
-                        $this->openDeliveryInformationForm();
-                    }
-                }),
-                
             Actions\Action::make('send_account')
                 ->label('Kirim Info Akun')
                 ->icon('heroicon-o-envelope')
@@ -138,6 +111,11 @@ class EditOrder extends EditRecord
                 $oldStatus, 
                 $newStatus
             );
+            
+            // Jika status baru adalah approved, buka form informasi akun
+            if ($newStatus === 'approved') {
+                $this->openDeliveryInformationForm();
+            }
         }
     }
 }
